@@ -3,7 +3,7 @@
 ## Top-Level Areas
 - `src/app`: routing, layouts, route handlers, and route-local composition
 - `src/modules`: feature and cross-cutting module entry points
-- `src/shared`: code that is safe to reuse across modules
+- `src/shared`: code that is safe to reuse across modules, including DB foundation
 
 ## Module Areas
 - `auth`
