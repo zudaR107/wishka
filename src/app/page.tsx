@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { getTranslations } from "@/modules/i18n";
+import { LinkCard } from "@/shared/ui/link-card";
 import { PageShell } from "@/shared/ui/page-shell";
 
 const common = getTranslations("common");
@@ -20,17 +20,21 @@ export default function HomePage() {
       title={messages.home.title}
       description={messages.home.description}
     >
-      <div className="space-y-4">
-        <p className="text-sm leading-6 text-slate-600">{messages.home.routesHint}</p>
+      <div className="space-y-5">
+        <p
+          className="max-w-2xl"
+          style={{
+            color: "var(--color-text-base)",
+            fontSize: "var(--font-size-label)",
+            lineHeight: "var(--line-height-body)",
+          }}
+        >
+          {messages.home.routesHint}
+        </p>
         <ul className="grid gap-3 sm:grid-cols-2">
           {routes.map((route) => (
             <li key={route.href}>
-              <Link
-                href={route.href}
-                className="block rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-white"
-              >
-                {route.label}
-              </Link>
+              <LinkCard href={route.href} label={route.label} />
             </li>
           ))}
         </ul>
