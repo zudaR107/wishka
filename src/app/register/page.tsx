@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { MIN_PASSWORD_LENGTH, registerUser } from "@/modules/auth";
+import { MIN_PASSWORD_LENGTH } from "@/modules/auth/server/register-input";
 import { getTranslations } from "@/modules/i18n";
 import { PageShell } from "@/shared/ui/page-shell";
 
@@ -69,6 +69,8 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
 
 async function registerAction(formData: FormData) {
   "use server";
+
+  const { registerUser } = await import("@/modules/auth/server/register");
 
   const result = await registerUser({
     email: getFormValue(formData, "email"),
