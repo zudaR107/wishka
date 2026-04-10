@@ -20,6 +20,12 @@ Create a wishlist, share it by link, and let another person reserve an item.
 - Docker Compose
 - Caddy
 
+## Project Rules
+- `v1.0.0` stays minimal: email/password auth, one wishlist per user in UI, item CRUD, public share link, reservation flow, Russian UI, and light theme.
+- Releases follow SemVer.
+- Commits follow Conventional Commits.
+- `main` is protected and updated only through PRs.
+
 ## Project Docs
 - Product and delivery plan: `master-plan.md`
 - Agent guidance: `AGENTS.md`
