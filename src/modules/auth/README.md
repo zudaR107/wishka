@@ -4,6 +4,8 @@
 - `db/schema.ts`: auth-owned database tables for `users` and `sessions`
 - `server/password.ts`: reusable password hashing and verification helpers
 - `server/email.ts`: shared email normalization for auth entry points
+- `server/register.ts`: minimal server-side registration helper built on auth
+  schema and helpers
 
 ## Scope
 - Keep auth helpers inside the `auth` module until there is a proven reuse case

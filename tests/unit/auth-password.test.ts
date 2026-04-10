@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
-import {
-  hashPassword,
-  normalizeEmail,
-  verifyPassword,
-} from "../../src/modules/auth/server";
+import { hashPassword, verifyPassword } from "../../src/modules/auth/server/password";
+import { normalizeEmail } from "../../src/modules/auth/server/email";
 
 describe("auth password helpers", () => {
   it("hashes and verifies a password", async () => {

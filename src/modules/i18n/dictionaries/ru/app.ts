@@ -17,7 +17,18 @@ export const app = {
   },
   register: {
     title: "Регистрация",
-    description: "Сценарий регистрации будет добавлен при начале auth milestone.",
+    description: "Создайте аккаунт по email и паролю, чтобы позже управлять своим вишлистом.",
+    emailLabel: "Email",
+    passwordLabel: "Пароль",
+    submitLabel: "Создать аккаунт",
+    minPasswordHint: "Минимум 8 символов.",
+    successMessage: "Аккаунт создан. Теперь можно перейти к будущему сценарию входа.",
+    errors: {
+      invalidEmail: "Введите корректный email.",
+      passwordTooShort: "Пароль должен быть не короче 8 символов.",
+      emailTaken: "Пользователь с таким email уже существует.",
+      unknown: "Не удалось завершить регистрацию. Попробуйте ещё раз.",
+    },
   },
   dashboard: {
     title: "Приложение",

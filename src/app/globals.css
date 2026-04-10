@@ -114,4 +114,78 @@
   .ui-link-card:focus-visible {
     border-color: var(--color-border-strong);
   }
+
+  .ui-form {
+    display: grid;
+    gap: var(--space-5);
+    max-width: 28rem;
+  }
+
+  .ui-field {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .ui-label {
+    color: var(--color-text-strong);
+    font-size: var(--font-size-label);
+    font-weight: 600;
+  }
+
+  .ui-input {
+    width: 100%;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface);
+    padding: var(--space-4);
+    color: var(--color-text-strong);
+    font: inherit;
+  }
+
+  .ui-input::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  .ui-input:hover,
+  .ui-input:focus-visible {
+    border-color: var(--color-border-strong);
+  }
+
+  .ui-button {
+    width: fit-content;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    background: var(--color-text-strong);
+    padding: var(--space-4) var(--space-5);
+    color: #ffffff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .ui-button:hover {
+    background: #1f3049;
+  }
+
+  .ui-note {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-label);
+  }
+
+  .ui-message {
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    font-size: var(--font-size-label);
+  }
+
+  .ui-message-success {
+    background: #f1f9f3;
+    color: #245033;
+  }
+
+  .ui-message-error {
+    background: #fff4f4;
+    color: #8a2431;
+  }
 }
