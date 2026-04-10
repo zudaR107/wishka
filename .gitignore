@@ -8,6 +8,8 @@ dist/
 
 # build outputs
 coverage/
+playwright-report/
+test-results/
 *.tsbuildinfo
 
 # env files

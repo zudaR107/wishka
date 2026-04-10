@@ -92,3 +92,93 @@ jobs:
             printf ' - %s\n' "${unbalanced[@]}"
             exit 1
           fi
+
+  install:
+    name: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verify lockfile-based install
+        shell: bash
+        run: npm ci
+
+  typecheck:
+    name: typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        shell: bash
+        run: npm ci
+
+      - name: Run typecheck
+        shell: bash
+        run: npm run typecheck
+
+  build-smoke:
+    name: build-smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        shell: bash
+        run: npm ci
+
+      - name: Build application
+        shell: bash
+        run: npm run build
+
+  unit-smoke:
+    name: unit-smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        shell: bash
+        run: npm ci
+
+      - name: Run unit smoke tests
+        shell: bash
+        run: npm run test:unit:smoke
+
+  e2e-smoke:
+    name: e2e-smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        shell: bash
+        run: npm ci
+
+      - name: Install Playwright browser
+        shell: bash
+        run: npx playwright install --with-deps chromium
+
+      - name: Run e2e smoke tests
+        shell: bash
+        run: npm run test:e2e:smoke
