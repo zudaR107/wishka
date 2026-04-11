@@ -1,4 +1,4 @@
-import { normalizeEmail } from "@/modules/auth/server/email";
+import { isValidEmail, normalizeEmail } from "@/modules/auth/server/email";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -24,9 +24,4 @@ export function validateRegisterUserInput({ email, password }: RegisterUserInput
 
   return { status: "success" };
 }
-
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
 export { MIN_PASSWORD_LENGTH };
