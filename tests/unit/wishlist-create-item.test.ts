@@ -54,6 +54,17 @@ describe("wishlist item creation validation", () => {
       }),
     ).toEqual({ status: "error", code: "invalid-price" });
   });
+
+  it("rejects non-numeric prices", () => {
+    expect(
+      validateCreateWishlistItemInput({
+        title: "Наушники",
+        url: "",
+        note: "",
+        price: "abc",
+      }),
+    ).toEqual({ status: "error", code: "invalid-price" });
+  });
 });
 
 describe("wishlist item creation flow", () => {

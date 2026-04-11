@@ -70,6 +70,60 @@ describe("owner app wishlist bootstrap", () => {
     expect(html).toContain("Добавить желание");
   });
 
+  it("renders create success feedback when redirected after item creation", async () => {
+    const { default: AppPage } = await import("../../src/app/app/page");
+
+    const page = await AppPage({
+      searchParams: Promise.resolve({ status: "item-created" }),
+    });
+    const html = renderToStaticMarkup(page);
+
+    expect(html).toContain("Желание добавлено в текущий вишлист.");
+  });
+
+  it("renders update and delete success feedback with action-aware state", async () => {
+    const { default: AppPage } = await import("../../src/app/app/page");
+
+    const updatedPage = await AppPage({
+      searchParams: Promise.resolve({ status: "item-updated" }),
+    });
+    const deletedPage = await AppPage({
+      searchParams: Promise.resolve({ status: "item-deleted" }),
+    });
+
+    expect(renderToStaticMarkup(updatedPage)).toContain("Желание обновлено.");
+    expect(renderToStaticMarkup(deletedPage)).toContain("Желание удалено из текущего вишлиста.");
+  });
+
+  it("renders action-aware error feedback for create, update, and delete flows", async () => {
+    const { default: AppPage } = await import("../../src/app/app/page");
+
+    const createPage = await AppPage({
+      searchParams: Promise.resolve({ action: "create", error: "unknown" }),
+    });
+    const updatePage = await AppPage({
+      searchParams: Promise.resolve({ action: "update", error: "unknown" }),
+    });
+    const deletePage = await AppPage({
+      searchParams: Promise.resolve({ action: "delete", error: "unknown" }),
+    });
+
+    expect(renderToStaticMarkup(createPage)).toContain("Не удалось добавить желание. Попробуйте ещё раз.");
+    expect(renderToStaticMarkup(updatePage)).toContain("Не удалось сохранить изменения. Попробуйте ещё раз.");
+    expect(renderToStaticMarkup(deletePage)).toContain("Не удалось удалить желание. Попробуйте ещё раз.");
+  });
+
+  it("renders item-not-found feedback for owner-scoped update or delete failures", async () => {
+    const { default: AppPage } = await import("../../src/app/app/page");
+
+    const page = await AppPage({
+      searchParams: Promise.resolve({ action: "update", error: "item-not-found" }),
+    });
+    const html = renderToStaticMarkup(page);
+
+    expect(html).toContain("Не удалось найти это желание в текущем вишлисте.");
+  });
+
   it("renders wishlist items when they exist", async () => {
     mocks.getCurrentWishlistWithItems.mockResolvedValue({
       id: "wishlist-1",
