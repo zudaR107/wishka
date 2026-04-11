@@ -7,6 +7,13 @@ export { loginUser } from "@/modules/auth/server/login";
 export { logoutUser } from "@/modules/auth/server/logout";
 export { hashPassword, verifyPassword } from "@/modules/auth/server/password";
 export {
+  type CurrentUser,
+  getCurrentSession,
+  getCurrentSessionToken,
+  getCurrentUser,
+  requireCurrentUser,
+} from "@/modules/auth/server/current-user";
+export {
   MIN_PASSWORD_LENGTH,
   validateRegisterUserInput,
 } from "@/modules/auth/server/register-input";

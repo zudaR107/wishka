@@ -1,12 +1,15 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { requireCurrentUser } from "@/modules/auth/server/current-user";
 import { getTranslations } from "@/modules/i18n";
 import { PageShell } from "@/shared/ui/page-shell";
 
 const common = getTranslations("common");
 const messages = getTranslations("app");
 
-export default function AppPage() {
+export default async function AppPage() {
+  await requireCurrentUser();
+
   return (
     <PageShell
       eyebrow={common.routeSkeleton}
