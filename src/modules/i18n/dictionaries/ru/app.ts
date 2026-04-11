@@ -13,7 +13,16 @@ export const app = {
   },
   login: {
     title: "Вход",
-    description: "Интерфейс авторизации появится на следующем этапе auth.",
+    description: "Войдите по email и паролю, чтобы перейти к текущему каркасу приложения.",
+    emailLabel: "Email",
+    passwordLabel: "Пароль",
+    submitLabel: "Войти",
+    loggedOutMessage: "Вы вышли из аккаунта.",
+    errors: {
+      invalidInput: "Введите корректный email и пароль.",
+      invalidCredentials: "Неверный email или пароль.",
+      unknown: "Не удалось выполнить вход. Попробуйте ещё раз.",
+    },
   },
   register: {
     title: "Регистрация",
@@ -33,6 +42,7 @@ export const app = {
   dashboard: {
     title: "Приложение",
     description: "Это только каркас защищённой зоны для будущих возможностей Wishka.",
+    logoutLabel: "Выйти",
   },
   reservations: {
     title: "Бронирования",

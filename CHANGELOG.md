@@ -6,8 +6,8 @@ The format is based on Keep a Changelog, and this project follows SemVer.
 
 ## [Unreleased]
 
-### Planned
-- Milestone 2: auth core.
+### Added
+- Minimal login/logout flow with server-side sessions and HTTP-only auth cookie.
 
 ## [0.2.0] - 2026-04-10
 
