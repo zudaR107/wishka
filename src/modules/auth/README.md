@@ -11,6 +11,8 @@
   credentials and creates a session
 - `server/session.ts`: server-side session persistence and cookie helpers
 - `server/logout.ts`: minimal logout helper that removes the current session
+- `server/current-user.ts`: current session and authenticated-user helpers for
+  route-level server guards
 
 ## Scope
 - Keep auth helpers inside the `auth` module until there is a proven reuse case

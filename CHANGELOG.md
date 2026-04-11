@@ -8,6 +8,7 @@ The format is based on Keep a Changelog, and this project follows SemVer.
 
 ### Added
 - Minimal login/logout flow with server-side sessions and HTTP-only auth cookie.
+- Minimal server-side session guards for `/app` and `/app/reservations`.
 
 ## [0.2.0] - 2026-04-10
 
