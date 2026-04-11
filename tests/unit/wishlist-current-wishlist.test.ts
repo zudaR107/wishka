@@ -18,7 +18,10 @@ vi.mock("../../src/shared/db", () => ({
   },
 }));
 
-import { getOrCreateCurrentWishlist } from "../../src/modules/wishlist/server/current-wishlist";
+import {
+  getCurrentWishlist,
+  getOrCreateCurrentWishlist,
+} from "../../src/modules/wishlist/server/current-wishlist";
 
 describe("current owner wishlist bootstrap", () => {
   beforeEach(() => {
@@ -33,6 +36,28 @@ describe("current owner wishlist bootstrap", () => {
     mocks.insertValues.mockReturnValue({
       returning: mocks.insertReturning,
     });
+  });
+
+  it("returns the current wishlist without creating one in read-only mode", async () => {
+    const wishlist = {
+      id: "wishlist-1",
+      userId: "user-1",
+      isActive: true,
+      createdAt: new Date("2026-04-11T00:00:00.000Z"),
+      updatedAt: new Date("2026-04-11T00:00:00.000Z"),
+    };
+
+    mocks.findFirst.mockResolvedValueOnce(wishlist);
+
+    await expect(getCurrentWishlist("user-1")).resolves.toEqual(wishlist);
+    expect(mocks.insert).not.toHaveBeenCalled();
+  });
+
+  it("returns null in read-only mode when the owner has no wishlist", async () => {
+    mocks.findFirst.mockResolvedValueOnce(undefined).mockResolvedValueOnce(undefined);
+
+    await expect(getCurrentWishlist("user-1")).resolves.toBeNull();
+    expect(mocks.insert).not.toHaveBeenCalled();
   });
 
   it("returns the current active wishlist when it exists", async () => {
