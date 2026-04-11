@@ -6,6 +6,8 @@ const mocks = vi.hoisted(() => ({
   requireCurrentUser: vi.fn(),
   getCurrentWishlistWithItems: vi.fn(),
   createCurrentWishlistItem: vi.fn(),
+  updateCurrentWishlistItem: vi.fn(),
+  deleteCurrentWishlistItem: vi.fn(),
 }));
 
 vi.mock("../../src/modules/auth/server/current-user", () => ({
@@ -20,12 +22,19 @@ vi.mock("../../src/modules/wishlist/server/create-item", () => ({
   createCurrentWishlistItem: mocks.createCurrentWishlistItem,
 }));
 
+vi.mock("../../src/modules/wishlist/server/manage-item", () => ({
+  updateCurrentWishlistItem: mocks.updateCurrentWishlistItem,
+  deleteCurrentWishlistItem: mocks.deleteCurrentWishlistItem,
+}));
+
 describe("owner app wishlist bootstrap", () => {
   beforeEach(() => {
     Object.assign(globalThis, { React });
     mocks.requireCurrentUser.mockReset();
     mocks.getCurrentWishlistWithItems.mockReset();
     mocks.createCurrentWishlistItem.mockReset();
+    mocks.updateCurrentWishlistItem.mockReset();
+    mocks.deleteCurrentWishlistItem.mockReset();
 
     mocks.requireCurrentUser.mockResolvedValue({
       id: "user-1",
@@ -91,5 +100,7 @@ describe("owner app wishlist bootstrap", () => {
     expect(html).toContain("https://example.com/item");
     expect(html).toContain("Нужны беспроводные");
     expect(html).toContain("9990.00");
+    expect(html).toContain("Сохранить изменения");
+    expect(html).toContain("Удалить желание");
   });
 });

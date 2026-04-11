@@ -4,6 +4,10 @@ import { requireCurrentUser } from "@/modules/auth/server/current-user";
 import { getTranslations } from "@/modules/i18n";
 import { createCurrentWishlistItem } from "@/modules/wishlist/server/create-item";
 import { getCurrentWishlistWithItems } from "@/modules/wishlist/server/items";
+import {
+  deleteCurrentWishlistItem,
+  updateCurrentWishlistItem,
+} from "@/modules/wishlist/server/manage-item";
 import { PageShell } from "@/shared/ui/page-shell";
 
 const common = getTranslations("common");
@@ -11,6 +15,7 @@ const messages = getTranslations("app");
 
 type AppPageProps = {
   searchParams?: Promise<{
+    action?: string;
     status?: string;
     error?: string;
   }>;
@@ -20,6 +25,7 @@ export default async function AppPage(props: AppPageProps) {
   const user = await requireCurrentUser();
   const params = props?.searchParams ? await props.searchParams : undefined;
   const wishlist = await getCurrentWishlistWithItems(user.id);
+  const action = params?.action;
   const status = params?.status;
   const errorCode = params?.error;
 
@@ -32,9 +38,13 @@ export default async function AppPage(props: AppPageProps) {
       <div className="space-y-8">
         {status === "item-created" ? (
           <p className="ui-message ui-message-success">{messages.dashboard.successMessage}</p>
+        ) : status === "item-updated" ? (
+          <p className="ui-message ui-message-success">{messages.dashboard.updateSuccessMessage}</p>
+        ) : status === "item-deleted" ? (
+          <p className="ui-message ui-message-success">{messages.dashboard.deleteSuccessMessage}</p>
         ) : null}
         {errorCode ? (
-          <p className="ui-message ui-message-error">{getCreateItemErrorMessage(errorCode)}</p>
+          <p className="ui-message ui-message-error">{getActionErrorMessage(action, errorCode)}</p>
         ) : null}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="grid gap-3">
@@ -124,34 +134,97 @@ export default async function AppPage(props: AppPageProps) {
             <ul className="space-y-4">
               {wishlist.items.map((item) => (
                 <li key={item.id} className="ui-surface p-6">
-                  <div className="space-y-3">
-                    <h3 className="text-base font-semibold text-[color:var(--color-text-strong)]">
-                      {item.title}
-                    </h3>
-                    {item.url ? (
-                      <p className="text-sm text-[color:var(--color-text-base)] break-all">
-                        <span className="font-medium text-[color:var(--color-text-strong)]">
-                          {messages.dashboard.itemFields.url}: 
-                        </span>
-                        {item.url}
-                      </p>
-                    ) : null}
-                    {item.note ? (
-                      <p className="text-sm text-[color:var(--color-text-base)]">
-                        <span className="font-medium text-[color:var(--color-text-strong)]">
-                          {messages.dashboard.itemFields.note}: 
-                        </span>
-                        {item.note}
-                      </p>
-                    ) : null}
-                    {item.price ? (
-                      <p className="text-sm text-[color:var(--color-text-base)]">
-                        <span className="font-medium text-[color:var(--color-text-strong)]">
-                          {messages.dashboard.itemFields.price}: 
-                        </span>
-                        {item.price}
-                      </p>
-                    ) : null}
+                  <div className="space-y-5">
+                    <div className="space-y-3">
+                      <h3 className="text-base font-semibold text-[color:var(--color-text-strong)]">
+                        {item.title}
+                      </h3>
+                      {item.url ? (
+                        <p className="text-sm text-[color:var(--color-text-base)] break-all">
+                          <span className="font-medium text-[color:var(--color-text-strong)]">
+                            {messages.dashboard.itemFields.url}: 
+                          </span>
+                          {item.url}
+                        </p>
+                      ) : null}
+                      {item.note ? (
+                        <p className="text-sm text-[color:var(--color-text-base)]">
+                          <span className="font-medium text-[color:var(--color-text-strong)]">
+                            {messages.dashboard.itemFields.note}: 
+                          </span>
+                          {item.note}
+                        </p>
+                      ) : null}
+                      {item.price ? (
+                        <p className="text-sm text-[color:var(--color-text-base)]">
+                          <span className="font-medium text-[color:var(--color-text-strong)]">
+                            {messages.dashboard.itemFields.price}: 
+                          </span>
+                          {item.price}
+                        </p>
+                      ) : null}
+                    </div>
+                    <form action={updateItemAction} className="ui-form max-w-none">
+                      <input type="hidden" name="itemId" value={item.id} />
+                      <div className="ui-field">
+                        <label className="ui-label" htmlFor={`title-${item.id}`}>
+                          {messages.dashboard.fields.title}
+                        </label>
+                        <input
+                          id={`title-${item.id}`}
+                          name="title"
+                          defaultValue={item.title}
+                          className="ui-input"
+                          required
+                        />
+                      </div>
+                      <div className="ui-field">
+                        <label className="ui-label" htmlFor={`url-${item.id}`}>
+                          {messages.dashboard.fields.url}
+                        </label>
+                        <input
+                          id={`url-${item.id}`}
+                          name="url"
+                          type="url"
+                          defaultValue={item.url ?? ""}
+                          className="ui-input"
+                        />
+                      </div>
+                      <div className="ui-field">
+                        <label className="ui-label" htmlFor={`note-${item.id}`}>
+                          {messages.dashboard.fields.note}
+                        </label>
+                        <textarea
+                          id={`note-${item.id}`}
+                          name="note"
+                          defaultValue={item.note ?? ""}
+                          className="ui-input min-h-28 resize-y"
+                        />
+                      </div>
+                      <div className="ui-field">
+                        <label className="ui-label" htmlFor={`price-${item.id}`}>
+                          {messages.dashboard.fields.price}
+                        </label>
+                        <input
+                          id={`price-${item.id}`}
+                          name="price"
+                          inputMode="decimal"
+                          defaultValue={item.price ?? ""}
+                          className="ui-input"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-3 sm:flex-row">
+                        <button type="submit" className="ui-button">
+                          {messages.dashboard.updateLabel}
+                        </button>
+                      </div>
+                    </form>
+                    <form action={deleteItemAction}>
+                      <input type="hidden" name="itemId" value={item.id} />
+                      <button type="submit" className="ui-button">
+                        {messages.dashboard.deleteLabel}
+                      </button>
+                    </form>
                   </div>
                 </li>
               ))}
@@ -193,7 +266,38 @@ async function createItemAction(formData: FormData) {
     redirect("/app?status=item-created");
   }
 
-  redirect(`/app?error=${result.code}`);
+  redirect(`/app?action=create&error=${result.code}`);
+}
+
+async function updateItemAction(formData: FormData) {
+  "use server";
+
+  const user = await requireCurrentUser();
+  const result = await updateCurrentWishlistItem(user.id, getFormValue(formData, "itemId"), {
+    title: getFormValue(formData, "title"),
+    url: getFormValue(formData, "url"),
+    note: getFormValue(formData, "note"),
+    price: getFormValue(formData, "price"),
+  });
+
+  if (result.status === "success") {
+    redirect("/app?status=item-updated");
+  }
+
+  redirect(`/app?action=update&error=${result.code}`);
+}
+
+async function deleteItemAction(formData: FormData) {
+  "use server";
+
+  const user = await requireCurrentUser();
+  const result = await deleteCurrentWishlistItem(user.id, getFormValue(formData, "itemId"));
+
+  if (result.status === "success") {
+    redirect("/app?status=item-deleted");
+  }
+
+  redirect(`/app?action=delete&error=${result.code}`);
 }
 
 function getFormValue(formData: FormData, fieldName: string): string {
@@ -202,7 +306,7 @@ function getFormValue(formData: FormData, fieldName: string): string {
   return typeof value === "string" ? value : "";
 }
 
-function getCreateItemErrorMessage(errorCode: string): string {
+function getActionErrorMessage(action: string | undefined, errorCode: string): string {
   switch (errorCode) {
     case "invalid-title":
       return messages.dashboard.errors.invalidTitle;
@@ -210,7 +314,17 @@ function getCreateItemErrorMessage(errorCode: string): string {
       return messages.dashboard.errors.invalidUrl;
     case "invalid-price":
       return messages.dashboard.errors.invalidPrice;
+    case "item-not-found":
+      return messages.dashboard.errors.itemNotFound;
     default:
-      return messages.dashboard.errors.unknown;
+      if (action === "update") {
+        return messages.dashboard.errors.unknownUpdate;
+      }
+
+      if (action === "delete") {
+        return messages.dashboard.errors.unknownDelete;
+      }
+
+      return messages.dashboard.errors.unknownCreate;
   }
 }

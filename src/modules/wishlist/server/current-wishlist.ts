@@ -9,6 +9,10 @@ export type CurrentWishlist = {
   updatedAt: Date;
 };
 
+export async function getCurrentWishlist(userId: string): Promise<CurrentWishlist | null> {
+  return findCurrentWishlist(userId);
+}
+
 export async function getOrCreateCurrentWishlist(userId: string): Promise<CurrentWishlist> {
   const currentWishlist = await findCurrentWishlist(userId);
 
