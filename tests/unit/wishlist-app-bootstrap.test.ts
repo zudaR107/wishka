@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   requireCurrentUser: vi.fn(),
   getCurrentWishlistWithItems: vi.fn(),
+  createCurrentWishlistItem: vi.fn(),
 }));
 
 vi.mock("../../src/modules/auth/server/current-user", () => ({
@@ -15,11 +16,16 @@ vi.mock("../../src/modules/wishlist/server/items", () => ({
   getCurrentWishlistWithItems: mocks.getCurrentWishlistWithItems,
 }));
 
+vi.mock("../../src/modules/wishlist/server/create-item", () => ({
+  createCurrentWishlistItem: mocks.createCurrentWishlistItem,
+}));
+
 describe("owner app wishlist bootstrap", () => {
   beforeEach(() => {
     Object.assign(globalThis, { React });
     mocks.requireCurrentUser.mockReset();
     mocks.getCurrentWishlistWithItems.mockReset();
+    mocks.createCurrentWishlistItem.mockReset();
 
     mocks.requireCurrentUser.mockResolvedValue({
       id: "user-1",
@@ -38,7 +44,7 @@ describe("owner app wishlist bootstrap", () => {
   it("loads the current wishlist for the authenticated owner on /app", async () => {
     const { default: AppPage } = await import("../../src/app/app/page");
 
-    await AppPage();
+    await AppPage({});
 
     expect(mocks.requireCurrentUser).toHaveBeenCalled();
     expect(mocks.getCurrentWishlistWithItems).toHaveBeenCalledWith("user-1");
@@ -47,11 +53,12 @@ describe("owner app wishlist bootstrap", () => {
   it("renders an empty state when the wishlist has no items", async () => {
     const { default: AppPage } = await import("../../src/app/app/page");
 
-    const page = await AppPage();
+    const page = await AppPage({});
     const html = renderToStaticMarkup(page);
 
     expect(html).toContain("Вишлист пока пуст");
     expect(html).toContain("Количество желаний");
+    expect(html).toContain("Добавить желание");
   });
 
   it("renders wishlist items when they exist", async () => {
@@ -77,7 +84,7 @@ describe("owner app wishlist bootstrap", () => {
 
     const { default: AppPage } = await import("../../src/app/app/page");
 
-    const page = await AppPage();
+    const page = await AppPage({});
     const html = renderToStaticMarkup(page);
 
     expect(html).toContain("Наушники");

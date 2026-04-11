@@ -10,3 +10,8 @@ export {
   getWishlistWithItems,
   listWishlistItems,
 } from "@/modules/wishlist/server/items";
+export {
+  type CreateWishlistItemResult,
+  createCurrentWishlistItem,
+  validateCreateWishlistItemInput,
+} from "@/modules/wishlist/server/create-item";
