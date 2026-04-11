@@ -11,8 +11,10 @@
   read state, and item CRUD.
 - `src/app/app/reservations` remains a protected placeholder for a later
   milestone.
-- `wishlist` is now an active feature module; `share` and `reservation` remain
-  the next product modules to flesh out.
+- `wishlist` is now an active feature module.
+- `share` now has its schema foundation in place; runtime and route behavior
+  remain for the next Milestone 4 issues.
+- `reservation` remains a later product module to flesh out.
 
 ## Module Areas
 - `auth`

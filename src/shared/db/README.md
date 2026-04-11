@@ -22,6 +22,8 @@
 - Auth runtime logic now builds on these tables inside the `auth` module.
 - Wishlist schema now lives in `src/modules/wishlist/db/schema.ts` with
   first-class `wishlists` and `wishlist_items` tables.
+- Share schema now lives in `src/modules/share/db/schema.ts` with a
+  first-class `share_links` table for opaque public access tokens.
 - Wishlist runtime logic now builds on these tables inside the `wishlist`
   module for bootstrap, reads, and owner-scoped item mutations.
 
@@ -31,9 +33,12 @@
 - `wishlist_items`: item records linked to a wishlist with MVP fields:
   `title`, `url?`, `note?`, `price?`, and timestamps.
 
-## Next Expansion
-- The next DB expansion is expected in the future `share` module for public
-  share-token records tied to wishlists.
+## Share Schema Foundation
+- `share_links`: wishlist-linked public access records with opaque `token`,
+  `is_active`, and timestamps.
+- `token` is globally unique for `/share/[token]` access.
+- The schema allows many historical links per wishlist while restricting each
+  wishlist to one current active link.
 
 ## Environment Contract
 - `DATABASE_URL`: required PostgreSQL connection string
