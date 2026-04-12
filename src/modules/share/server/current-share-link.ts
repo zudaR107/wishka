@@ -39,6 +39,28 @@ export async function getOrCreateCurrentShareLink(userId: string): Promise<Curre
   return createActiveShareLink(wishlist.id);
 }
 
+export async function revokeCurrentShareLink(userId: string): Promise<boolean> {
+  const wishlist = await getCurrentWishlist(userId);
+
+  if (!wishlist) {
+    return false;
+  }
+
+  return deactivateActiveShareLinksForWishlist(wishlist.id);
+}
+
+export async function regenerateCurrentShareLink(userId: string): Promise<CurrentShareLink> {
+  const wishlist = await getCurrentWishlist(userId);
+
+  if (!wishlist) {
+    throw new Error("Failed to regenerate active share link.");
+  }
+
+  await deactivateActiveShareLinksForWishlist(wishlist.id);
+
+  return createActiveShareLink(wishlist.id);
+}
+
 async function createActiveShareLink(wishlistId: string): Promise<CurrentShareLink> {
   const db = await getDb();
 
@@ -79,6 +101,23 @@ async function createActiveShareLink(wishlistId: string): Promise<CurrentShareLi
   }
 
   throw new Error("Failed to create active share link.");
+}
+
+async function deactivateActiveShareLinksForWishlist(wishlistId: string): Promise<boolean> {
+  const db = await getDb();
+
+  const deactivatedShareLinks = await db
+    .update(shareLinks)
+    .set({
+      isActive: false,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(shareLinks.wishlistId, wishlistId), eq(shareLinks.isActive, true)))
+    .returning({
+      id: shareLinks.id,
+    });
+
+  return deactivatedShareLinks.length > 0;
 }
 
 async function findActiveShareLinkByWishlistId(wishlistId: string): Promise<CurrentShareLink | null> {

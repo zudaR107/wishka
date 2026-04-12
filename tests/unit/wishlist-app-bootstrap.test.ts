@@ -7,6 +7,8 @@ const mocks = vi.hoisted(() => ({
   getCurrentWishlistWithItems: vi.fn(),
   getCurrentShareLink: vi.fn(),
   getOrCreateCurrentShareLink: vi.fn(),
+  revokeCurrentShareLink: vi.fn(),
+  regenerateCurrentShareLink: vi.fn(),
   createCurrentWishlistItem: vi.fn(),
   updateCurrentWishlistItem: vi.fn(),
   deleteCurrentWishlistItem: vi.fn(),
@@ -40,6 +42,8 @@ vi.mock("../../src/modules/auth/server/current-user", () => ({
 vi.mock("../../src/modules/share", () => ({
   getCurrentShareLink: mocks.getCurrentShareLink,
   getOrCreateCurrentShareLink: mocks.getOrCreateCurrentShareLink,
+  revokeCurrentShareLink: mocks.revokeCurrentShareLink,
+  regenerateCurrentShareLink: mocks.regenerateCurrentShareLink,
 }));
 
 vi.mock("../../src/modules/wishlist/server/items", () => ({
@@ -62,6 +66,8 @@ describe("owner app wishlist bootstrap", () => {
     mocks.getCurrentWishlistWithItems.mockReset();
     mocks.getCurrentShareLink.mockReset();
     mocks.getOrCreateCurrentShareLink.mockReset();
+    mocks.revokeCurrentShareLink.mockReset();
+    mocks.regenerateCurrentShareLink.mockReset();
     mocks.createCurrentWishlistItem.mockReset();
     mocks.updateCurrentWishlistItem.mockReset();
     mocks.deleteCurrentWishlistItem.mockReset();
@@ -121,6 +127,8 @@ describe("owner app wishlist bootstrap", () => {
 
     expect(html).toContain("Текущая публичная ссылка");
     expect(html).toContain("https://wishka.test/share/opaque-token");
+    expect(html).toContain("Отключить ссылку");
+    expect(html).toContain("Создать новую ссылку");
     expect(html).not.toContain("Создать публичную ссылку");
   });
 
@@ -159,6 +167,20 @@ describe("owner app wishlist bootstrap", () => {
     expect(renderToStaticMarkup(page)).toContain("Публичная ссылка готова.");
   });
 
+  it("renders share revoke and regenerate success feedback", async () => {
+    const { default: AppPage } = await import("../../src/app/app/page");
+
+    const revokedPage = await AppPage({
+      searchParams: Promise.resolve({ status: "share-link-revoked" }),
+    });
+    const regeneratedPage = await AppPage({
+      searchParams: Promise.resolve({ status: "share-link-regenerated" }),
+    });
+
+    expect(renderToStaticMarkup(revokedPage)).toContain("Публичная ссылка отключена.");
+    expect(renderToStaticMarkup(regeneratedPage)).toContain("Создана новая публичная ссылка.");
+  });
+
   it("renders action-aware error feedback for create, update, and delete flows", async () => {
     const { default: AppPage } = await import("../../src/app/app/page");
 
@@ -186,6 +208,24 @@ describe("owner app wishlist bootstrap", () => {
 
     expect(renderToStaticMarkup(page)).toContain(
       "Не удалось создать публичную ссылку. Попробуйте ещё раз.",
+    );
+  });
+
+  it("renders share revoke and regenerate error feedback", async () => {
+    const { default: AppPage } = await import("../../src/app/app/page");
+
+    const revokePage = await AppPage({
+      searchParams: Promise.resolve({ action: "share-revoke", error: "unknown" }),
+    });
+    const regeneratePage = await AppPage({
+      searchParams: Promise.resolve({ action: "share-regenerate", error: "unknown" }),
+    });
+
+    expect(renderToStaticMarkup(revokePage)).toContain(
+      "Не удалось отключить публичную ссылку. Попробуйте ещё раз.",
+    );
+    expect(renderToStaticMarkup(regeneratePage)).toContain(
+      "Не удалось создать новую публичную ссылку. Попробуйте ещё раз.",
     );
   });
 

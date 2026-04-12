@@ -6,6 +6,10 @@ const mocks = vi.hoisted(() => ({
   insert: vi.fn(),
   insertValues: vi.fn(),
   insertReturning: vi.fn(),
+  update: vi.fn(),
+  updateSet: vi.fn(),
+  updateWhere: vi.fn(),
+  updateReturning: vi.fn(),
   getCurrentWishlist: vi.fn(),
   getOrCreateCurrentWishlist: vi.fn(),
   generateShareToken: vi.fn(),
@@ -19,6 +23,7 @@ vi.mock("../../src/shared/db", () => ({
       },
     },
     insert: mocks.insert,
+    update: mocks.update,
   },
 }));
 
@@ -34,6 +39,8 @@ vi.mock("../../src/modules/share/server/token", () => ({
 import {
   getCurrentShareLink,
   getOrCreateCurrentShareLink,
+  regenerateCurrentShareLink,
+  revokeCurrentShareLink,
 } from "../../src/modules/share/server/current-share-link";
 
 describe("current owner share link helpers", () => {
@@ -42,6 +49,10 @@ describe("current owner share link helpers", () => {
     mocks.insert.mockReset();
     mocks.insertValues.mockReset();
     mocks.insertReturning.mockReset();
+    mocks.update.mockReset();
+    mocks.updateSet.mockReset();
+    mocks.updateWhere.mockReset();
+    mocks.updateReturning.mockReset();
     mocks.getCurrentWishlist.mockReset();
     mocks.getOrCreateCurrentWishlist.mockReset();
     mocks.generateShareToken.mockReset();
@@ -52,6 +63,16 @@ describe("current owner share link helpers", () => {
     mocks.insertValues.mockReturnValue({
       returning: mocks.insertReturning,
     });
+    mocks.update.mockReturnValue({
+      set: mocks.updateSet,
+    });
+    mocks.updateSet.mockReturnValue({
+      where: mocks.updateWhere,
+    });
+    mocks.updateWhere.mockReturnValue({
+      returning: mocks.updateReturning,
+    });
+    mocks.updateReturning.mockResolvedValue([]);
   });
 
   it("returns null in read-only mode when the owner has no current wishlist", async () => {
@@ -167,5 +188,69 @@ describe("current owner share link helpers", () => {
 
     await expect(getOrCreateCurrentShareLink("user-1")).resolves.toEqual(shareLink);
     expect(mocks.insert).toHaveBeenCalledTimes(1);
+  });
+
+  it("revokes the current active share link for the owner wishlist", async () => {
+    const wishlist = {
+      id: "wishlist-1",
+      userId: "user-1",
+      isActive: true,
+      createdAt: new Date("2026-04-12T00:00:00.000Z"),
+      updatedAt: new Date("2026-04-12T00:00:00.000Z"),
+    };
+
+    mocks.getCurrentWishlist.mockResolvedValue(wishlist);
+    mocks.updateReturning.mockResolvedValue([{ id: "share-1" }]);
+
+    await expect(revokeCurrentShareLink("user-1")).resolves.toBe(true);
+    expect(mocks.update).toHaveBeenCalledTimes(1);
+    expect(mocks.updateSet).toHaveBeenCalledWith(
+      expect.objectContaining({
+        isActive: false,
+        updatedAt: expect.any(Date),
+      }),
+    );
+  });
+
+  it("regenerates the current share link with a new opaque token", async () => {
+    const wishlist = {
+      id: "wishlist-1",
+      userId: "user-1",
+      isActive: true,
+      createdAt: new Date("2026-04-12T00:00:00.000Z"),
+      updatedAt: new Date("2026-04-12T00:00:00.000Z"),
+    };
+    const newShareLink = {
+      id: "share-2",
+      wishlistId: "wishlist-1",
+      token: "new-generated-token",
+      isActive: true,
+      createdAt: new Date("2026-04-12T00:00:00.000Z"),
+      updatedAt: new Date("2026-04-12T00:00:00.000Z"),
+    };
+
+    mocks.getCurrentWishlist.mockResolvedValue(wishlist);
+    mocks.updateReturning.mockResolvedValue([{ id: "share-1" }]);
+    mocks.generateShareToken.mockReturnValue("new-generated-token");
+    mocks.insertReturning.mockResolvedValue([newShareLink]);
+
+    await expect(regenerateCurrentShareLink("user-1")).resolves.toEqual(newShareLink);
+    expect(mocks.update).toHaveBeenCalledTimes(1);
+    expect(mocks.insertValues).toHaveBeenCalledWith({
+      wishlistId: "wishlist-1",
+      token: "new-generated-token",
+      isActive: true,
+    });
+  });
+
+  it("does not create a wishlist while regenerating when no current wishlist exists", async () => {
+    mocks.getCurrentWishlist.mockResolvedValue(null);
+
+    await expect(regenerateCurrentShareLink("user-1")).rejects.toThrow(
+      "Failed to regenerate active share link.",
+    );
+    expect(mocks.update).not.toHaveBeenCalled();
+    expect(mocks.insert).not.toHaveBeenCalled();
+    expect(mocks.getOrCreateCurrentWishlist).not.toHaveBeenCalled();
   });
 });

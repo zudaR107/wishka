@@ -57,6 +57,13 @@ describe("public wishlist loading by share token", () => {
     expect(mocks.getWishlistWithItems).not.toHaveBeenCalled();
   });
 
+  it("returns null when the token has been revoked", async () => {
+    mocks.findShareLink.mockResolvedValue(undefined);
+
+    await expect(getPublicWishlistByShareToken("revoked-token")).resolves.toBeNull();
+    expect(mocks.getWishlistWithItems).not.toHaveBeenCalled();
+  });
+
   it("returns null when the active token points to a missing wishlist", async () => {
     mocks.findShareLink.mockResolvedValue({
       id: "share-1",
@@ -117,6 +124,37 @@ describe("public wishlist loading by share token", () => {
       shareLink: {
         id: "share-1",
         token: "opaque-token",
+      },
+    });
+  });
+
+  it("loads only the new token after regeneration while the old token stays invalid", async () => {
+    mocks.findShareLink
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce({
+        id: "share-2",
+        wishlistId: "wishlist-1",
+        token: "new-token",
+        isActive: true,
+        createdAt: new Date("2026-04-12T00:00:00.000Z"),
+        updatedAt: new Date("2026-04-12T00:00:00.000Z"),
+      });
+    mocks.getWishlistWithItems.mockResolvedValue({
+      id: "wishlist-1",
+      userId: "owner-1",
+      isActive: true,
+      createdAt: new Date("2026-04-11T00:00:00.000Z"),
+      updatedAt: new Date("2026-04-11T00:00:00.000Z"),
+      items: [],
+    });
+
+    await expect(getPublicWishlistByShareToken("old-token")).resolves.toBeNull();
+    await expect(getPublicWishlistByShareToken("new-token")).resolves.toEqual({
+      id: "wishlist-1",
+      items: [],
+      shareLink: {
+        id: "share-2",
+        token: "new-token",
       },
     });
   });

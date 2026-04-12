@@ -7,4 +7,6 @@ export {
   getCurrentShareLink,
   getOrCreateCurrentShareLink,
   getPublicWishlistByShareToken,
+  regenerateCurrentShareLink,
+  revokeCurrentShareLink,
 } from "@/modules/share/server";

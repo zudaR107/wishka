@@ -2,7 +2,12 @@ import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireCurrentUser } from "@/modules/auth/server/current-user";
 import { getTranslations } from "@/modules/i18n";
-import { getCurrentShareLink, getOrCreateCurrentShareLink } from "@/modules/share";
+import {
+  getCurrentShareLink,
+  getOrCreateCurrentShareLink,
+  regenerateCurrentShareLink,
+  revokeCurrentShareLink,
+} from "@/modules/share";
 import { createCurrentWishlistItem } from "@/modules/wishlist/server/create-item";
 import { getCurrentWishlistWithItems } from "@/modules/wishlist/server/items";
 import {
@@ -51,6 +56,14 @@ export default async function AppPage(props: AppPageProps) {
         ) : status === "share-link-created" ? (
           <p className="ui-message ui-message-success">
             {messages.dashboard.share.successMessage}
+          </p>
+        ) : status === "share-link-revoked" ? (
+          <p className="ui-message ui-message-success">
+            {messages.dashboard.share.revokeSuccessMessage}
+          </p>
+        ) : status === "share-link-regenerated" ? (
+          <p className="ui-message ui-message-success">
+            {messages.dashboard.share.regenerateSuccessMessage}
           </p>
         ) : null}
         {errorCode ? (
@@ -112,6 +125,18 @@ export default async function AppPage(props: AppPageProps) {
                   />
                 </div>
                 <p className="ui-note">{messages.dashboard.share.copyHint}</p>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <form action={revokeShareLinkAction}>
+                    <button type="submit" className="ui-button">
+                      {messages.dashboard.share.revokeLabel}
+                    </button>
+                  </form>
+                  <form action={regenerateShareLinkAction}>
+                    <button type="submit" className="ui-button">
+                      {messages.dashboard.share.regenerateLabel}
+                    </button>
+                  </form>
+                </div>
               </div>
             ) : (
               <div className="space-y-4">
@@ -366,6 +391,34 @@ async function createShareLinkAction() {
   redirect("/app?status=share-link-created");
 }
 
+async function revokeShareLinkAction() {
+  "use server";
+
+  const user = await requireCurrentUser();
+
+  try {
+    await revokeCurrentShareLink(user.id);
+  } catch {
+    redirect("/app?action=share-revoke&error=unknown");
+  }
+
+  redirect("/app?status=share-link-revoked");
+}
+
+async function regenerateShareLinkAction() {
+  "use server";
+
+  const user = await requireCurrentUser();
+
+  try {
+    await regenerateCurrentShareLink(user.id);
+  } catch {
+    redirect("/app?action=share-regenerate&error=unknown");
+  }
+
+  redirect("/app?status=share-link-regenerated");
+}
+
 function getFormValue(formData: FormData, fieldName: string): string {
   const value = formData.get(fieldName);
 
@@ -385,6 +438,14 @@ function getActionErrorMessage(action: string | undefined, errorCode: string): s
     default:
       if (action === "share-create") {
         return messages.dashboard.share.errors.unknownCreate;
+      }
+
+      if (action === "share-revoke") {
+        return messages.dashboard.share.errors.unknownRevoke;
+      }
+
+      if (action === "share-regenerate") {
+        return messages.dashboard.share.errors.unknownRegenerate;
       }
 
       if (action === "update") {
