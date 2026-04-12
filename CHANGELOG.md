@@ -7,7 +7,25 @@ The format is based on Keep a Changelog, and this project follows SemVer.
 ## [Unreleased]
 
 ### Planned
-- Milestone 5: reservations.
+- Milestone 6: delivery and ops.
+
+## [0.6.0] - 2026-04-12
+
+### Added
+- Reservation schema foundation with first-class `reservations` records and one
+  active reservation per wishlist item.
+- Reservation lifecycle helpers for active lookup, availability, eligibility,
+  creation, and cancellation rules.
+- Reservation-aware public wishlist loading by share token with privacy-safe
+  item state.
+- Public reservation create flow on `/share/[token]` for authenticated
+  non-owners with predictable guard behavior for guests, owners, invalid share
+  context, and already-reserved items.
+- Privacy-safe reserved-status rendering on the owner dashboard `/app`.
+- Current-user reservations page on `/app/reservations` with active reservation
+  list and cancel flow.
+- Reservation coverage across lifecycle helpers, public loading, public reserve
+  flow, owner dashboard rendering, and reserver page behavior.
 
 ## [0.5.0] - 2026-04-12
 

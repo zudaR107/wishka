@@ -19,9 +19,10 @@ create a wishlist, share it by link, and let another person reserve an item.
 - Milestone 2 is complete.
 - Milestone 3 is complete.
 - Milestone 4 is complete.
-- Repository, app, DB, i18n, UI, auth, wishlist, and share foundations are in
-  place.
-- Next focus: Milestone 5 - Reservations.
+- Milestone 5 is complete.
+- Repository, app, DB, i18n, UI, auth, wishlist, share, and reservation
+  foundations are in place.
+- Next focus: Milestone 6 - Delivery And Ops.
 
 ## Scope For `v1.0.0`
 Included:
@@ -462,7 +463,7 @@ Goal:
 - deliver reservation flow, cancellation, and privacy rules
 
 Status:
-- planned
+- complete
 
 Execution backlog:
 1. Reservation schema foundation
@@ -546,6 +547,88 @@ Release note:
 ### Milestone 6 - Delivery And Ops (`v0.7.0`)
 Goal:
 - deliver deploy-ready infrastructure, CI/CD, and release automation
+
+Status:
+- planned
+
+Execution backlog:
+1. Runtime environment contract and deploy docs foundation
+2. Production container image foundation
+3. Docker Compose production stack
+4. Caddy reverse proxy and HTTPS foundation
+5. GitHub Actions build, release, and image publish pipeline
+6. VPS deploy workflow and health-check flow
+7. Delivery and ops validation coverage
+
+Recommended issue shape:
+- `M6-I1 Runtime environment contract and deploy docs foundation`
+- `M6-I2 Production container image foundation`
+- `M6-I3 Docker Compose production stack`
+- `M6-I4 Caddy reverse proxy and HTTPS foundation`
+- `M6-I5 GitHub Actions build, release, and image publish pipeline`
+- `M6-I6 VPS deploy workflow and health-check flow`
+- `M6-I7 Delivery and ops validation coverage`
+
+Recommended PR order:
+1. `M6-I1 Runtime environment contract and deploy docs foundation`
+2. `M6-I2 Production container image foundation`
+3. `M6-I3 Docker Compose production stack`
+4. `M6-I4 Caddy reverse proxy and HTTPS foundation`
+5. `M6-I5 GitHub Actions build, release, and image publish pipeline`
+6. `M6-I6 VPS deploy workflow and health-check flow`
+7. `M6-I7 Delivery and ops validation coverage`
+
+Dependencies:
+- `M6-I2` depends on `M6-I1`
+- `M6-I3` depends on `M6-I1` and `M6-I2`
+- `M6-I4` depends on `M6-I3`
+- `M6-I5` depends on `M6-I2`
+- `M6-I6` depends on `M6-I3`, `M6-I4`, and `M6-I5`
+- `M6-I7` depends on `M6-I2`, `M6-I3`, `M6-I4`, `M6-I5`, and `M6-I6`
+
+Scope notes:
+- Keep the deployment target limited to one VPS with one production
+  environment.
+- Build around the current application behavior; Milestone 6 should not add new
+  wishlist, share, or reservation product features.
+- Prefer `Next.js standalone` images and a minimal runtime surface.
+- Keep operational configuration explicit: env contract, secrets handling,
+  ports, volumes, and health checks should be documented and reviewable.
+- Use GHCR and GitHub Actions for image publishing and deployment automation.
+- Production rollout must verify `/healthz` after deploy.
+
+Acceptance targets:
+- the repository documents the runtime env contract for local, CI, and
+  production deployment
+- a production image can be built consistently from the current app
+- a Docker Compose stack can run `app`, `postgres`, and `caddy` together
+- Caddy can front the app with the expected production routing and HTTPS setup
+- GitHub Actions can build, version, and publish the app image
+- deploy automation can roll out the current release to the VPS and confirm
+  health via `/healthz`
+- delivery and ops behavior is covered by focused validation checks and docs
+
+Exit criteria:
+- runtime env contract and deployment docs exist
+- production Docker image build exists
+- production Docker Compose stack exists
+- Caddy production config exists
+- GitHub Actions release and image publish workflow exists
+- protected VPS deploy workflow exists
+- post-deploy health verification exists
+- delivery validation coverage exists for the happy path and key failure guards
+
+Definition of small PRs for this milestone:
+- env-contract PR only adds deploy env docs, templates, and rollout notes
+- container PR only adds production image build logic
+- compose PR only adds orchestration for `app`, `postgres`, and `caddy`
+- caddy PR only adds reverse proxy and HTTPS config
+- ci-publish PR only adds build, release, and GHCR publish automation
+- deploy PR only adds VPS rollout and health-check behavior
+- validation PR expands delivery checks and docs without mixing in product work
+
+Release note:
+- `v0.7.0` marks the delivery and operations milestone.
 
 ### Milestone 7 - MVP Hardening (`v1.0.0`)
 Goal:
