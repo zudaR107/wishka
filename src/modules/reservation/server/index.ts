@@ -1,4 +1,3 @@
-export { reservations } from "@/modules/reservation/db/schema";
 export {
   type ActiveReservation,
   type CancelReservationResult,
@@ -10,4 +9,4 @@ export {
   getActiveReservationByItemId,
   getItemReservationAvailability,
   getItemReservationEligibility,
-} from "@/modules/reservation/server";
+} from "@/modules/reservation/server/lifecycle";
