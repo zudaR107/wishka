@@ -99,6 +99,16 @@ export const app = {
   },
   share: {
     title: "Публичный вишлист",
-    description: "Публичный рендеринг списка появится после начала milestone sharing.",
+    description: "Здесь можно посмотреть желания из вишлиста по публичной ссылке в режиме только чтения.",
+    unavailableTitle: "Публичная ссылка недоступна",
+    unavailableDescription: "Эта ссылка недействительна или больше неактивна.",
+    emptyTitle: "Этот вишлист пока пуст",
+    emptyDescription: "Владелец ещё не добавил сюда желания.",
+    itemsTitle: "Желания",
+    itemFields: {
+      url: "Ссылка",
+      note: "Заметка",
+      price: "Цена",
+    },
   },
 } as const;
