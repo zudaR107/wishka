@@ -71,4 +71,17 @@ describe("current user active reservations loading", () => {
     await expect(listCurrentUserActiveReservations("user-1")).resolves.toEqual([]);
     expect(mocks.findWishlistItems).not.toHaveBeenCalled();
   });
+
+  it("does not return reservations whose linked active item data is missing", async () => {
+    mocks.findReservations.mockResolvedValue([
+      {
+        id: "reservation-1",
+        wishlistItemId: "missing-item",
+        createdAt: new Date("2026-04-12T00:00:00.000Z"),
+      },
+    ]);
+    mocks.findWishlistItems.mockResolvedValue([]);
+
+    await expect(listCurrentUserActiveReservations("user-1")).resolves.toEqual([]);
+  });
 });

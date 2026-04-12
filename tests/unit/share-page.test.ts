@@ -5,6 +5,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   getCurrentUser: vi.fn(),
   getPublicWishlistViewByShareToken: vi.fn(),
+  createReservation: vi.fn(),
+  redirect: vi.fn(),
+}));
+
+vi.mock("next/navigation", () => ({
+  redirect: mocks.redirect,
 }));
 
 vi.mock("../../src/modules/auth", () => ({
@@ -23,11 +29,25 @@ vi.mock("../../src/modules/share/server/public-wishlist", () => ({
   getPublicWishlistViewByShareToken: mocks.getPublicWishlistViewByShareToken,
 }));
 
+vi.mock("../../src/modules/reservation/server/lifecycle", () => ({
+  createReservation: mocks.createReservation,
+}));
+
+function expectRedirectCall(run: () => Promise<unknown>, url: string) {
+  mocks.redirect.mockImplementationOnce((target: string) => {
+    throw new Error(`REDIRECT:${target}`);
+  });
+
+  return expect(run()).rejects.toThrow(`REDIRECT:${url}`);
+}
+
 describe("public share route rendering", () => {
   beforeEach(() => {
     Object.assign(globalThis, { React });
     mocks.getCurrentUser.mockReset();
     mocks.getPublicWishlistViewByShareToken.mockReset();
+    mocks.createReservation.mockReset();
+    mocks.redirect.mockReset();
     mocks.getCurrentUser.mockResolvedValue(null);
   });
 
@@ -285,5 +305,141 @@ describe("public share route rendering", () => {
 
     expect(renderToStaticMarkup(successPage)).toContain("Желание забронировано.");
     expect(renderToStaticMarkup(errorPage)).toContain("Это желание уже забронировано.");
+  });
+
+  it("redirects guests to login when reserve action is submitted", async () => {
+    const { reservePublicWishlistItemAction } = await import("../../src/app/share/[token]/actions");
+    const formData = new FormData();
+    formData.set("token", "opaque-token");
+    formData.set("itemId", "item-1");
+
+    await expectRedirectCall(() => reservePublicWishlistItemAction(formData), "/login");
+    expect(mocks.getPublicWishlistViewByShareToken).not.toHaveBeenCalled();
+    expect(mocks.createReservation).not.toHaveBeenCalled();
+  });
+
+  it("creates a reservation for an eligible authenticated non-owner", async () => {
+    mocks.getCurrentUser.mockResolvedValue({
+      id: "user-2",
+      email: "user@example.com",
+    });
+    mocks.getPublicWishlistViewByShareToken.mockResolvedValue({
+      id: "wishlist-1",
+      items: [
+        {
+          id: "item-1",
+          wishlistId: "wishlist-1",
+          title: "Наушники",
+          url: null,
+          note: null,
+          price: null,
+          createdAt: new Date("2026-04-11T00:00:00.000Z"),
+          updatedAt: new Date("2026-04-11T00:00:00.000Z"),
+          reservation: { status: "available" },
+        },
+      ],
+      shareLink: { id: "share-1", token: "opaque-token" },
+      viewer: { isAuthenticated: true, isOwner: false },
+    });
+    mocks.createReservation.mockResolvedValue({
+      status: "success",
+      reservation: {
+        id: "reservation-1",
+        wishlistItemId: "item-1",
+        userId: "user-2",
+        cancelledAt: null,
+        createdAt: new Date("2026-04-12T00:00:00.000Z"),
+      },
+    });
+
+    const { reservePublicWishlistItemAction } = await import("../../src/app/share/[token]/actions");
+    const formData = new FormData();
+    formData.set("token", "opaque-token");
+    formData.set("itemId", "item-1");
+
+    await expectRedirectCall(
+      () => reservePublicWishlistItemAction(formData),
+      "/share/opaque-token?status=reservation-created",
+    );
+    expect(mocks.createReservation).toHaveBeenCalledWith("user-2", "item-1");
+  });
+
+  it("blocks reserve action for an invalid share or missing item context", async () => {
+    mocks.getCurrentUser.mockResolvedValue({
+      id: "user-2",
+      email: "user@example.com",
+    });
+    mocks.getPublicWishlistViewByShareToken.mockResolvedValue(null);
+
+    const { reservePublicWishlistItemAction } = await import("../../src/app/share/[token]/actions");
+    const formData = new FormData();
+    formData.set("token", "opaque-token");
+    formData.set("itemId", "item-1");
+
+    await expectRedirectCall(
+      () => reservePublicWishlistItemAction(formData),
+      "/share/opaque-token?action=reserve&error=invalid-share",
+    );
+    expect(mocks.createReservation).not.toHaveBeenCalled();
+
+    mocks.getPublicWishlistViewByShareToken.mockResolvedValueOnce({
+      id: "wishlist-1",
+      items: [],
+      shareLink: { id: "share-1", token: "opaque-token" },
+      viewer: { isAuthenticated: true, isOwner: false },
+    });
+
+    await expectRedirectCall(
+      () => reservePublicWishlistItemAction(formData),
+      "/share/opaque-token?action=reserve&error=invalid-share",
+    );
+    expect(mocks.createReservation).not.toHaveBeenCalled();
+  });
+
+  it("blocks reserve action for owner and already-reserved results", async () => {
+    mocks.getCurrentUser.mockResolvedValue({
+      id: "user-2",
+      email: "user@example.com",
+    });
+    mocks.getPublicWishlistViewByShareToken.mockResolvedValue({
+      id: "wishlist-1",
+      items: [
+        {
+          id: "item-1",
+          wishlistId: "wishlist-1",
+          title: "Наушники",
+          url: null,
+          note: null,
+          price: null,
+          createdAt: new Date("2026-04-11T00:00:00.000Z"),
+          updatedAt: new Date("2026-04-11T00:00:00.000Z"),
+          reservation: { status: "available" },
+        },
+      ],
+      shareLink: { id: "share-1", token: "opaque-token" },
+      viewer: { isAuthenticated: true, isOwner: false },
+    });
+
+    const { reservePublicWishlistItemAction } = await import("../../src/app/share/[token]/actions");
+
+    const ownerFormData = new FormData();
+    ownerFormData.set("token", "opaque-token");
+    ownerFormData.set("itemId", "item-1");
+    mocks.createReservation.mockResolvedValueOnce({ status: "error", code: "own-item" });
+
+    await expectRedirectCall(
+      () => reservePublicWishlistItemAction(ownerFormData),
+      "/share/opaque-token?action=reserve&error=own-item",
+    );
+
+    const reservedFormData = new FormData();
+    reservedFormData.set("token", "opaque-token");
+    reservedFormData.set("itemId", "item-1");
+    mocks.createReservation.mockResolvedValueOnce({ status: "error", code: "already-reserved" });
+
+    await expectRedirectCall(
+      () => reservePublicWishlistItemAction(reservedFormData),
+      "/share/opaque-token?action=reserve&error=already-reserved",
+    );
   });
 });

@@ -106,6 +106,18 @@ describe("reservation lifecycle helpers", () => {
     expect(mocks.findReservations).toHaveBeenCalledTimes(1);
   });
 
+  it("returns null when the existing reservation record is already canceled", async () => {
+    mocks.findReservation.mockResolvedValue({
+      id: "reservation-1",
+      wishlistItemId: "item-1",
+      userId: "user-2",
+      cancelledAt: new Date("2026-04-13T00:00:00.000Z"),
+      createdAt: new Date("2026-04-12T00:00:00.000Z"),
+    });
+
+    await expect(getActiveReservationByItemId("item-1")).resolves.toBeNull();
+  });
+
   it("reports item-not-found when reservation availability has no item context", async () => {
     mocks.findWishlistItem.mockResolvedValue(undefined);
 
@@ -114,6 +126,45 @@ describe("reservation lifecycle helpers", () => {
       code: "item-not-found",
     });
     expect(mocks.findReservation).not.toHaveBeenCalled();
+  });
+
+  it("reports already-reserved when reservation availability sees an active reservation", async () => {
+    mocks.findWishlistItem.mockResolvedValue({
+      id: "item-1",
+      wishlistId: "wishlist-1",
+    });
+    mocks.findWishlist.mockResolvedValue({
+      id: "wishlist-1",
+      userId: "owner-1",
+    });
+    mocks.findReservation.mockResolvedValue({
+      id: "reservation-1",
+      wishlistItemId: "item-1",
+      userId: "user-3",
+      cancelledAt: null,
+      createdAt: new Date("2026-04-12T00:00:00.000Z"),
+    });
+
+    await expect(getItemReservationAvailability("item-1")).resolves.toEqual({
+      status: "unavailable",
+      code: "already-reserved",
+    });
+  });
+
+  it("marks a non-owner as eligible when the item is available", async () => {
+    mocks.findWishlistItem.mockResolvedValue({
+      id: "item-1",
+      wishlistId: "wishlist-1",
+    });
+    mocks.findWishlist.mockResolvedValue({
+      id: "wishlist-1",
+      userId: "owner-1",
+    });
+    mocks.findReservation.mockResolvedValue(undefined);
+
+    await expect(getItemReservationEligibility("user-2", "item-1")).resolves.toEqual({
+      status: "eligible",
+    });
   });
 
   it("blocks the owner from reserving their own item", async () => {
@@ -169,6 +220,16 @@ describe("reservation lifecycle helpers", () => {
       wishlistItemId: "item-1",
       userId: "user-2",
     });
+  });
+
+  it("returns item-not-found when create reservation has no valid item context", async () => {
+    mocks.findWishlistItem.mockResolvedValue(undefined);
+
+    await expect(createReservation("user-2", "item-1")).resolves.toEqual({
+      status: "error",
+      code: "item-not-found",
+    });
+    expect(mocks.insert).not.toHaveBeenCalled();
   });
 
   it("returns already-reserved when the item already has an active reservation", async () => {
@@ -233,6 +294,16 @@ describe("reservation lifecycle helpers", () => {
     expect(mocks.updateSet).toHaveBeenCalledWith({
       cancelledAt: expect.any(Date),
     });
+  });
+
+  it("returns reservation-not-found when cancel target is missing or already inactive", async () => {
+    mocks.findReservation.mockResolvedValue(undefined);
+
+    await expect(cancelReservation("user-2", "reservation-1")).resolves.toEqual({
+      status: "error",
+      code: "reservation-not-found",
+    });
+    expect(mocks.update).not.toHaveBeenCalled();
   });
 
   it("rejects cancellation by a different user", async () => {
