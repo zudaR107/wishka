@@ -1,6 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import * as authSchema from "@/modules/auth/db/schema";
+import * as shareSchema from "@/modules/share/db/schema";
 import * as wishlistSchema from "@/modules/wishlist/db/schema";
 import { getDatabaseEnv } from "@/shared/db/env";
 
@@ -14,6 +15,7 @@ export const pool = new Pool({
 export const db = drizzle(pool, {
   schema: {
     ...authSchema,
+    ...shareSchema,
     ...wishlistSchema,
   },
 });
