@@ -9,4 +9,5 @@ export {
   getActiveReservationByItemId,
   getItemReservationAvailability,
   getItemReservationEligibility,
+  listActiveReservationsByItemIds,
 } from "@/modules/reservation/server/lifecycle";

@@ -7,7 +7,8 @@
 - `server/current-share-link.ts`: owner-side current-link read, create, revoke,
   and regenerate helpers for the current wishlist.
 - `server/public-wishlist.ts`: public loading helpers that resolve an active
-  share token to a read-only wishlist with ordered items.
+  share token to a read-only wishlist with ordered items and privacy-safe
+  reservation state.
 
 ## Current Behavior
 - `/app` shows the owner a share section for the current wishlist.
@@ -16,6 +17,8 @@
 - `/share/[token]` renders a public read-only wishlist for valid active tokens.
 - Invalid, inactive, revoked, and superseded tokens do not expose wishlist
   data.
+- Public item read models expose only `available` or `reserved` state without
+  reserver identity.
 
 ## Test Coverage
 - Unit and integration-like tests cover token generation, owner lifecycle

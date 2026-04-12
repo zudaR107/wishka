@@ -3,6 +3,7 @@ import { DatabaseError } from "pg";
 
 const mocks = vi.hoisted(() => ({
   findReservation: vi.fn(),
+  findReservations: vi.fn(),
   findWishlistItem: vi.fn(),
   findWishlist: vi.fn(),
   insert: vi.fn(),
@@ -19,6 +20,7 @@ vi.mock("../../src/shared/db", () => ({
     query: {
       reservations: {
         findFirst: mocks.findReservation,
+        findMany: mocks.findReservations,
       },
       wishlistItems: {
         findFirst: mocks.findWishlistItem,
@@ -38,11 +40,13 @@ import {
   getActiveReservationByItemId,
   getItemReservationAvailability,
   getItemReservationEligibility,
+  listActiveReservationsByItemIds,
 } from "../../src/modules/reservation/server/lifecycle";
 
 describe("reservation lifecycle helpers", () => {
   beforeEach(() => {
     mocks.findReservation.mockReset();
+    mocks.findReservations.mockReset();
     mocks.findWishlistItem.mockReset();
     mocks.findWishlist.mockReset();
     mocks.insert.mockReset();
@@ -74,6 +78,32 @@ describe("reservation lifecycle helpers", () => {
   it("returns null for a blank active reservation lookup", async () => {
     await expect(getActiveReservationByItemId("   ")).resolves.toBeNull();
     expect(mocks.findReservation).not.toHaveBeenCalled();
+  });
+
+  it("loads active reservations for multiple item ids in one batch", async () => {
+    const createdAt = new Date("2026-04-12T00:00:00.000Z");
+
+    mocks.findReservations.mockResolvedValue([
+      {
+        id: "reservation-1",
+        wishlistItemId: "item-1",
+        userId: "user-2",
+        cancelledAt: null,
+        createdAt,
+      },
+    ]);
+
+    await expect(listActiveReservationsByItemIds(["item-1", " item-1 ", "item-2"]))
+      .resolves.toEqual([
+        {
+          id: "reservation-1",
+          wishlistItemId: "item-1",
+          userId: "user-2",
+          cancelledAt: null,
+          createdAt,
+        },
+      ]);
+    expect(mocks.findReservations).toHaveBeenCalledTimes(1);
   });
 
   it("reports item-not-found when reservation availability has no item context", async () => {

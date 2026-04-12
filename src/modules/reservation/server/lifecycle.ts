@@ -1,4 +1,4 @@
-import { and, asc, eq, isNull } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import { DatabaseError } from "pg";
 import { reservations } from "@/modules/reservation/db/schema";
 import { wishlistItems, wishlists } from "@/modules/wishlist/db/schema";
@@ -84,6 +84,38 @@ export async function getActiveReservationByItemId(itemId: string): Promise<Acti
   }
 
   return toActiveReservation(activeReservation);
+}
+
+export async function listActiveReservationsByItemIds(
+  itemIds: string[],
+): Promise<ActiveReservation[]> {
+  const normalizedItemIds = Array.from(
+    new Set(itemIds.map((itemId) => itemId.trim()).filter(Boolean)),
+  );
+
+  if (normalizedItemIds.length === 0) {
+    return [];
+  }
+
+  const db = await getDb();
+  const activeReservations = await db.query.reservations.findMany({
+    columns: {
+      id: true,
+      wishlistItemId: true,
+      userId: true,
+      cancelledAt: true,
+      createdAt: true,
+    },
+    where: and(
+      inArray(reservations.wishlistItemId, normalizedItemIds),
+      isNull(reservations.cancelledAt),
+    ),
+    orderBy: [asc(reservations.createdAt), asc(reservations.id)],
+  });
+
+  return activeReservations
+    .filter((reservation) => reservation.cancelledAt === null)
+    .map(toActiveReservation);
 }
 
 export async function getItemReservationAvailability(
