@@ -29,8 +29,10 @@
 ## Environment Separation
 
 ### Local
-- Store values in `.env.local` only.
-- `.env.local` is gitignored and must not be committed.
+- Store host-run values in `.env.local`.
+- Store container-local verification values in a separate `.env.docker.local` file based on `.env.docker.example` when the database stays on the host machine.
+- `.env.local` and `.env.docker.local` are gitignored and must not be committed.
+- `.env.local` is for running the app directly on the host machine.
 - Minimum local runtime contract:
   - `DATABASE_URL`
 - Typical local value:
@@ -93,6 +95,20 @@
   - `GET /healthz`
   - HTTP `200`
   - JSON body with `{"status":"ok"}`
+
+## Container Runtime Surface
+- The production container image runs the `Next.js standalone` server.
+- The container listens on port `3000`.
+- The image sets `NODE_ENV=production`, `HOSTNAME=0.0.0.0`, and `PORT=3000` as process defaults for the standalone server.
+- The only application runtime env variables expected inside the container remain:
+  - `DATABASE_URL`
+  - `DATABASE_SSL`
+- No secrets are baked into image layers.
+- Local verification without Compose should use a container-specific env file when the database stays on the host machine.
+- `.env.docker.example` documents the expected host alias pattern for that case.
+- Local verification commands:
+  - `docker build -t wshka-app .`
+  - `docker run -p 3000:3000 --env-file .env.docker.local wshka-app`
 
 ## Rollout And Rollback Assumptions
 - Delivery remains single-environment and single-VPS.

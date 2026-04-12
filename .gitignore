@@ -15,6 +15,7 @@ test-results/
 # env files
 .env
 .env.local
+.env.docker.local
 .env.development.local
 .env.test.local
 .env.production.local

@@ -1,11 +1,11 @@
 {
   "name": "wshka",
-  "version": "0.2.0",
+  "version": "0.6.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node .next/standalone/server.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
@@ -14,23 +14,23 @@
     "test:e2e:smoke": "playwright test tests/e2e/app-shell.spec.ts"
   },
   "dependencies": {
-    "drizzle-orm": "^0.36.4",
+    "@types/node": "^22.19.17",
+    "@types/pg": "^8.20.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.27",
+    "drizzle-orm": "^0.45.2",
     "next": "^15.0.0",
     "pg": "^8.13.1",
+    "postcss": "^8.5.9",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "@types/pg": "^8.11.10",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
     "@playwright/test": "^1.55.0",
-    "autoprefixer": "^10.4.20",
-    "drizzle-kit": "^0.27.1",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.17",
-    "typescript": "^5.7.0",
+    "drizzle-kit": "^0.27.2",
     "vitest": "^2.1.8"
   }
 }
