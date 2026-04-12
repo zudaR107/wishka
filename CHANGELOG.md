@@ -7,7 +7,22 @@ The format is based on Keep a Changelog, and this project follows SemVer.
 ## [Unreleased]
 
 ### Planned
-- Milestone 4: share links.
+- Milestone 5: reservations.
+
+## [0.5.0] - 2026-04-12
+
+### Added
+- Share-link schema foundation with first-class `share_links` records and one
+  current active link per wishlist.
+- Opaque share-token generation and owner-side current share-link helpers.
+- Server-rendered owner share-link controls on `/app` with create, revoke, and
+  regenerate flows.
+- Public wishlist loading by active share token and read-only rendering on
+  `/share/[token]`.
+- Predictable invalidation behavior for inactive, revoked, and regenerated
+  share links.
+- Share milestone coverage across token generation, owner lifecycle helpers,
+  public loading, and route rendering states.
 
 ## [0.4.0] - 2026-04-11
 

@@ -3,7 +3,7 @@
 Minimal, fast wishlist app.
 
 ## Status
-Milestone 3 complete. Owner wishlist core is in place.
+Milestone 4 complete. Public share-link flow is in place.
 
 ## Core Idea
 Create a wishlist, share it by link, and let another person reserve an item.
@@ -27,7 +27,7 @@ Create a wishlist, share it by link, and let another person reserve an item.
 - `main` is protected and updated only through PRs.
 
 ## Current Focus
-- Milestone 4: share links.
+- Milestone 5: reservations.
 
 ## Current Capabilities
 - Email/password registration.
@@ -37,7 +37,10 @@ Create a wishlist, share it by link, and let another person reserve an item.
 - Automatic current wishlist bootstrap for authenticated owners.
 - Server-rendered owner dashboard with empty state and item list.
 - Owner-side wishlist item create, update, and delete flows.
-- Wishlist core coverage across focused unit and integration-like tests.
+- Owner-side share-link create, revoke, and regenerate flows on `/app`.
+- Public read-only wishlist access on `/share/[token]` by active opaque token.
+- Predictable unavailable state for invalid, inactive, and revoked share links.
+- Focused share coverage across server helpers and route rendering states.
 
 ## Project Docs
 - Product and delivery plan: `master-plan.md`
