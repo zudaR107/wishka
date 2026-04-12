@@ -18,7 +18,7 @@ vi.mock("next/headers", () => ({
   headers: vi.fn().mockResolvedValue({
     get: (name: string) => {
       if (name === "host") {
-        return "wishka.test";
+        return "wshka.test";
       }
 
       if (name === "x-forwarded-proto") {
@@ -126,7 +126,7 @@ describe("owner app wishlist bootstrap", () => {
     const html = renderToStaticMarkup(page);
 
     expect(html).toContain("Текущая публичная ссылка");
-    expect(html).toContain("https://wishka.test/share/opaque-token");
+    expect(html).toContain("https://wshka.test/share/opaque-token");
     expect(html).toContain("Отключить ссылку");
     expect(html).toContain("Создать новую ссылку");
     expect(html).not.toContain("Создать публичную ссылку");

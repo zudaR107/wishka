@@ -17,7 +17,7 @@ vi.mock("next/headers", () => ({
   headers: vi.fn().mockResolvedValue({
     get: (name: string) => {
       if (name === "host") {
-        return "wishka.test";
+        return "wshka.test";
       }
 
       if (name === "x-forwarded-proto") {

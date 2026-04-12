@@ -1,6 +1,6 @@
 export const app = {
   home: {
-    title: "Минималистичный каркас Wishka",
+    title: "Минималистичный каркас Wshka",
     description: "Эта страница фиксирует стартовый app shell для Milestone 1.",
     routesHint: "Ниже только маршруты-заглушки без продуктовой логики.",
     links: {

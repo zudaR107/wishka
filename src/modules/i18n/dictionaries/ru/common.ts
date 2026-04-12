@@ -1,4 +1,4 @@
 export const common = {
-  brand: "Wishka",
+  brand: "Wshka",
   routeSkeleton: "Каркас маршрута",
 } as const;

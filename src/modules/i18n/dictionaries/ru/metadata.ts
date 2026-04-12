@@ -1,4 +1,4 @@
 export const metadata = {
-  title: "Wishka",
+  title: "Wshka",
   description: "Минималистичное и быстрое приложение для вишлистов.",
 } as const;

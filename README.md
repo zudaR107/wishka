@@ -1,4 +1,4 @@
-# Wishka
+# Wshka
 
 Minimal, fast wishlist app.
 

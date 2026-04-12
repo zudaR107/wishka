@@ -1,11 +1,11 @@
-# Wishka Master Plan
+# Wshka Master Plan
 
 ## Product
-Wishka is a minimal, fast wishlist application with one main social flow:
+Wshka is a minimal, fast wishlist application with one main social flow:
 create a wishlist, share it by link, and let another person reserve an item.
 
 ## Product Decisions
-- Product name: `Wishka`
+- Product name: `Wshka`
 - Primary language: Russian first
 - Theme strategy: light theme first
 - Deployment target: one remote VPS with a domain
@@ -660,3 +660,4 @@ Recommended planning rule:
 - `v1.3.0`: English locale
 - `v1.4.0`: dark theme
 - `v1.5.0`: email verification and password reset
+- `v1.6.0`: api documentation (swagger / openapi)

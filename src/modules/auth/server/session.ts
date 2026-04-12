@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { eq } from "drizzle-orm";
 import { sessions } from "@/modules/auth/db/schema";
 
-export const AUTH_SESSION_COOKIE_NAME = "wishka_session";
+export const AUTH_SESSION_COOKIE_NAME = "wshka_session";
 
 const SESSION_TOKEN_LENGTH = 32;
 const SESSION_TTL_DAYS = 30;

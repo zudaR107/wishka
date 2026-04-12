@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Mission
-Build Wishka: a minimal, fast wishlist app focused on one core flow:
+Build Wshka: a minimal, fast wishlist app focused on one core flow:
 create wishlist -> share link -> reserve gift.
 
 ## Scope
