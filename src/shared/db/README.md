@@ -31,6 +31,9 @@
   owner link lifecycle and public read-only loading.
 - Reservation schema now lives in `src/modules/reservation/db/schema.ts` with a
   first-class `reservations` table for item-level reservation history.
+- Reservation runtime logic now builds on this schema inside the `reservation`
+  module for lifecycle rules, public reserve flow, owner read state, and
+  current-user cancellation flow.
 
 ## Wishlist Schema Foundation
 - `wishlists`: owner-linked wishlist records with `user_id`, `is_active`, and
@@ -54,8 +57,8 @@
   each item to one current active reservation.
 
 ## Next Expansion
-- The next DB expansion is expected in the `reservation` module for lifecycle
-  helpers, reservation-aware reads, and reservation flows built on this schema.
+- No new product DB expansion is planned for Milestone 6; focus shifts to
+  delivery and ops on top of the current schema set.
 
 ## Environment Contract
 - `DATABASE_URL`: required PostgreSQL connection string

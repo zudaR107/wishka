@@ -1,14 +1,20 @@
 # Reservation Module
 
 ## Current State
-- `src/modules/reservation/db/schema.ts` now owns the reservation DB
-  foundation.
-- `src/modules/reservation/server/lifecycle.ts` now owns reservation helper and
-  lifecycle rule foundation.
+- `src/modules/reservation/db/schema.ts` owns the reservation DB foundation.
+- `src/modules/reservation/server/lifecycle.ts` owns reservation lifecycle and
+  eligibility rules.
+- `src/modules/reservation/server/owner-wishlist.ts` builds the privacy-safe
+  owner read model used on `/app`.
+- `src/modules/reservation/server/current-user-reservations.ts` builds the
+  current-user active reservation list used on `/app/reservations`.
 - `reservations` stores reservation history per wishlist item without adding
   reserved flags to `wishlist_items`.
-- `/app/reservations` still exists as a protected route placeholder for a later
-  issue in this milestone.
+- `/share/[token]` supports public reservation create flow for eligible
+  authenticated non-owners.
+- `/app` shows privacy-safe reserved status without reserver identity.
+- `/app/reservations` is a protected reserver page with active reservation list
+  and cancel flow.
 
 ## Schema Foundation
 - Each reservation belongs to one `wishlist_item` and one authenticated
@@ -20,6 +26,8 @@
 ## Helper Foundation
 - `getActiveReservationByItemId(...)` reads the current active reservation for
   one item.
+- `listActiveReservationsByItemIds(...)` batches active reservation reads across
+  many wishlist items.
 - `getItemReservationAvailability(...)` and
   `getItemReservationEligibility(...)` centralize availability and ownership
   checks for future route-level flows.
@@ -27,16 +35,25 @@
   lifecycle rules inside the module layer.
 - `getCurrentOwnerWishlistWithReservations(...)` builds a privacy-safe owner
   read model with `available` or `reserved` item state and no reserver identity.
-- `listCurrentUserActiveReservations(...)` builds the active reservation list for
-  the authenticated reserver page and cancel flow.
+- `listCurrentUserActiveReservations(...)` builds the active reservation list
+  for the authenticated reserver page and cancel flow.
 
-## Planned Role
-- Model active reservation records for wishlist items.
-- Let authenticated non-owners reserve items from public share pages.
-- Let reservers review and cancel their own active reservations.
-- Let owners see reserved status without learning reserver identity.
+## Current Behavior
+- Active reservation state is derived only from reservation records.
+- Authenticated non-owners can reserve available items from public share pages.
+- Guests can view public wishlists but cannot reserve.
+- Owners can see `available` or `reserved` state on `/app` without seeing who
+  reserved an item.
+- Reservers can review and cancel only their own active reservations on
+  `/app/reservations`.
 
-## Next Milestone Scope
-- Add reservation schema, lifecycle helpers, public reservation flow, owner
-  privacy-safe reserved status, and current-user reservation views in Milestone
-  5.
+## Test Coverage
+- Focused tests cover lifecycle rules, reservation-aware public loading, public
+  reserve flow, owner privacy-safe rendering, and current-user cancel behavior.
+
+## Current Boundaries
+- Reservation mutations and lifecycle rules stay in the `reservation` module.
+- Share-token access and public wishlist read models stay in the `share`
+  module.
+- Milestone 6 should build delivery and ops around this behavior without adding
+  new reservation product scope.

@@ -16,7 +16,11 @@
 - `/app` shows the owner a share section for the current wishlist.
 - Owners can create, view, revoke, and regenerate the current public share
   link through server-side actions.
-- `/share/[token]` renders a public read-only wishlist for valid active tokens.
+- `/share/[token]` renders a public wishlist for valid active tokens with
+  reservation-aware item state.
+- Guests can see the public wishlist and a login CTA, but not reserve controls.
+- Eligible authenticated non-owners can reserve available items from the public
+  page through server-side actions.
 - Invalid, inactive, revoked, and superseded tokens do not expose wishlist
   data.
 - Public item read models expose only `available` or `reserved` state without
@@ -24,10 +28,12 @@
 
 ## Test Coverage
 - Unit and integration-like tests cover token generation, owner lifecycle
-  helpers, public loading by token, owner dashboard share states, and public
-  route rendering states.
+  helpers, public loading by token, public reserve action behavior, owner
+  dashboard share states, and public route rendering states.
 
-## Scope
-- Keep share behavior read-only on the public route in Milestone 4.
-- Keep share lifecycle logic inside the `share` module instead of routes.
-- Keep reservation behavior in the upcoming `reservation` milestone.
+## Current Boundaries
+- Keep share-token access and public wishlist read models inside the `share`
+  module instead of routes.
+- Keep reservation creation and cancellation rules inside the `reservation`
+  module even when the public route triggers them.
+- Milestone 6 should treat the current share behavior as stable product scope.
