@@ -1,7 +1,8 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireCurrentUser } from "@/modules/auth/server/current-user";
 import { getTranslations } from "@/modules/i18n";
+import { getCurrentShareLink, getOrCreateCurrentShareLink } from "@/modules/share";
 import { createCurrentWishlistItem } from "@/modules/wishlist/server/create-item";
 import { getCurrentWishlistWithItems } from "@/modules/wishlist/server/items";
 import {
@@ -24,10 +25,15 @@ type AppPageProps = {
 export default async function AppPage(props: AppPageProps) {
   const user = await requireCurrentUser();
   const params = props?.searchParams ? await props.searchParams : undefined;
-  const wishlist = await getCurrentWishlistWithItems(user.id);
+  const [wishlist, currentShareLink, appOrigin] = await Promise.all([
+    getCurrentWishlistWithItems(user.id),
+    getCurrentShareLink(user.id),
+    getAppOrigin(),
+  ]);
   const action = params?.action;
   const status = params?.status;
   const errorCode = params?.error;
+  const currentShareUrl = currentShareLink ? buildShareUrl(appOrigin, currentShareLink.token) : null;
 
   return (
     <PageShell
@@ -42,6 +48,10 @@ export default async function AppPage(props: AppPageProps) {
           <p className="ui-message ui-message-success">{messages.dashboard.updateSuccessMessage}</p>
         ) : status === "item-deleted" ? (
           <p className="ui-message ui-message-success">{messages.dashboard.deleteSuccessMessage}</p>
+        ) : status === "share-link-created" ? (
+          <p className="ui-message ui-message-success">
+            {messages.dashboard.share.successMessage}
+          </p>
         ) : null}
         {errorCode ? (
           <p className="ui-message ui-message-error">{getActionErrorMessage(action, errorCode)}</p>
@@ -75,6 +85,48 @@ export default async function AppPage(props: AppPageProps) {
             </button>
           </form>
         </div>
+
+        <section className="ui-surface p-6">
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <h2 className="text-lg font-semibold text-[color:var(--color-text-strong)]">
+                {messages.dashboard.share.title}
+              </h2>
+              <p className="text-sm text-[color:var(--color-text-base)]">
+                {messages.dashboard.share.description}
+              </p>
+            </div>
+
+            {currentShareUrl ? (
+              <div className="space-y-3">
+                <p className="ui-note">{messages.dashboard.share.readyLabel}</p>
+                <div className="ui-field">
+                  <label className="ui-label" htmlFor="share-link-url">
+                    {messages.dashboard.share.urlLabel}
+                  </label>
+                  <input
+                    id="share-link-url"
+                    value={currentShareUrl}
+                    readOnly
+                    className="ui-input"
+                  />
+                </div>
+                <p className="ui-note">{messages.dashboard.share.copyHint}</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-sm text-[color:var(--color-text-base)]">
+                  {messages.dashboard.share.emptyDescription}
+                </p>
+                <form action={createShareLinkAction}>
+                  <button type="submit" className="ui-button">
+                    {messages.dashboard.share.createLabel}
+                  </button>
+                </form>
+              </div>
+            )}
+          </div>
+        </section>
 
         <section className="ui-surface p-6">
           <div className="space-y-5">
@@ -300,6 +352,20 @@ async function deleteItemAction(formData: FormData) {
   redirect(`/app?action=delete&error=${result.code}`);
 }
 
+async function createShareLinkAction() {
+  "use server";
+
+  const user = await requireCurrentUser();
+
+  try {
+    await getOrCreateCurrentShareLink(user.id);
+  } catch {
+    redirect("/app?action=share-create&error=unknown");
+  }
+
+  redirect("/app?status=share-link-created");
+}
+
 function getFormValue(formData: FormData, fieldName: string): string {
   const value = formData.get(fieldName);
 
@@ -317,6 +383,10 @@ function getActionErrorMessage(action: string | undefined, errorCode: string): s
     case "item-not-found":
       return messages.dashboard.errors.itemNotFound;
     default:
+      if (action === "share-create") {
+        return messages.dashboard.share.errors.unknownCreate;
+      }
+
       if (action === "update") {
         return messages.dashboard.errors.unknownUpdate;
       }
@@ -327,4 +397,20 @@ function getActionErrorMessage(action: string | undefined, errorCode: string): s
 
       return messages.dashboard.errors.unknownCreate;
   }
+}
+
+async function getAppOrigin(): Promise<string> {
+  const headerStore = await headers();
+  const forwardedProto = headerStore.get("x-forwarded-proto");
+  const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
+
+  if (!host) {
+    return "http://localhost:3000";
+  }
+
+  return `${forwardedProto ?? "http"}://${host}`;
+}
+
+function buildShareUrl(origin: string, token: string): string {
+  return new URL(`/share/${token}`, origin).toString();
 }
