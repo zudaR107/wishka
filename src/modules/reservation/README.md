@@ -27,6 +27,8 @@
   lifecycle rules inside the module layer.
 - `getCurrentOwnerWishlistWithReservations(...)` builds a privacy-safe owner
   read model with `available` or `reserved` item state and no reserver identity.
+- `listCurrentUserActiveReservations(...)` builds the active reservation list for
+  the authenticated reserver page and cancel flow.
 
 ## Planned Role
 - Model active reservation records for wishlist items.

@@ -12,6 +12,11 @@ export {
   listActiveReservationsByItemIds,
 } from "@/modules/reservation/server/lifecycle";
 export {
+  type CurrentUserReservation,
+  type CurrentUserReservationItem,
+  listCurrentUserActiveReservations,
+} from "@/modules/reservation/server/current-user-reservations";
+export {
   type OwnerWishlistItem,
   type OwnerWishlistItemReservation,
   type OwnerWishlistWithReservations,

@@ -2,6 +2,8 @@ export { reservations } from "@/modules/reservation/db/schema";
 export {
   type ActiveReservation,
   type CancelReservationResult,
+  type CurrentUserReservation,
+  type CurrentUserReservationItem,
   type CreateReservationResult,
   type OwnerWishlistItem,
   type OwnerWishlistItemReservation,
@@ -14,5 +16,6 @@ export {
   getActiveReservationByItemId,
   getItemReservationAvailability,
   getItemReservationEligibility,
+  listCurrentUserActiveReservations,
   listActiveReservationsByItemIds,
 } from "@/modules/reservation/server";
