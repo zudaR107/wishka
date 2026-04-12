@@ -9,7 +9,8 @@
 ## Schema Layout
 - Module-owned schema files should live at `src/modules/<module>/db/schema.ts`
 - The current schema files live in `src/modules/auth/db/schema.ts`,
-  `src/modules/wishlist/db/schema.ts`, and `src/modules/share/db/schema.ts`
+  `src/modules/wishlist/db/schema.ts`, `src/modules/share/db/schema.ts`, and
+  `src/modules/reservation/db/schema.ts`
 - Auth schema starts with `users` and `sessions` only; keep auth runtime logic
   out of the DB foundation layer
 
@@ -28,6 +29,8 @@
   module for bootstrap, reads, and owner-scoped item mutations.
 - Share runtime logic now builds on these tables inside the `share` module for
   owner link lifecycle and public read-only loading.
+- Reservation schema now lives in `src/modules/reservation/db/schema.ts` with a
+  first-class `reservations` table for item-level reservation history.
 
 ## Wishlist Schema Foundation
 - `wishlists`: owner-linked wishlist records with `user_id`, `is_active`, and
@@ -42,9 +45,17 @@
 - The schema allows many historical links per wishlist while restricting each
   wishlist to one current active link.
 
+## Reservation Schema Foundation
+- `reservations`: item-linked reservation records with a reserver `user_id`,
+  `created_at`, and nullable `cancelled_at` lifecycle field.
+- Active reservation state is derived from `cancelled_at IS NULL` instead of an
+  item-level flag.
+- The schema allows many historical reservations per item while restricting
+  each item to one current active reservation.
+
 ## Next Expansion
-- The next DB expansion is expected in the `reservation` module for active
-  reservation records tied to wishlist items and authenticated reservers.
+- The next DB expansion is expected in the `reservation` module for lifecycle
+  helpers, reservation-aware reads, and reservation flows built on this schema.
 
 ## Environment Contract
 - `DATABASE_URL`: required PostgreSQL connection string

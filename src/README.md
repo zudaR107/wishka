@@ -16,7 +16,8 @@
 - `wishlist` is now an active feature module.
 - `share` is now an active feature module with schema, owner lifecycle helpers,
   public loading, and route rendering.
-- `reservation` remains the next product module to flesh out.
+- `reservation` now has its DB schema foundation in place for later milestone
+  issues.
 
 ## Module Areas
 - `auth`
