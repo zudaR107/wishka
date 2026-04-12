@@ -11,3 +11,9 @@ export {
   getItemReservationEligibility,
   listActiveReservationsByItemIds,
 } from "@/modules/reservation/server/lifecycle";
+export {
+  type OwnerWishlistItem,
+  type OwnerWishlistItemReservation,
+  type OwnerWishlistWithReservations,
+  getCurrentOwnerWishlistWithReservations,
+} from "@/modules/reservation/server/owner-wishlist";

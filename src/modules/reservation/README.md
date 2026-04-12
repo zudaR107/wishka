@@ -25,6 +25,8 @@
   checks for future route-level flows.
 - `createReservation(...)` and `cancelReservation(...)` enforce the minimal
   lifecycle rules inside the module layer.
+- `getCurrentOwnerWishlistWithReservations(...)` builds a privacy-safe owner
+  read model with `available` or `reserved` item state and no reserver identity.
 
 ## Planned Role
 - Model active reservation records for wishlist items.

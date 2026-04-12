@@ -98,6 +98,10 @@ export const app = {
       note: "Заметка",
       price: "Цена",
     },
+    itemReservation: {
+      availableLabel: "Статус: доступно",
+      reservedLabel: "Статус: забронировано",
+    },
   },
   reservations: {
     title: "Бронирования",

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   requireCurrentUser: vi.fn(),
-  getCurrentWishlistWithItems: vi.fn(),
+  getCurrentOwnerWishlistWithReservations: vi.fn(),
   getCurrentShareLink: vi.fn(),
   getOrCreateCurrentShareLink: vi.fn(),
   revokeCurrentShareLink: vi.fn(),
@@ -46,8 +46,8 @@ vi.mock("../../src/modules/share", () => ({
   regenerateCurrentShareLink: mocks.regenerateCurrentShareLink,
 }));
 
-vi.mock("../../src/modules/wishlist/server/items", () => ({
-  getCurrentWishlistWithItems: mocks.getCurrentWishlistWithItems,
+vi.mock("../../src/modules/reservation", () => ({
+  getCurrentOwnerWishlistWithReservations: mocks.getCurrentOwnerWishlistWithReservations,
 }));
 
 vi.mock("../../src/modules/wishlist/server/create-item", () => ({
@@ -63,7 +63,7 @@ describe("owner app wishlist bootstrap", () => {
   beforeEach(() => {
     Object.assign(globalThis, { React });
     mocks.requireCurrentUser.mockReset();
-    mocks.getCurrentWishlistWithItems.mockReset();
+    mocks.getCurrentOwnerWishlistWithReservations.mockReset();
     mocks.getCurrentShareLink.mockReset();
     mocks.getOrCreateCurrentShareLink.mockReset();
     mocks.revokeCurrentShareLink.mockReset();
@@ -76,7 +76,7 @@ describe("owner app wishlist bootstrap", () => {
       id: "user-1",
       email: "user@example.com",
     });
-    mocks.getCurrentWishlistWithItems.mockResolvedValue({
+    mocks.getCurrentOwnerWishlistWithReservations.mockResolvedValue({
       id: "wishlist-1",
       userId: "user-1",
       isActive: true,
@@ -93,7 +93,7 @@ describe("owner app wishlist bootstrap", () => {
     await AppPage({});
 
     expect(mocks.requireCurrentUser).toHaveBeenCalled();
-    expect(mocks.getCurrentWishlistWithItems).toHaveBeenCalledWith("user-1");
+    expect(mocks.getCurrentOwnerWishlistWithReservations).toHaveBeenCalledWith("user-1");
     expect(mocks.getCurrentShareLink).toHaveBeenCalledWith("user-1");
   });
 
@@ -241,7 +241,7 @@ describe("owner app wishlist bootstrap", () => {
   });
 
   it("renders wishlist items when they exist", async () => {
-    mocks.getCurrentWishlistWithItems.mockResolvedValue({
+    mocks.getCurrentOwnerWishlistWithReservations.mockResolvedValue({
       id: "wishlist-1",
       userId: "user-1",
       isActive: true,
@@ -257,6 +257,9 @@ describe("owner app wishlist bootstrap", () => {
           price: "9990.00",
           createdAt: new Date("2026-04-11T00:00:00.000Z"),
           updatedAt: new Date("2026-04-11T00:00:00.000Z"),
+          reservation: {
+            status: "reserved",
+          },
         },
       ],
     });
@@ -270,7 +273,56 @@ describe("owner app wishlist bootstrap", () => {
     expect(html).toContain("https://example.com/item");
     expect(html).toContain("Нужны беспроводные");
     expect(html).toContain("9990.00");
+    expect(html).toContain("Статус: забронировано");
     expect(html).toContain("Сохранить изменения");
     expect(html).toContain("Удалить желание");
+  });
+
+  it("renders privacy-safe item status without reserver identity", async () => {
+    mocks.getCurrentOwnerWishlistWithReservations.mockResolvedValue({
+      id: "wishlist-1",
+      userId: "user-1",
+      isActive: true,
+      createdAt: new Date("2026-04-11T00:00:00.000Z"),
+      updatedAt: new Date("2026-04-11T00:00:00.000Z"),
+      items: [
+        {
+          id: "item-1",
+          wishlistId: "wishlist-1",
+          title: "Наушники",
+          url: null,
+          note: null,
+          price: null,
+          createdAt: new Date("2026-04-11T00:00:00.000Z"),
+          updatedAt: new Date("2026-04-11T00:00:00.000Z"),
+          reservation: {
+            status: "available",
+          },
+        },
+        {
+          id: "item-2",
+          wishlistId: "wishlist-1",
+          title: "Книга",
+          url: null,
+          note: null,
+          price: null,
+          createdAt: new Date("2026-04-11T00:00:00.000Z"),
+          updatedAt: new Date("2026-04-11T00:00:00.000Z"),
+          reservation: {
+            status: "reserved",
+          },
+        },
+      ],
+    });
+
+    const { default: AppPage } = await import("../../src/app/app/page");
+
+    const page = await AppPage({});
+    const html = renderToStaticMarkup(page);
+
+    expect(html).toContain("Статус: доступно");
+    expect(html).toContain("Статус: забронировано");
+    expect(html).not.toContain("user-2");
+    expect(html).not.toContain("@example.com");
   });
 });

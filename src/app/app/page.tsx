@@ -8,8 +8,8 @@ import {
   regenerateCurrentShareLink,
   revokeCurrentShareLink,
 } from "@/modules/share";
+import { getCurrentOwnerWishlistWithReservations } from "@/modules/reservation";
 import { createCurrentWishlistItem } from "@/modules/wishlist/server/create-item";
-import { getCurrentWishlistWithItems } from "@/modules/wishlist/server/items";
 import {
   deleteCurrentWishlistItem,
   updateCurrentWishlistItem,
@@ -31,7 +31,7 @@ export default async function AppPage(props: AppPageProps) {
   const user = await requireCurrentUser();
   const params = props?.searchParams ? await props.searchParams : undefined;
   const [wishlist, currentShareLink, appOrigin] = await Promise.all([
-    getCurrentWishlistWithItems(user.id),
+    getCurrentOwnerWishlistWithReservations(user.id),
     getCurrentShareLink(user.id),
     getAppOrigin(),
   ]);
@@ -240,6 +240,11 @@ export default async function AppPage(props: AppPageProps) {
                           {item.price}
                         </p>
                       ) : null}
+                      <p className="ui-note font-medium text-[color:var(--color-text-strong)]">
+                        {item.reservation.status === "reserved"
+                          ? messages.dashboard.itemReservation.reservedLabel
+                          : messages.dashboard.itemReservation.availableLabel}
+                      </p>
                     </div>
                     <form action={updateItemAction} className="ui-form max-w-none">
                       <input type="hidden" name="itemId" value={item.id} />
