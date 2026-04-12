@@ -63,3 +63,5 @@
 ## Environment Contract
 - `DATABASE_URL`: required PostgreSQL connection string
 - `DATABASE_SSL`: optional boolean flag for SSL mode; default is `false`
+- Runtime env separation, secrets handling, and production deploy assumptions
+  are documented in `docs/runtime-environment.md`

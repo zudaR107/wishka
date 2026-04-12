@@ -49,6 +49,7 @@ Create a wishlist, share it by link, and let another person reserve an item.
 
 ## Project Docs
 - Product and delivery plan: `master-plan.md`
+- Runtime env and deploy foundation: `docs/runtime-environment.md`
 - Agent guidance: `AGENTS.md`
 
 ## License

@@ -591,6 +591,8 @@ Scope notes:
   environment.
 - Build around the current application behavior; Milestone 6 should not add new
   wishlist, share, or reservation product features.
+- Keep `docs/runtime-environment.md` as the canonical env and deploy foundation
+  doc for subsequent Milestone 6 PRs.
 - Prefer `Next.js standalone` images and a minimal runtime surface.
 - Keep operational configuration explicit: env contract, secrets handling,
   ports, volumes, and health checks should be documented and reviewable.
