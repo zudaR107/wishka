@@ -9,6 +9,8 @@
 - `server/public-wishlist.ts`: public loading helpers that resolve an active
   share token to a read-only wishlist with ordered items and privacy-safe
   reservation state.
+- Public share loading can also return a viewer-aware read model for minimal
+  auth-sensitive public reservation UX.
 
 ## Current Behavior
 - `/app` shows the owner a share section for the current wishlist.

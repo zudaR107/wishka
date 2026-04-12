@@ -24,6 +24,15 @@ export type PublicWishlist = {
   };
 };
 
+export type PublicWishlistViewer = {
+  isAuthenticated: boolean;
+  isOwner: boolean;
+};
+
+export type PublicWishlistView = PublicWishlist & {
+  viewer: PublicWishlistViewer;
+};
+
 export async function getActiveShareLinkByToken(token: string): Promise<CurrentShareLink | null> {
   const normalizedToken = token.trim();
 
@@ -52,9 +61,38 @@ export async function getPublicWishlistByShareToken(token: string): Promise<Publ
   return getReservationAwarePublicWishlistByShareToken(token);
 }
 
+export async function getPublicWishlistViewByShareToken(
+  token: string,
+  viewerUserId?: string,
+): Promise<PublicWishlistView | null> {
+  const data = await loadPublicWishlistByShareToken(token);
+
+  if (!data) {
+    return null;
+  }
+
+  return {
+    ...buildPublicWishlist(data),
+    viewer: {
+      isAuthenticated: Boolean(viewerUserId),
+      isOwner: viewerUserId === data.wishlist.userId,
+    },
+  };
+}
+
 export async function getReservationAwarePublicWishlistByShareToken(
   token: string,
 ): Promise<PublicWishlist | null> {
+  const data = await loadPublicWishlistByShareToken(token);
+
+  if (!data) {
+    return null;
+  }
+
+  return buildPublicWishlist(data);
+}
+
+async function loadPublicWishlistByShareToken(token: string) {
   const shareLink = await getActiveShareLinkByToken(token);
 
   if (!shareLink) {
@@ -73,17 +111,31 @@ export async function getReservationAwarePublicWishlistByShareToken(
     ),
   );
 
-  const items = wishlist.items.map((item) => ({
+  return {
+    shareLink,
+    wishlist,
+    activeReservationItemIds,
+  };
+}
+
+function buildPublicWishlist(data: {
+  shareLink: CurrentShareLink;
+  wishlist: Awaited<ReturnType<typeof getWishlistWithItems>> extends infer T
+    ? NonNullable<T>
+    : never;
+  activeReservationItemIds: Set<string>;
+}): PublicWishlist {
+  const items = data.wishlist.items.map((item) => ({
     ...item,
-    reservation: getPublicWishlistItemReservation(item.id, activeReservationItemIds),
+    reservation: getPublicWishlistItemReservation(item.id, data.activeReservationItemIds),
   }));
 
   return {
-    id: wishlist.id,
+    id: data.wishlist.id,
     items,
     shareLink: {
-      id: shareLink.id,
-      token: shareLink.token,
+      id: data.shareLink.id,
+      token: data.shareLink.token,
     },
   };
 }
