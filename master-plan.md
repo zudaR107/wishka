@@ -18,8 +18,10 @@ create a wishlist, share it by link, and let another person reserve an item.
 - Milestone 1 is complete.
 - Milestone 2 is complete.
 - Milestone 3 is complete.
-- Repository, app, DB, i18n, UI, auth, and wishlist foundations are in place.
-- Next focus: Milestone 4 - Share Links.
+- Milestone 4 is complete.
+- Repository, app, DB, i18n, UI, auth, wishlist, and share foundations are in
+  place.
+- Next focus: Milestone 5 - Reservations.
 
 ## Scope For `v1.0.0`
 Included:
@@ -379,6 +381,9 @@ Release note:
 Goal:
 - deliver secure public read-only sharing by token
 
+Status:
+- complete
+
 Execution backlog:
 1. Share link schema foundation
 2. Share token and owner share helpers
@@ -449,9 +454,94 @@ Definition of small PRs for this milestone:
 - revoke-regenerate PR only adds share lifecycle behavior
 - test PR expands coverage without mixing in reservation behavior
 
+Release note:
+- `v0.5.0` marks the public sharing milestone.
+
 ### Milestone 5 - Reservations (`v0.6.0`)
 Goal:
 - deliver reservation flow, cancellation, and privacy rules
+
+Status:
+- planned
+
+Execution backlog:
+1. Reservation schema foundation
+2. Reservation helpers and lifecycle rules
+3. Public wishlist reservation state loading
+4. Public reservation create flow
+5. Owner dashboard reserved-status rendering
+6. Reserver reservations page and cancel flow
+7. Reservation test coverage
+
+Recommended issue shape:
+- `M5-I1 Reservation schema foundation`
+- `M5-I2 Reservation helpers and lifecycle rules`
+- `M5-I3 Public wishlist reservation state loading`
+- `M5-I4 Public reservation create flow`
+- `M5-I5 Owner dashboard reserved-status rendering`
+- `M5-I6 Reserver reservations page and cancel flow`
+- `M5-I7 Reservation test coverage`
+
+Recommended PR order:
+1. `M5-I1 Reservation schema foundation`
+2. `M5-I2 Reservation helpers and lifecycle rules`
+3. `M5-I3 Public wishlist reservation state loading`
+4. `M5-I4 Public reservation create flow`
+5. `M5-I5 Owner dashboard reserved-status rendering`
+6. `M5-I6 Reserver reservations page and cancel flow`
+7. `M5-I7 Reservation test coverage`
+
+Dependencies:
+- `M5-I2` depends on `M5-I1`
+- `M5-I3` depends on `M5-I1`, `M4-I4`, and `M3-I3`
+- `M5-I4` depends on `M5-I2`, `M5-I3`, and `M4-I5`
+- `M5-I5` depends on `M5-I1`, `M5-I2`, and `M3-I4`
+- `M5-I6` depends on `M5-I2` and `M2-I5`
+- `M5-I7` depends on `M5-I4`, `M5-I5`, and `M5-I6`
+
+Scope notes:
+- Reservation state must be derived from active reservation records instead of
+  denormalized item flags.
+- Only authenticated non-owners can reserve items from public share pages.
+- Guests may still view public wishlists, but they must not be able to reserve.
+- Owners must see reserved status without seeing reserver identity.
+- Keep cancel behavior scoped to the authenticated reserver's own active
+  reservations.
+- Reuse the share and wishlist read foundations instead of duplicating route
+  queries for reservation-aware views.
+
+Acceptance targets:
+- authenticated non-owner can reserve an available item from a public share page
+- guest can view the public page but cannot reserve items
+- owner cannot reserve their own wishlist items
+- owner dashboard shows privacy-safe reserved status for items
+- reserver can view and cancel their own active reservations on
+  `/app/reservations`
+- reservation rules are covered by focused tests for owner, reserver, and guard
+  cases
+
+Exit criteria:
+- reservation schema exists
+- at most one active reservation can exist per item
+- public share page can create reservations for eligible authenticated
+  non-owners
+- owner dashboard shows reserved state without exposing reserver identity
+- `/app/reservations` lists the current user's reservations and supports
+  cancellation
+- canceled or superseded reservations no longer count as active
+- reservation coverage exists for rule enforcement and key UI states
+
+Definition of small PRs for this milestone:
+- schema PR only adds reservation tables, constraints, migrations, and docs
+- helper PR only adds reusable reservation lifecycle and eligibility helpers
+- public-loading PR only wires reservation-aware public read state
+- create-flow PR only adds public reservation behavior and guard feedback
+- owner-status PR only adds privacy-safe owner dashboard state
+- reservations-page PR only adds current-user reservation reads and cancel flow
+- test PR expands coverage without mixing in delivery or notification work
+
+Release note:
+- `v0.6.0` marks the reservation flow milestone.
 
 ### Milestone 6 - Delivery And Ops (`v0.7.0`)
 Goal:

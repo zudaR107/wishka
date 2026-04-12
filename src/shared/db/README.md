@@ -8,8 +8,8 @@
 
 ## Schema Layout
 - Module-owned schema files should live at `src/modules/<module>/db/schema.ts`
-- The first schema files are expected in `src/modules/auth/db/schema.ts`
-  and `src/modules/wishlist/db/schema.ts`
+- The current schema files live in `src/modules/auth/db/schema.ts`,
+  `src/modules/wishlist/db/schema.ts`, and `src/modules/share/db/schema.ts`
 - Auth schema starts with `users` and `sessions` only; keep auth runtime logic
   out of the DB foundation layer
 
@@ -26,6 +26,8 @@
   first-class `share_links` table for opaque public access tokens.
 - Wishlist runtime logic now builds on these tables inside the `wishlist`
   module for bootstrap, reads, and owner-scoped item mutations.
+- Share runtime logic now builds on these tables inside the `share` module for
+  owner link lifecycle and public read-only loading.
 
 ## Wishlist Schema Foundation
 - `wishlists`: owner-linked wishlist records with `user_id`, `is_active`, and
@@ -39,6 +41,10 @@
 - `token` is globally unique for `/share/[token]` access.
 - The schema allows many historical links per wishlist while restricting each
   wishlist to one current active link.
+
+## Next Expansion
+- The next DB expansion is expected in the `reservation` module for active
+  reservation records tied to wishlist items and authenticated reservers.
 
 ## Environment Contract
 - `DATABASE_URL`: required PostgreSQL connection string

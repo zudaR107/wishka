@@ -8,13 +8,15 @@
 ## Current State
 - `src/app/login` and `src/app/register` contain working auth entry flows.
 - `src/app/app` is a server-rendered owner dashboard with wishlist bootstrap,
-  read state, and item CRUD.
+  read state, item CRUD, and share-link controls.
 - `src/app/app/reservations` remains a protected placeholder for a later
   milestone.
+- `src/app/share/[token]` is now a real public read-only route backed by the
+  `share` module.
 - `wishlist` is now an active feature module.
-- `share` now has its schema foundation in place; runtime and route behavior
-  remain for the next Milestone 4 issues.
-- `reservation` remains a later product module to flesh out.
+- `share` is now an active feature module with schema, owner lifecycle helpers,
+  public loading, and route rendering.
+- `reservation` remains the next product module to flesh out.
 
 ## Module Areas
 - `auth`
