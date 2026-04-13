@@ -75,6 +75,27 @@
 | `PRODUCTION_SSH_KEY` | yes | yes | GitHub environment secret | SSH private key for deploy workflow |
 | `GHCR_IMAGE` | yes | no | workflow env or repository variable | Fully qualified image name to publish and deploy |
 
+## GitHub Actions Publish Flow
+- PR build validation is handled by `.github/workflows/baseline-pr-validation.yml`.
+- GHCR image publish is handled by `.github/workflows/image-publish.yml`.
+- The publish workflow uses the existing production `Dockerfile` from `M6-I2`.
+- Publish events are:
+  - push to `main`
+  - push of SemVer tags matching `v*.*.*`
+- Expected image tags:
+  - `sha-<full-commit-sha>` for every publish run
+  - `main` for default branch publishes
+  - `vX.Y.Z`, `X.Y`, and `X` for SemVer tag publishes
+  - `latest` for SemVer tag publishes only
+- Expected GitHub permissions:
+  - `contents: read`
+  - `packages: write`
+- Expected GitHub configuration:
+  - `GHCR_IMAGE` as a repository variable or environment variable
+- If `GHCR_IMAGE` is not set, the workflow falls back to `ghcr.io/<owner>/wshka-app`.
+- No extra registry secret is expected for GHCR publish; the workflow uses `secrets.GITHUB_TOKEN`.
+- `M6-I6` should consume one of the published immutable tags for deploy and rollback decisions rather than rebuilding on the server.
+
 ## One-VPS Production Target
 - One Ubuntu LTS VPS.
 - One production environment only.
