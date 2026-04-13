@@ -79,13 +79,19 @@ export default async function AppPage(props: AppPageProps) {
               <dl className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <dt className="ui-note">ID</dt>
-                  <dd className="mt-1 break-all font-medium text-[color:var(--color-text-strong)]">
+                  <dd
+                    data-testid="wishlist-id"
+                    className="mt-1 break-all font-medium text-[color:var(--color-text-strong)]"
+                  >
                     {wishlist.id}
                   </dd>
                 </div>
                 <div>
                   <dt className="ui-note">{messages.dashboard.itemCountLabel}</dt>
-                  <dd className="mt-1 font-medium text-[color:var(--color-text-strong)]">
+                  <dd
+                    data-testid="wishlist-item-count"
+                    className="mt-1 font-medium text-[color:var(--color-text-strong)]"
+                  >
                     {wishlist.items.length}
                   </dd>
                 </div>
@@ -119,6 +125,7 @@ export default async function AppPage(props: AppPageProps) {
                   </label>
                   <input
                     id="share-link-url"
+                    data-testid="share-link-url"
                     value={currentShareUrl}
                     readOnly
                     className="ui-input"
@@ -160,7 +167,11 @@ export default async function AppPage(props: AppPageProps) {
                 {messages.dashboard.formTitle}
               </h2>
             </div>
-            <form action={createItemAction} className="ui-form max-w-none">
+            <form
+              action={createItemAction}
+              className="ui-form max-w-none"
+              data-testid="wishlist-create-form"
+            >
               <div className="ui-field">
                 <label className="ui-label" htmlFor="title">
                   {messages.dashboard.fields.title}
@@ -195,7 +206,7 @@ export default async function AppPage(props: AppPageProps) {
         </section>
 
         {wishlist.items.length === 0 ? (
-          <section className="ui-surface p-6">
+          <section className="ui-surface p-6" data-testid="wishlist-empty-state">
             <h2 className="text-lg font-semibold text-[color:var(--color-text-strong)]">
               {messages.dashboard.emptyTitle}
             </h2>
