@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/modules/auth/server/current-user";
 import { MIN_PASSWORD_LENGTH } from "@/modules/auth/server/register-input";
 import { getTranslations } from "@/modules/i18n";
 import { PageShell } from "@/shared/ui/page-shell";
@@ -14,6 +15,12 @@ type RegisterPageProps = {
 };
 
 export default async function RegisterPage({ searchParams }: RegisterPageProps) {
+  const currentUser = await getCurrentUser();
+
+  if (currentUser) {
+    redirect("/app");
+  }
+
   const params = searchParams ? await searchParams : undefined;
   const status = params?.status;
   const errorCode = params?.error;
