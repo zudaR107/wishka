@@ -50,6 +50,7 @@ Create a wishlist, share it by link, and let another person reserve an item.
 ## Project Docs
 - Product and delivery plan: `master-plan.md`
 - Runtime env and deploy foundation: `docs/runtime-environment.md`
+- Delivery validation runbook: `docs/delivery-validation.md`
 - GitHub Actions build and image publish: `.github/workflows/`
 - Agent guidance: `AGENTS.md`
 

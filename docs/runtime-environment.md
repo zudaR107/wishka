@@ -4,6 +4,7 @@
 - This document is the `M6-I1` foundation for runtime env rules and one-VPS deployment assumptions.
 - It documents the contract that later Milestone 6 PRs should reuse.
 - It does not define the production image, Docker Compose stack, Caddy config, GitHub Actions workflows, or deploy scripts.
+- End-to-end delivery validation steps are documented in `docs/delivery-validation.md`.
 
 ## Runtime Env Contract
 
