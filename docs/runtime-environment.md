@@ -110,6 +110,32 @@
   - `docker build -t wshka-app .`
   - `docker run -p 3000:3000 --env-file .env.docker.local wshka-app`
 
+## Compose Stack Foundation
+- `compose.yaml` is the production-oriented stack foundation for one VPS.
+- The stack shape is:
+  - `caddy` as the public HTTP entrypoint
+  - `app` as the internal Next.js runtime
+  - `postgres` as the internal persistent database
+- `caddy` publishes port `80`.
+- Port `443` remains reserved for the future HTTPS-focused `M6-I4` change and is not published by this foundation yet.
+- `app` is not published externally and is reachable only on the internal Compose network.
+- `postgres` is not published externally and is reachable only on the internal Compose network.
+- Persistent volumes are expected for:
+  - PostgreSQL data
+  - Caddy data
+  - Caddy config state
+- Compose-level values should live in a gitignored `.env.compose.local` file based on `.env.compose.example`.
+- The app runtime env inside Compose still follows the `M6-I1` contract:
+  - `DATABASE_URL`
+  - `DATABASE_SSL`
+- Compose local validation commands:
+  - `docker compose --env-file .env.compose.local config`
+  - `docker compose --env-file .env.compose.local up -d`
+- Compose smoke-check commands:
+  - `docker compose --env-file .env.compose.local ps`
+  - `curl http://localhost/healthz`
+- `M6-I4` is expected to replace the placeholder HTTP-only Caddy foundation with domain-aware production proxy and HTTPS behavior.
+
 ## Rollout And Rollback Assumptions
 - Delivery remains single-environment and single-VPS.
 - A rollout is expected to update the running app version, then verify `/healthz`.
