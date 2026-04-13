@@ -73,7 +73,11 @@
 | `PRODUCTION_SSH_USER` | yes | no | GitHub environment variable or workflow env | SSH user for deploy access |
 | `PRODUCTION_SSH_PORT` | no | no | GitHub environment variable or workflow env | SSH port, default `22` |
 | `PRODUCTION_SSH_KEY` | yes | yes | GitHub environment secret | SSH private key for deploy workflow |
+| `PRODUCTION_APP_DIR` | no | no | GitHub environment variable or workflow env | Target application directory on the VPS; default `/opt/wshka` |
+| `PRODUCTION_HEALTHCHECK_URL` | no | no | GitHub environment variable or workflow env | Public deploy verification URL; default `https://wshka.ru/healthz` |
 | `GHCR_IMAGE` | yes | no | workflow env or repository variable | Fully qualified image name to publish and deploy |
+| `GHCR_USERNAME` | no | no | GitHub environment variable or workflow env | GHCR username for remote image pull; defaults to repository owner |
+| `GHCR_TOKEN` | yes | yes | GitHub environment secret | GHCR read token for pulling the published image on the VPS |
 
 ## GitHub Actions Publish Flow
 - PR build validation is handled by `.github/workflows/baseline-pr-validation.yml`.
@@ -95,6 +99,35 @@
 - If `GHCR_IMAGE` is not set, the workflow falls back to `ghcr.io/<owner>/wshka-app`.
 - No extra registry secret is expected for GHCR publish; the workflow uses `secrets.GITHUB_TOKEN`.
 - `M6-I6` should consume one of the published immutable tags for deploy and rollback decisions rather than rebuilding on the server.
+
+## GitHub Actions Deploy Flow
+- Production deploy is handled by `.github/workflows/production-deploy.yml`.
+- The deploy workflow triggers on `release.published` only.
+- The deployed image tag is the GitHub Release tag name.
+- The deploy workflow uses the already-published GHCR image from `M6-I5` and does not rebuild on the VPS.
+- The workflow uploads these tracked deployment artifacts to the VPS application directory:
+  - `compose.yaml`
+  - `ops/caddy/Caddyfile`
+  - `ops/deploy/remote-deploy.sh`
+- The VPS must already contain a gitignored runtime file at `<PRODUCTION_APP_DIR>/.env.compose.production` based on `.env.compose.production.example`.
+- Remote deploy steps are:
+  - authenticate to GHCR with an ephemeral Docker config
+  - validate `docker compose` config using `.env.compose.production`
+  - start `postgres` and wait for it to become healthy
+  - run the production migration step before the updated app is started
+  - pull the target app image tag
+  - run `docker compose up -d --no-build --force-recreate app caddy`
+  - print `docker compose ps`
+- Post-deploy verification is an external health check against `https://wshka.ru/healthz` by default.
+- A failed public health check fails the workflow.
+- A failed migration step fails the deploy before the updated app is rolled out.
+- The migration step uses the same production database wiring shape as app runtime:
+  - `postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}`
+  - `DATABASE_SSL`
+- The published app image includes a dedicated migration runner at `node /app/ops/deploy/run-migrations.mjs`.
+- Rollback expectation remains minimal and explicit:
+  - redeploy the previous known-good immutable image tag through the same compose path
+  - do not rebuild on the VPS during rollback
 
 ## One-VPS Production Target
 - One Ubuntu LTS VPS.
@@ -145,6 +178,7 @@
   - Caddy data
   - Caddy config state
 - Compose-level values should live in a gitignored `.env.compose.local` file based on `.env.compose.example`.
+- VPS runtime values should live in a gitignored `.env.compose.production` file based on `.env.compose.production.example`.
 - The app runtime env inside Compose still follows the `M6-I1` contract:
   - `DATABASE_URL`
   - `DATABASE_SSL`

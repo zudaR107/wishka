@@ -17,6 +17,7 @@ test-results/
 .env.local
 .env.docker.local
 .env.compose.local
+.env.compose.production
 .env.development.local
 .env.test.local
 .env.production.local

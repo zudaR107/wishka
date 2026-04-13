@@ -1,0 +1,90 @@
+name: M6 Production Deploy
+
+on:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+env:
+  GHCR_IMAGE: ${{ vars.GHCR_IMAGE || format('ghcr.io/{0}/wshka-app', github.repository_owner) }}
+  GHCR_USERNAME: ${{ vars.GHCR_USERNAME || github.repository_owner }}
+  IMAGE_TAG: ${{ github.event.release.tag_name }}
+  PRODUCTION_APP_DIR: ${{ vars.PRODUCTION_APP_DIR || '/opt/wshka' }}
+  PRODUCTION_HEALTHCHECK_URL: ${{ vars.PRODUCTION_HEALTHCHECK_URL || 'https://wshka.ru/healthz' }}
+  PRODUCTION_HOST: ${{ vars.PRODUCTION_HOST }}
+  PRODUCTION_SSH_PORT: ${{ vars.PRODUCTION_SSH_PORT || '22' }}
+  PRODUCTION_SSH_USER: ${{ vars.PRODUCTION_SSH_USER }}
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Configure SSH access
+        shell: bash
+        env:
+          PRODUCTION_SSH_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$PRODUCTION_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "$PRODUCTION_SSH_PORT" "$PRODUCTION_HOST" >> ~/.ssh/known_hosts
+
+      - name: Prepare remote deploy directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -p "$PRODUCTION_SSH_PORT" "$PRODUCTION_SSH_USER@$PRODUCTION_HOST" \
+            "mkdir -p '$PRODUCTION_APP_DIR/ops/caddy' '$PRODUCTION_APP_DIR/ops/deploy'"
+
+      - name: Upload deploy artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          scp -P "$PRODUCTION_SSH_PORT" compose.yaml \
+            "$PRODUCTION_SSH_USER@$PRODUCTION_HOST:$PRODUCTION_APP_DIR/compose.yaml"
+          scp -P "$PRODUCTION_SSH_PORT" ops/caddy/Caddyfile \
+            "$PRODUCTION_SSH_USER@$PRODUCTION_HOST:$PRODUCTION_APP_DIR/ops/caddy/Caddyfile"
+          scp -P "$PRODUCTION_SSH_PORT" ops/deploy/remote-deploy.sh \
+            "$PRODUCTION_SSH_USER@$PRODUCTION_HOST:$PRODUCTION_APP_DIR/ops/deploy/remote-deploy.sh"
+
+      - name: Upload deploy metadata
+        shell: bash
+        env:
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+        run: |
+          set -euo pipefail
+          {
+            printf 'APP_IMAGE=%q\n' "$GHCR_IMAGE:$IMAGE_TAG"
+            printf 'GHCR_USERNAME=%q\n' "$GHCR_USERNAME"
+            printf 'GHCR_TOKEN=%q\n' "$GHCR_TOKEN"
+          } > "$RUNNER_TEMP/.deploy.env"
+
+          scp -P "$PRODUCTION_SSH_PORT" "$RUNNER_TEMP/.deploy.env" \
+            "$PRODUCTION_SSH_USER@$PRODUCTION_HOST:$PRODUCTION_APP_DIR/.deploy.env"
+
+      - name: Roll out production stack
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -p "$PRODUCTION_SSH_PORT" "$PRODUCTION_SSH_USER@$PRODUCTION_HOST" \
+            "cd '$PRODUCTION_APP_DIR' && chmod +x ops/deploy/remote-deploy.sh && ./ops/deploy/remote-deploy.sh"
+
+      - name: Verify production health
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location \
+            --retry 12 --retry-delay 5 --retry-all-errors \
+            "$PRODUCTION_HEALTHCHECK_URL"

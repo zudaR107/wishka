@@ -22,8 +22,11 @@ RUN apk add --no-cache libc6-compat \
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
+COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+COPY drizzle ./drizzle
+COPY ops/deploy/run-migrations.mjs ./ops/deploy/run-migrations.mjs
 USER nextjs
 EXPOSE 3000
 CMD ["node", "server.js"]
