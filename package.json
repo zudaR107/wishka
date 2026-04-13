@@ -10,8 +10,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "typecheck": "rm -rf .next && next typegen && tsc --noEmit",
-    "test:unit:smoke": "vitest run tests/unit/healthz.test.ts",
-    "test:e2e:smoke": "playwright test tests/e2e/app-shell.spec.ts"
+    "test:unit": "vitest run tests/unit",
+    "test:e2e": "playwright test tests/e2e"
   },
   "dependencies": {
     "@types/node": "^22.19.17",

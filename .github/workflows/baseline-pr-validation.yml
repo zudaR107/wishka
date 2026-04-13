@@ -1,4 +1,4 @@
-name: M0 Baseline PR Validation
+name: PR Validation
 
 on:
   pull_request:
@@ -125,8 +125,8 @@ jobs:
         shell: bash
         run: npm run typecheck
 
-  build-smoke:
-    name: build-smoke
+  build:
+    name: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -143,8 +143,8 @@ jobs:
         shell: bash
         run: npm run build
 
-  unit-smoke:
-    name: unit-smoke
+  unit:
+    name: unit
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -157,13 +157,30 @@ jobs:
         shell: bash
         run: npm ci
 
-      - name: Run unit smoke tests
+      - name: Run unit test suite
         shell: bash
-        run: npm run test:unit:smoke
+        run: npm run test:unit
 
-  e2e-smoke:
-    name: e2e-smoke
+  e2e:
+    name: e2e
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: wshka
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d wshka"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/wshka
+      DATABASE_SSL: "false"
     steps:
       - uses: actions/checkout@v5
 
@@ -174,11 +191,15 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: npm ci
+
+      - name: Run database migrations
+        shell: bash
+        run: npm run db:migrate
 
       - name: Install Playwright browser
         shell: bash
         run: npx playwright install --with-deps chromium
 
-      - name: Run e2e smoke tests
+      - name: Run e2e test suite
         shell: bash
-        run: npm run test:e2e:smoke
+        run: npm run test:e2e

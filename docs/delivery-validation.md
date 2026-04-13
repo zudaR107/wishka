@@ -21,8 +21,9 @@
   - `npm ci`
   - `npm run typecheck`
   - `npm run build`
-  - `npm run test:unit:smoke`
-  - `npm run test:e2e:smoke`
+  - `npm run test:unit`
+  - `npm run test:e2e`
+- The `e2e` job provisions PostgreSQL in GitHub Actions and runs `npm run db:migrate` before Playwright.
 - A PR is not delivery-ready until this workflow is green.
 
 ### Image Publish
@@ -54,13 +55,13 @@ How to validate locally before or after PR:
 npm ci
 npm run typecheck
 npm run build
-npm run test:unit:smoke
-npm run test:e2e:smoke
+npm run test:unit
+npm run test:e2e
 ```
 
 How to validate on GitHub:
 1. Open the PR.
-2. Check the `M0 Baseline PR Validation` workflow.
+2. Check the `PR Validation` workflow.
 3. Confirm all jobs are green.
 
 If this stage fails:
