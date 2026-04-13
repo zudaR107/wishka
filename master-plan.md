@@ -20,9 +20,13 @@ create a wishlist, share it by link, and let another person reserve an item.
 - Milestone 3 is complete.
 - Milestone 4 is complete.
 - Milestone 5 is complete.
+- Milestone 6 is complete.
 - Repository, app, DB, i18n, UI, auth, wishlist, share, and reservation
   foundations are in place.
-- Next focus: Milestone 6 - Delivery And Ops.
+- Delivery and ops foundations are now in place: runtime env contract,
+  production image, compose stack, Caddy proxy, GHCR publish, VPS deploy,
+  production migrations, and validation runbook.
+- Next focus: Milestone 7 - MVP Hardening.
 
 ## Scope For `v1.0.0`
 Included:
@@ -549,7 +553,7 @@ Goal:
 - deliver deploy-ready infrastructure, CI/CD, and release automation
 
 Status:
-- planned
+- complete
 
 Execution backlog:
 1. Runtime environment contract and deploy docs foundation
@@ -635,6 +639,80 @@ Release note:
 ### Milestone 7 - MVP Hardening (`v1.0.0`)
 Goal:
 - harden the product, complete core end-to-end coverage, and ship `v1.0.0`
+
+Status:
+- planned
+
+Execution backlog:
+1. Owner journey end-to-end coverage
+2. Public share and reservation end-to-end coverage
+3. Auth/session and route hardening
+4. User-facing validation and unavailable-state polish
+5. Production release rehearsal and rollback validation
+6. `v1.0.0` launch checklist and release prep
+
+Recommended issue shape:
+- `M7-I1 Owner journey end-to-end coverage`
+- `M7-I2 Public share and reservation end-to-end coverage`
+- `M7-I3 Auth/session and route hardening`
+- `M7-I4 User-facing validation and unavailable-state polish`
+- `M7-I5 Production release rehearsal and rollback validation`
+- `M7-I6 v1.0.0 launch checklist and release prep`
+
+Recommended PR order:
+1. `M7-I1 Owner journey end-to-end coverage`
+2. `M7-I2 Public share and reservation end-to-end coverage`
+3. `M7-I3 Auth/session and route hardening`
+4. `M7-I4 User-facing validation and unavailable-state polish`
+5. `M7-I5 Production release rehearsal and rollback validation`
+6. `M7-I6 v1.0.0 launch checklist and release prep`
+
+Dependencies:
+- `M7-I2` depends on `M5-I7`
+- `M7-I3` depends on `M2-I6`
+- `M7-I4` depends on `M7-I1`, `M7-I2`, and `M7-I3`
+- `M7-I5` depends on `M6-I7`
+- `M7-I6` depends on `M7-I1`, `M7-I2`, `M7-I3`, `M7-I4`, and `M7-I5`
+
+Scope notes:
+- Do not add new product scope beyond the existing `v1.0.0` contract.
+- Prefer fixing real gaps in reliability, UX, validation, and coverage over
+  introducing new abstractions.
+- Keep end-to-end coverage focused on the core owner and reserver journeys.
+- Reuse the current production image, compose, and deploy path for release
+  rehearsal instead of inventing a special release-only path.
+- Keep launch prep limited to checklist, docs, changelog, and release notes.
+
+Acceptance targets:
+- the owner journey is validated end-to-end from auth to wishlist and share
+  management
+- the public/reserver journey is validated end-to-end from public view to
+  reserve and cancel
+- auth/session failure states and route guards are hardened for the MVP release
+- key validation, unavailable, and empty states are predictable and localized
+- the release path is rehearsed against the current publish, deploy, migration,
+  and health-check flow
+- `v1.0.0` release docs and checklist are ready for a first public launch
+
+Exit criteria:
+- focused end-to-end coverage exists for the core owner journey
+- focused end-to-end coverage exists for the core public/reserver journey
+- major auth/session and route-guard regressions are resolved
+- key user-facing validation and unavailable states are documented and stable
+- release rehearsal notes and rollback instructions are current
+- changelog and release notes are ready for `v1.0.0`
+- no known blocker remains for the first stable MVP release
+
+Definition of small PRs for this milestone:
+- owner-journey PR only expands or fixes owner-focused end-to-end coverage
+- public-journey PR only expands or fixes share/reservation end-to-end coverage
+- auth-hardening PR only fixes auth/session/guard issues
+- UX-hardening PR only fixes targeted validation, unavailable, or empty-state gaps
+- release-rehearsal PR only updates delivery validation evidence and rollback notes
+- release-prep PR only updates changelog, release notes, and launch checklist
+
+Release note:
+- `v1.0.0` marks the first stable MVP release.
 
 ## GitHub Project Shape
 Recommended item types:

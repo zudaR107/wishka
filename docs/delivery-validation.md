@@ -1,9 +1,9 @@
 # Delivery Validation Runbook
 
 ## Scope
-- This document is the `M6-I7` validation runbook for the current delivery flow.
+- This document was introduced in `M6-I7` and is now the current validation runbook for the delivery flow.
 - It describes how to validate the path from PR to production health check.
-- It reuses the runtime, image, compose, publish, and deploy foundations already defined in earlier Milestone 6 work.
+- It reuses the runtime, image, compose, publish, and deploy foundations that are now part of the current project baseline.
 
 ## Delivery Flow
 1. Open a PR to `main`.

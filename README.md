@@ -3,7 +3,7 @@
 Minimal, fast wishlist app.
 
 ## Status
-Milestone 5 complete. Reservation flow is in place.
+Milestone 6 complete. Delivery and ops flow is in place.
 
 ## Core Idea
 Create a wishlist, share it by link, and let another person reserve an item.
@@ -27,7 +27,7 @@ Create a wishlist, share it by link, and let another person reserve an item.
 - `main` is protected and updated only through PRs.
 
 ## Current Focus
-- Milestone 6: delivery and ops.
+- Milestone 7: MVP hardening and release prep.
 
 ## Current Capabilities
 - Email/password registration.
@@ -46,12 +46,19 @@ Create a wishlist, share it by link, and let another person reserve an item.
 - Privacy-safe reserved status on the owner dashboard `/app`.
 - Current-user reservations page and cancel flow on `/app/reservations`.
 - Focused reservation coverage across helper logic and owner/public/reserver routes.
+- Runtime env and deploy contract for local, CI, and production.
+- Production `Next.js standalone` image build through the repository `Dockerfile`.
+- Production-oriented Docker Compose stack for `app`, `postgres`, and `caddy`.
+- Caddy reverse proxy and HTTPS foundation for `wshka.ru`.
+- GHCR image publish on `main` and SemVer tag pushes.
+- Release-triggered VPS deploy with production migrations and `/healthz` verification.
+- Delivery validation and rollback runbook for the current release path.
 
 ## Project Docs
 - Product and delivery plan: `master-plan.md`
 - Runtime env and deploy foundation: `docs/runtime-environment.md`
 - Delivery validation runbook: `docs/delivery-validation.md`
-- GitHub Actions build and image publish: `.github/workflows/`
+- GitHub Actions workflows: `.github/workflows/`
 - Agent guidance: `AGENTS.md`
 
 ## License

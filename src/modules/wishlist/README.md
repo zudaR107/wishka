@@ -26,5 +26,5 @@
 ## Scope
 - Keep the single-active-wishlist rule in business logic for `v1.0.0`, not as a
   schema dead end.
-- Keep public sharing in the upcoming `share` milestone instead of mixing it
+- Keep public sharing inside the existing `share` module instead of mixing it
   into the owner dashboard helpers.

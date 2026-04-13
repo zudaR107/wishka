@@ -55,5 +55,5 @@
 - Reservation mutations and lifecycle rules stay in the `reservation` module.
 - Share-token access and public wishlist read models stay in the `share`
   module.
-- Milestone 6 should build delivery and ops around this behavior without adding
-  new reservation product scope.
+- Milestone 7 should harden and validate this behavior without adding new
+  reservation product scope.

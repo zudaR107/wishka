@@ -7,7 +7,23 @@ The format is based on Keep a Changelog, and this project follows SemVer.
 ## [Unreleased]
 
 ### Planned
-- Milestone 6: delivery and ops.
+- Milestone 7: MVP hardening and release prep.
+
+## [0.7.0] - 2026-04-13
+
+### Added
+- Runtime environment contract docs for local, CI, and production usage with a
+  one-VPS deploy model.
+- Production `Next.js standalone` Docker image foundation and container runtime
+  surface.
+- Production-oriented Docker Compose stack for `app`, `postgres`, and `caddy`
+  with persistent storage and explicit service wiring.
+- Caddy reverse proxy and automatic HTTPS foundation for `wshka.ru`.
+- GHCR image publish workflow for `main` and SemVer tag pushes.
+- Release-triggered VPS deploy workflow over SSH with compose rollout,
+  production migration step, and `/healthz` verification.
+- Delivery validation runbook covering PR validation, image publish, deploy,
+  migration verification, failure diagnosis, and rollback shape.
 
 ## [0.6.0] - 2026-04-12
 

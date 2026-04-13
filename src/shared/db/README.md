@@ -57,8 +57,8 @@
   each item to one current active reservation.
 
 ## Next Expansion
-- No new product DB expansion is planned for Milestone 6; focus shifts to
-  delivery and ops on top of the current schema set.
+- Milestone 7 focuses on hardening and release readiness on top of the current
+  schema set rather than adding new product DB scope.
 
 ## Environment Contract
 - `DATABASE_URL`: required PostgreSQL connection string

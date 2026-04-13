@@ -2,8 +2,8 @@
 
 ## Scope
 - This document is the `M6-I1` foundation for runtime env rules and one-VPS deployment assumptions.
-- It documents the contract that later Milestone 6 PRs should reuse.
-- It does not define the production image, Docker Compose stack, Caddy config, GitHub Actions workflows, or deploy scripts.
+- It documents the stable contract that later delivery, release, and hardening work should reuse.
+- It does not replace the dedicated production image, compose, Caddy, workflow, or deploy-script files.
 - End-to-end delivery validation steps are documented in `docs/delivery-validation.md`.
 
 ## Runtime Env Contract
@@ -15,7 +15,7 @@
 | `DATABASE_SSL` | no | no | local, CI, production | Enables PostgreSQL SSL mode when set to `true`, `1`, or `yes` | Default behavior is `false` |
 
 ### Current Non-Env Runtime Assumptions
-- There is no separate auth secret env in `M6-I1`.
+- There is still no separate auth secret env.
 - Session tokens are opaque random values stored in the database.
 - The auth cookie name is fixed in code as `wshka_session`.
 - Production requires HTTPS so the secure auth cookie path works correctly.
@@ -65,7 +65,7 @@
 - Non-secret deploy metadata may live in docs, workflow env, or repository variables.
 
 ## Deploy Automation Inputs
-- These values are for later Milestone 6 automation work.
+- These values support the current publish and deploy automation flow.
 - They are not application runtime variables and are intentionally not added to `.env.example`.
 
 | Input | Required | Secret | Expected Storage | Purpose |
@@ -180,7 +180,7 @@
   - Caddy config state
 - Compose-level values should live in a gitignored `.env.compose.local` file based on `.env.compose.example`.
 - VPS runtime values should live in a gitignored `.env.compose.production` file based on `.env.compose.production.example`.
-- The app runtime env inside Compose still follows the `M6-I1` contract:
+- The app runtime env inside Compose still follows the core runtime contract:
   - `DATABASE_URL`
   - `DATABASE_SSL`
 - The Caddy-facing Compose values are:
@@ -217,9 +217,9 @@
 - Rollback is expected to redeploy the previous known-good image tag.
 - Backups remain a production requirement before release-impacting database changes.
 
-## Relationship To Later PRs
-- `M6-I2` should reuse this env contract when defining the production image runtime surface.
-- `M6-I3` should reuse the same ports, runtime variables, and VPS topology for Docker Compose.
-- `M6-I4` should reuse the same domain and forwarded-header assumptions for Caddy.
-- `M6-I5` should reuse the deploy automation input names and storage expectations.
-- `M6-I6` should reuse `/healthz`, rollout, and rollback expectations.
+## Current Reuse Points
+- The production image reuses this runtime contract for container env and port assumptions.
+- The compose stack reuses the same runtime variables, domain expectations, ports, and VPS topology.
+- The Caddy foundation reuses the same public domain and forwarded-header expectations.
+- The GHCR publish and VPS deploy workflows reuse the documented automation inputs and secret-storage expectations.
+- The delivery validation runbook reuses `/healthz`, immutable image tags, and rollback expectations.

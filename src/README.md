@@ -11,6 +11,8 @@
   read state, item CRUD, share-link controls, and privacy-safe reserved status.
 - `src/app/app/reservations` is now a protected reserver page with active
   reservations and cancel flow.
+- `src/app/healthz` is a public-safe health route used by compose, reverse
+  proxy, and deploy verification flows.
 - `src/app/share/[token]` is now a real public route backed by the `share`
   module with reservation-aware loading and reserve flow.
 - `wishlist` is now an active feature module.

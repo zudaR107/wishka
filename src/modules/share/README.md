@@ -36,4 +36,5 @@
   module instead of routes.
 - Keep reservation creation and cancellation rules inside the `reservation`
   module even when the public route triggers them.
-- Milestone 6 should treat the current share behavior as stable product scope.
+- Milestone 7 should harden and validate the current share behavior without
+  adding new share product scope.
