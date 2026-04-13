@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/modules/auth/server/current-user";
 import { getTranslations } from "@/modules/i18n";
 import { PageShell } from "@/shared/ui/page-shell";
 
@@ -13,6 +14,12 @@ type LoginPageProps = {
 };
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const currentUser = await getCurrentUser();
+
+  if (currentUser) {
+    redirect("/app");
+  }
+
   const params = searchParams ? await searchParams : undefined;
   const status = params?.status;
   const errorCode = params?.error;

@@ -741,3 +741,6 @@ Recommended planning rule:
 - `v1.4.0`: dark theme
 - `v1.5.0`: email verification and password reset
 - `v1.6.0`: api documentation (swagger / openapi)
+- Add a password repeat on registration
+- Fix UI
+- Reorganize the repository structure
