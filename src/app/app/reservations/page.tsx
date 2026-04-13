@@ -38,7 +38,7 @@ export default async function ReservationsPage(props: ReservationsPageProps) {
         </p>
       ) : null}
       {reservations.length === 0 ? (
-        <section className="ui-surface p-6">
+        <section className="ui-surface p-6" data-testid="reservations-empty-state">
           <h2 className="text-lg font-semibold text-[color:var(--color-text-strong)]">
             {messages.reservations.emptyTitle}
           </h2>
@@ -53,7 +53,7 @@ export default async function ReservationsPage(props: ReservationsPageProps) {
           </h2>
           <ul className="space-y-4">
             {reservations.map((reservation) => (
-              <li key={reservation.id} className="ui-surface p-6">
+              <li key={reservation.id} className="ui-surface p-6" data-testid="reservation-card">
                 <div className="space-y-4">
                   <div className="space-y-3">
                     <h3 className="text-base font-semibold text-[color:var(--color-text-strong)]">

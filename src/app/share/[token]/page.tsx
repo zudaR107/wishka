@@ -54,7 +54,7 @@ export default async function SharePage(props: SharePageProps) {
         <p className="ui-message ui-message-error">{getShareActionErrorMessage(action, errorCode)}</p>
       ) : null}
       {!publicWishlist.viewer.isAuthenticated ? (
-        <div className="ui-surface p-4">
+        <div className="ui-surface p-4" data-testid="share-guest-guard">
           <p className="text-sm text-[color:var(--color-text-base)]">{messages.share.guestHint}</p>
           <div className="mt-3">
             <Link href="/login" className="ui-button inline-flex">
@@ -81,7 +81,7 @@ export default async function SharePage(props: SharePageProps) {
           </h2>
           <ul className="space-y-4">
             {publicWishlist.items.map((item) => (
-              <li key={item.id} className="ui-surface p-6">
+              <li key={item.id} className="ui-surface p-6" data-testid="share-item-card">
                 <div className="space-y-3">
                   <h3 className="text-base font-semibold text-[color:var(--color-text-strong)]">
                     {item.title}
