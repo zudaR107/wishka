@@ -413,7 +413,7 @@
   /* Share panel */
   .share-panel {
     border: 1px solid var(--color-border-soft);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background: var(--color-bg-surface);
     box-shadow: var(--shadow-card);
     padding: var(--space-5) var(--space-6);
@@ -471,7 +471,7 @@
   /* Add item collapsible */
   .add-item-details {
     border: 1px solid var(--color-border-soft);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background: var(--color-bg-surface);
     box-shadow: var(--shadow-card);
     overflow: hidden;
@@ -510,7 +510,7 @@
   /* Item card */
   .item-card {
     border: 1px solid var(--color-border-soft);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background: var(--color-bg-surface);
     box-shadow: var(--shadow-card);
     overflow: hidden;
@@ -772,7 +772,7 @@
   /* Reservation card */
   .reservation-card {
     border: 1px solid var(--color-border-soft);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background: var(--color-bg-surface);
     box-shadow: var(--shadow-card);
     padding: var(--space-5) var(--space-6);
@@ -810,7 +810,7 @@
   /* Share page item card */
   .share-item-card {
     border: 1px solid var(--color-border-soft);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background: var(--color-bg-surface);
     box-shadow: var(--shadow-card);
     padding: var(--space-5) var(--space-6);
