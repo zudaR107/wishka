@@ -156,7 +156,7 @@ async function DashboardView({
       <div className="dashboard-header">
         <h1 className="dashboard-title">{messages.dashboard.title}</h1>
         <span className="dashboard-count">
-          {wishlist.items.length} {messages.dashboard.itemCountLabel}
+          {wishlist.items.length} {pluralize(wishlist.items.length, messages.dashboard.itemCountForms)}
         </span>
       </div>
 
@@ -548,4 +548,12 @@ async function getAppOrigin(): Promise<string> {
 
 function buildShareUrl(origin: string, token: string): string {
   return new URL(`/share/${token}`, origin).toString();
+}
+
+function pluralize(n: number, forms: [string, string, string]): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return forms[0];
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return forms[1];
+  return forms[2];
 }

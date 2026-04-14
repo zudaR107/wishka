@@ -78,7 +78,7 @@ export const app = {
     deleteLabel: "Удалить",
     editToggleLabel: "Редактировать",
     summaryLabel: "Текущий вишлист",
-    itemCountLabel: "желаний",
+    itemCountForms: ["желание", "желания", "желаний"] as [string, string, string],
     successMessage: "Желание добавлено.",
     updateSuccessMessage: "Желание обновлено.",
     deleteSuccessMessage: "Желание удалено.",
