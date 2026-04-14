@@ -8,7 +8,7 @@ export default function TermsPage() {
           ← Wshka
         </Link>
         <h1 className="legal-page-title">Условия использования</h1>
-        <p className="legal-page-updated">Дата вступления в силу: [ДАТА TODO]</p>
+        <p className="legal-page-updated">Дата вступления в силу: 14 апреля 2026 г.</p>
       </div>
 
       <div className="legal-content">
@@ -123,7 +123,7 @@ export default function TermsPage() {
             или для отдельных аккаунтов) в случае нарушения настоящих Условий или в иных обоснованных случаях.
           </p>
           <p>
-            Вы можете удалить свой аккаунт, направив запрос на адрес: [EMAIL TODO].
+            Вы можете удалить свой аккаунт, направив запрос на адрес: zudin_daniil@mail.ru.
           </p>
         </div>
 
@@ -138,7 +138,7 @@ export default function TermsPage() {
         <div className="legal-section">
           <h2>10. Контакт</h2>
           <p>
-            По вопросам, связанным с Условиями использования, обращайтесь: [EMAIL TODO].
+            По вопросам, связанным с Условиями использования, обращайтесь: zudin_daniil@mail.ru.
           </p>
         </div>
       </div>
