@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/modules/auth/server/current-user";
 import { MIN_PASSWORD_LENGTH } from "@/modules/auth/server/register-input";
 import { getTranslations } from "@/modules/i18n";
-import { PageShell } from "@/shared/ui/page-shell";
 
 const common = getTranslations("common");
 const messages = getTranslations("app");
@@ -27,24 +26,27 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
   const errorCode = params?.error;
 
   return (
-    <PageShell
-      eyebrow={common.routeSkeleton}
-      title={messages.register.title}
-      description={messages.register.description}
-    >
-      {status === "success" ? (
-        <div className="ui-message ui-message-success space-y-3">
-          <p>{messages.register.successMessage}</p>
-          <Link href="/login" className="ui-button ui-button-secondary inline-flex">
-            {messages.register.successLinkLabel}
-          </Link>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-card-header">
+          <p className="auth-card-logo">{common.brand}</p>
+          <h1 className="auth-card-title">{messages.register.title}</h1>
+          <p className="auth-card-description">{messages.register.description}</p>
         </div>
-      ) : null}
-      {errorCode ? (
-        <p className="ui-message ui-message-error">{getRegisterErrorMessage(errorCode)}</p>
-      ) : null}
-      <div className="space-y-6">
-        <form action={registerAction} className="ui-form">
+
+        {status === "success" ? (
+          <div className="ui-message ui-message-success" style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+            <p>{messages.register.successMessage}</p>
+            <Link href="/login" className="ui-button ui-button-secondary" style={{ width: "fit-content" }}>
+              {messages.register.successLinkLabel}
+            </Link>
+          </div>
+        ) : null}
+        {errorCode ? (
+          <p className="ui-message ui-message-error">{getRegisterErrorMessage(errorCode)}</p>
+        ) : null}
+
+        <form action={registerAction} className="ui-form" style={{ maxWidth: "none" }}>
           <div className="ui-field">
             <label className="ui-label" htmlFor="email">
               {messages.register.emailLabel}
@@ -73,29 +75,51 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
             />
             <p className="ui-note">{messages.register.minPasswordHint}</p>
           </div>
-          <button type="submit" className="ui-button">
+          <div className="ui-field">
+            <label className="ui-label" htmlFor="confirmPassword">
+              {messages.register.confirmPasswordLabel}
+            </label>
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              autoComplete="new-password"
+              minLength={MIN_PASSWORD_LENGTH}
+              className="ui-input"
+              required
+            />
+          </div>
+          <button type="submit" className="ui-button ui-button-full">
             {messages.register.submitLabel}
           </button>
         </form>
-        <p className="text-sm text-[color:var(--color-text-base)]">
+
+        <p className="auth-card-footer">
           {messages.register.loginHint}{" "}
-          <Link href="/login" className="font-medium underline underline-offset-2">
+          <Link href="/login" className="auth-card-footer-link">
             {messages.register.loginLinkLabel}
           </Link>
         </p>
       </div>
-    </PageShell>
+    </div>
   );
 }
 
 async function registerAction(formData: FormData) {
   "use server";
 
+  const password = getFormValue(formData, "password");
+  const confirmPassword = getFormValue(formData, "confirmPassword");
+
+  if (password !== confirmPassword) {
+    redirect("/register?error=password-mismatch");
+  }
+
   const { registerUser } = await import("@/modules/auth/server/register");
 
   const result = await registerUser({
     email: getFormValue(formData, "email"),
-    password: getFormValue(formData, "password"),
+    password,
   });
 
   if (result.status === "success") {
@@ -117,6 +141,8 @@ function getRegisterErrorMessage(errorCode: string): string {
       return messages.register.errors.invalidEmail;
     case "password-too-short":
       return messages.register.errors.passwordTooShort;
+    case "password-mismatch":
+      return messages.register.errors.passwordMismatch;
     case "email-taken":
       return messages.register.errors.emailTaken;
     default:

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/modules/auth/server/current-user";
 import { getTranslations } from "@/modules/i18n";
-import { PageShell } from "@/shared/ui/page-shell";
 
 const common = getTranslations("common");
 const messages = getTranslations("app");
@@ -26,19 +25,22 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const errorCode = params?.error;
 
   return (
-    <PageShell
-      eyebrow={common.routeSkeleton}
-      title={messages.login.title}
-      description={messages.login.description}
-    >
-      {status === "logged-out" ? (
-        <p className="ui-message ui-message-success">{messages.login.loggedOutMessage}</p>
-      ) : null}
-      {errorCode ? (
-        <p className="ui-message ui-message-error">{getLoginErrorMessage(errorCode)}</p>
-      ) : null}
-      <div className="space-y-6">
-        <form action={loginAction} className="ui-form">
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-card-header">
+          <p className="auth-card-logo">{common.brand}</p>
+          <h1 className="auth-card-title">{messages.login.title}</h1>
+          <p className="auth-card-description">{messages.login.description}</p>
+        </div>
+
+        {status === "logged-out" ? (
+          <p className="ui-message ui-message-success">{messages.login.loggedOutMessage}</p>
+        ) : null}
+        {errorCode ? (
+          <p className="ui-message ui-message-error">{getLoginErrorMessage(errorCode)}</p>
+        ) : null}
+
+        <form action={loginAction} className="ui-form" style={{ maxWidth: "none" }}>
           <div className="ui-field">
             <label className="ui-label" htmlFor="email">
               {messages.login.emailLabel}
@@ -65,18 +67,19 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               required
             />
           </div>
-          <button type="submit" className="ui-button">
+          <button type="submit" className="ui-button ui-button-full">
             {messages.login.submitLabel}
           </button>
         </form>
-        <p className="text-sm text-[color:var(--color-text-base)]">
+
+        <p className="auth-card-footer">
           {messages.login.registerHint}{" "}
-          <Link href="/register" className="font-medium underline underline-offset-2">
+          <Link href="/register" className="auth-card-footer-link">
             {messages.login.registerLinkLabel}
           </Link>
         </p>
       </div>
-    </PageShell>
+    </div>
   );
 }
 
