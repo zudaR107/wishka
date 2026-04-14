@@ -234,7 +234,7 @@ function SharePageView({
                   <div className="share-item-meta">
                     {item.price ? (
                       <span style={{ fontWeight: 600, color: "var(--color-text-strong)" }}>
-                        {item.price}
+                        {formatPrice(item.price)}
                       </span>
                     ) : null}
                     {item.url ? (
@@ -272,6 +272,11 @@ function SharePageView({
       )}
     </div>
   );
+}
+
+function formatPrice(price: string): string {
+  const num = parseFloat(price);
+  return isNaN(num) ? price : String(Math.round(num));
 }
 
 function getShareActionErrorMessage(action: string | undefined, errorCode: string): string {

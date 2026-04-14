@@ -72,7 +72,7 @@ export default async function ReservationsPage(props: ReservationsPageProps) {
                   <div className="reservation-card-meta">
                     {reservation.item.price ? (
                       <span style={{ fontWeight: 600, color: "var(--color-text-strong)" }}>
-                        {reservation.item.price}
+                        {formatPrice(reservation.item.price)}
                       </span>
                     ) : null}
                     {reservation.item.url ? (
@@ -105,6 +105,11 @@ export default async function ReservationsPage(props: ReservationsPageProps) {
       )}
     </div>
   );
+}
+
+function formatPrice(price: string): string {
+  const num = parseFloat(price);
+  return isNaN(num) ? price : String(Math.round(num));
 }
 
 function getReservationsActionErrorMessage(action: string | undefined, errorCode: string): string {

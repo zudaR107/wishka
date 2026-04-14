@@ -304,7 +304,7 @@ async function DashboardView({
                   {(item.price || item.url || item.note) ? (
                     <div className="item-card-meta">
                       {item.price ? (
-                        <span className="item-card-price">{item.price}</span>
+                        <span className="item-card-price">{formatPrice(item.price)}</span>
                       ) : null}
                       {item.url ? (
                         <a
@@ -377,7 +377,7 @@ async function DashboardView({
                           id={`price-${item.id}`}
                           name="price"
                           inputMode="decimal"
-                          defaultValue={item.price ?? ""}
+                          defaultValue={item.price ? formatPrice(item.price) : ""}
                           className="ui-input"
                         />
                         <p className="ui-note">{messages.dashboard.hints.price}</p>
@@ -548,6 +548,11 @@ async function getAppOrigin(): Promise<string> {
 
 function buildShareUrl(origin: string, token: string): string {
   return new URL(`/share/${token}`, origin).toString();
+}
+
+function formatPrice(price: string): string {
+  const num = parseFloat(price);
+  return isNaN(num) ? price : String(Math.round(num));
 }
 
 function pluralize(n: number, forms: [string, string, string]): string {

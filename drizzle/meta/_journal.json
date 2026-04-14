@@ -29,6 +29,13 @@
       "when": 1775986656116,
       "tag": "0003_reservation-schema-foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1744646400000,
+      "tag": "0004_price-no-decimals",
+      "breakpoints": true
     }
   ]
 }
