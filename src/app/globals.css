@@ -358,6 +358,283 @@
     text-underline-offset: 3px;
   }
 
+  /* ── Dashboard page ─────────────────────────────────── */
+  .dashboard-page {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-4) var(--space-16);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .dashboard-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .dashboard-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--color-text-strong);
+    margin: 0;
+  }
+
+  .dashboard-count {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem var(--space-3);
+    border-radius: 9999px;
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border-soft);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+
+  /* Share panel */
+  .share-panel {
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-xl);
+    background: var(--color-bg-surface);
+    box-shadow: var(--shadow-surface);
+    padding: var(--space-5) var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .share-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .share-panel-title {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--color-text-strong);
+    margin: 0;
+  }
+
+  .share-panel-description {
+    font-size: var(--font-size-label);
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .share-url-row {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+  }
+
+  .share-url-input {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-subtle);
+    padding: var(--space-3) var(--space-4);
+    color: var(--color-text-base);
+    font: inherit;
+    font-size: var(--font-size-label);
+    cursor: text;
+  }
+
+  .share-panel-actions {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  /* Add item collapsible */
+  .add-item-details {
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-xl);
+    background: var(--color-bg-surface);
+    box-shadow: var(--shadow-surface);
+    overflow: hidden;
+  }
+
+  .add-item-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-6);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: var(--font-size-label);
+    color: var(--color-accent);
+    list-style: none;
+    user-select: none;
+    transition: background-color 120ms ease;
+  }
+
+  .add-item-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .add-item-summary:hover {
+    background: var(--color-accent-surface);
+  }
+
+  .add-item-details[open] .add-item-summary {
+    border-bottom: 1px solid var(--color-border-soft);
+  }
+
+  .add-item-form-inner {
+    padding: var(--space-6);
+  }
+
+  /* Item card */
+  .item-card {
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-xl);
+    background: var(--color-bg-surface);
+    box-shadow: var(--shadow-surface);
+    overflow: hidden;
+  }
+
+  .item-card-view {
+    padding: var(--space-5) var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .item-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .item-card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-strong);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .item-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    font-size: var(--font-size-label);
+    color: var(--color-text-base);
+  }
+
+  .item-card-price {
+    font-weight: 600;
+    color: var(--color-text-strong);
+  }
+
+  .item-card-url {
+    color: var(--color-accent);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 22rem;
+  }
+
+  .item-card-url:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .item-card-note {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-label);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .item-card-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    border-top: 1px solid var(--color-border-soft);
+    background: var(--color-bg-subtle);
+  }
+
+  /* Inline edit toggle */
+  .item-edit-details {
+    border-top: 1px solid var(--color-border-soft);
+  }
+
+  .item-edit-summary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    cursor: pointer;
+    font-size: var(--font-size-label);
+    font-weight: 600;
+    color: var(--color-text-base);
+    list-style: none;
+    user-select: none;
+    transition: color 120ms ease, background-color 120ms ease;
+    width: 100%;
+    background: var(--color-bg-subtle);
+  }
+
+  .item-edit-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .item-edit-summary:hover {
+    color: var(--color-text-strong);
+    background: var(--color-bg-canvas);
+  }
+
+  .item-edit-details[open] .item-edit-summary {
+    border-bottom: 1px solid var(--color-border-soft);
+    color: var(--color-accent);
+  }
+
+  .item-edit-form-inner {
+    padding: var(--space-6);
+    background: var(--color-bg-surface);
+  }
+
+  /* Empty state */
+  .dashboard-empty {
+    border: 2px dashed var(--color-border-soft);
+    border-radius: var(--radius-xl);
+    padding: var(--space-10) var(--space-6);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .dashboard-empty-title {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--color-text-strong);
+    margin: 0;
+  }
+
+  .dashboard-empty-description {
+    font-size: var(--font-size-label);
+    color: var(--color-text-muted);
+    max-width: 28rem;
+    line-height: var(--line-height-body);
+    margin: 0;
+  }
+
   /* ── Auth pages ─────────────────────────────────────── */
   .auth-page {
     display: flex;

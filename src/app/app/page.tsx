@@ -14,9 +14,7 @@ import {
   deleteCurrentWishlistItem,
   updateCurrentWishlistItem,
 } from "@/modules/wishlist/server/manage-item";
-import { PageShell } from "@/shared/ui/page-shell";
 
-const common = getTranslations("common");
 const messages = getTranslations("app");
 
 type AppPageProps = {
@@ -38,237 +36,214 @@ export default async function AppPage(props: AppPageProps) {
   const action = params?.action;
   const status = params?.status;
   const errorCode = params?.error;
-  const currentShareUrl = currentShareLink ? buildShareUrl(appOrigin, currentShareLink.token) : null;
+  const currentShareUrl = currentShareLink
+    ? buildShareUrl(appOrigin, currentShareLink.token)
+    : null;
 
   return (
-    <PageShell
-      eyebrow={common.routeSkeleton}
-      title={messages.dashboard.title}
-      description={messages.dashboard.description}
-    >
-      <div className="space-y-8">
-        {status === "item-created" ? (
-          <p className="ui-message ui-message-success">{messages.dashboard.successMessage}</p>
-        ) : status === "item-updated" ? (
-          <p className="ui-message ui-message-success">{messages.dashboard.updateSuccessMessage}</p>
-        ) : status === "item-deleted" ? (
-          <p className="ui-message ui-message-success">{messages.dashboard.deleteSuccessMessage}</p>
-        ) : status === "share-link-created" ? (
-          <p className="ui-message ui-message-success">
-            {messages.dashboard.share.successMessage}
-          </p>
-        ) : status === "share-link-revoked" ? (
-          <p className="ui-message ui-message-success">
-            {messages.dashboard.share.revokeSuccessMessage}
-          </p>
-        ) : status === "share-link-regenerated" ? (
-          <p className="ui-message ui-message-success">
-            {messages.dashboard.share.regenerateSuccessMessage}
-          </p>
-        ) : null}
-        {errorCode ? (
-          <p className="ui-message ui-message-error">{getActionErrorMessage(action, errorCode)}</p>
-        ) : null}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="grid gap-3">
-            <p className="ui-note">{messages.dashboard.summaryLabel}</p>
-            <div
-              className="ui-surface p-5"
-              style={{ background: "var(--color-bg-subtle)" }}
-            >
-              <dl className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <dt className="ui-note">ID</dt>
-                  <dd
-                    data-testid="wishlist-id"
-                    className="mt-1 break-all font-medium text-[color:var(--color-text-strong)]"
-                  >
-                    {wishlist.id}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="ui-note">{messages.dashboard.itemCountLabel}</dt>
-                  <dd
-                    data-testid="wishlist-item-count"
-                    className="mt-1 font-medium text-[color:var(--color-text-strong)]"
-                  >
-                    {wishlist.items.length}
-                  </dd>
-                </div>
-              </dl>
-            </div>
-          </div>
-          <form action={logoutAction}>
-            <button type="submit" className="ui-button ui-button-secondary">
-              {messages.dashboard.logoutLabel}
-            </button>
-          </form>
+    <div className="dashboard-page">
+      {/* Status messages */}
+      {status === "item-created" ? (
+        <p className="ui-message ui-message-success">{messages.dashboard.successMessage}</p>
+      ) : status === "item-updated" ? (
+        <p className="ui-message ui-message-success">{messages.dashboard.updateSuccessMessage}</p>
+      ) : status === "item-deleted" ? (
+        <p className="ui-message ui-message-success">{messages.dashboard.deleteSuccessMessage}</p>
+      ) : status === "share-link-created" ? (
+        <p className="ui-message ui-message-success">{messages.dashboard.share.successMessage}</p>
+      ) : status === "share-link-revoked" ? (
+        <p className="ui-message ui-message-success">
+          {messages.dashboard.share.revokeSuccessMessage}
+        </p>
+      ) : status === "share-link-regenerated" ? (
+        <p className="ui-message ui-message-success">
+          {messages.dashboard.share.regenerateSuccessMessage}
+        </p>
+      ) : null}
+      {errorCode ? (
+        <p className="ui-message ui-message-error">{getActionErrorMessage(action, errorCode)}</p>
+      ) : null}
+
+      {/* Page header */}
+      <div className="dashboard-header">
+        <h1 className="dashboard-title">{messages.dashboard.title}</h1>
+        <span className="dashboard-count">
+          {wishlist.items.length} {messages.dashboard.itemCountLabel}
+        </span>
+      </div>
+
+      {/* Share link panel */}
+      <div className="share-panel">
+        <div>
+          <h2 className="share-panel-title">{messages.dashboard.share.title}</h2>
+          <p className="share-panel-description">{messages.dashboard.share.description}</p>
         </div>
-
-        <section className="ui-surface p-6">
-          <div className="space-y-5">
-            <div className="space-y-2">
-              <h2 className="text-lg font-semibold text-[color:var(--color-text-strong)]">
-                {messages.dashboard.share.title}
-              </h2>
-              <p className="text-sm text-[color:var(--color-text-base)]">
-                {messages.dashboard.share.description}
-              </p>
+        {currentShareUrl ? (
+          <>
+            <div className="share-url-row">
+              <input
+                id="share-link-url"
+                data-testid="share-link-url"
+                value={currentShareUrl}
+                readOnly
+                className="share-url-input"
+                aria-label={messages.dashboard.share.urlLabel}
+              />
             </div>
-
-            {currentShareUrl ? (
-              <div className="space-y-3">
-                <p className="ui-note">{messages.dashboard.share.readyLabel}</p>
-                <div className="ui-field">
-                  <label className="ui-label" htmlFor="share-link-url">
-                    {messages.dashboard.share.urlLabel}
-                  </label>
-                  <input
-                    id="share-link-url"
-                    data-testid="share-link-url"
-                    value={currentShareUrl}
-                    readOnly
-                    className="ui-input"
-                  />
-                </div>
-                <p className="ui-note">{messages.dashboard.share.copyHint}</p>
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <form action={revokeShareLinkAction}>
-                    <button type="submit" className="ui-button ui-button-danger">
-                      {messages.dashboard.share.revokeLabel}
-                    </button>
-                  </form>
-                  <form action={regenerateShareLinkAction}>
-                    <button type="submit" className="ui-button ui-button-secondary">
-                      {messages.dashboard.share.regenerateLabel}
-                    </button>
-                  </form>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <p className="text-sm text-[color:var(--color-text-base)]">
-                  {messages.dashboard.share.emptyDescription}
-                </p>
-                <form action={createShareLinkAction}>
-                  <button type="submit" className="ui-button">
-                    {messages.dashboard.share.createLabel}
-                  </button>
-                </form>
-              </div>
-            )}
-          </div>
-        </section>
-
-        <section className="ui-surface p-6" id="wishlist-create-form-panel">
-          <div className="space-y-5">
-            <div className="space-y-2">
-              <h2 className="text-lg font-semibold text-[color:var(--color-text-strong)]">
-                {messages.dashboard.formTitle}
-              </h2>
-              <p className="text-sm text-[color:var(--color-text-base)]">
-                {messages.dashboard.formDescription}
-              </p>
+            <p className="ui-note">{messages.dashboard.share.copyHint}</p>
+            <div className="share-panel-actions">
+              <form action={revokeShareLinkAction}>
+                <button type="submit" className="ui-button ui-button-danger">
+                  {messages.dashboard.share.revokeLabel}
+                </button>
+              </form>
+              <form action={regenerateShareLinkAction}>
+                <button type="submit" className="ui-button ui-button-secondary">
+                  {messages.dashboard.share.regenerateLabel}
+                </button>
+              </form>
             </div>
-            <form
-              action={createItemAction}
-              className="ui-form max-w-none"
-              id="wishlist-create-form"
-              data-testid="wishlist-create-form"
-            >
-              <div className="ui-field">
-                <label className="ui-label" htmlFor="title">
-                  {messages.dashboard.fields.title}
-                </label>
-                <input id="title" name="title" className="ui-input" required />
-              </div>
-              <div className="ui-field">
-                <label className="ui-label" htmlFor="url">
-                  {messages.dashboard.fields.url}
-                </label>
-                <input id="url" name="url" type="url" className="ui-input" />
-                <p className="ui-note">{messages.dashboard.hints.url}</p>
-              </div>
-              <div className="ui-field">
-                <label className="ui-label" htmlFor="note">
-                  {messages.dashboard.fields.note}
-                </label>
-                <textarea id="note" name="note" className="ui-input min-h-28 resize-y" />
-              </div>
-              <div className="ui-field">
-                <label className="ui-label" htmlFor="price">
-                  {messages.dashboard.fields.price}
-                </label>
-                <input id="price" name="price" inputMode="decimal" className="ui-input" />
-                <p className="ui-note">{messages.dashboard.hints.price}</p>
-              </div>
+          </>
+        ) : (
+          <div>
+            <p className="ui-note" style={{ marginBottom: "var(--space-4)" }}>
+              {messages.dashboard.share.emptyDescription}
+            </p>
+            <form action={createShareLinkAction}>
               <button type="submit" className="ui-button">
-                {messages.dashboard.submitLabel}
+                {messages.dashboard.share.createLabel}
               </button>
             </form>
           </div>
-        </section>
+        )}
+      </div>
 
-        {wishlist.items.length === 0 ? (
-          <section className="ui-surface p-6" data-testid="wishlist-empty-state">
-            <div className="space-y-4">
-              <div>
-                <h2 className="text-lg font-semibold text-[color:var(--color-text-strong)]">
-                  {messages.dashboard.emptyTitle}
-                </h2>
-                <p className="mt-3 text-[color:var(--color-text-base)]">
-                  {messages.dashboard.emptyDescription}
-                </p>
-              </div>
-              <a href="#wishlist-create-form-panel" className="ui-button inline-flex">
-                {messages.dashboard.emptyActionLabel}
-              </a>
+      {/* Add item collapsible */}
+      <details className="add-item-details" id="wishlist-create-form-panel">
+        <summary className="add-item-summary">
+          <span>{messages.dashboard.addItemToggleLabel}</span>
+        </summary>
+        <div className="add-item-form-inner">
+          <p
+            style={{
+              fontSize: "var(--font-size-label)",
+              color: "var(--color-text-muted)",
+              marginBottom: "var(--space-5)",
+            }}
+          >
+            {messages.dashboard.formDescription}
+          </p>
+          <form
+            action={createItemAction}
+            className="ui-form"
+            style={{ maxWidth: "none" }}
+            id="wishlist-create-form"
+            data-testid="wishlist-create-form"
+          >
+            <div className="ui-field">
+              <label className="ui-label" htmlFor="title">
+                {messages.dashboard.fields.title}
+              </label>
+              <input id="title" name="title" className="ui-input" required />
             </div>
-          </section>
-        ) : (
-          <section className="space-y-4">
-            <h2 className="text-lg font-semibold text-[color:var(--color-text-strong)]">
-              {messages.dashboard.itemsTitle}
-            </h2>
-            <ul className="space-y-4">
-              {wishlist.items.map((item) => (
-                <li key={item.id} className="ui-surface p-6">
-                  <div className="space-y-5">
-                    <div className="space-y-3">
-                      <h3 className="text-base font-semibold text-[color:var(--color-text-strong)]">
-                        {item.title}
-                      </h3>
+            <div className="ui-field">
+              <label className="ui-label" htmlFor="url">
+                {messages.dashboard.fields.url}
+              </label>
+              <input id="url" name="url" type="url" className="ui-input" />
+              <p className="ui-note">{messages.dashboard.hints.url}</p>
+            </div>
+            <div className="ui-field">
+              <label className="ui-label" htmlFor="note">
+                {messages.dashboard.fields.note}
+              </label>
+              <textarea id="note" name="note" className="ui-input min-h-28 resize-y" />
+            </div>
+            <div className="ui-field">
+              <label className="ui-label" htmlFor="price">
+                {messages.dashboard.fields.price}
+              </label>
+              <input id="price" name="price" inputMode="decimal" className="ui-input" />
+              <p className="ui-note">{messages.dashboard.hints.price}</p>
+            </div>
+            <button type="submit" className="ui-button">
+              {messages.dashboard.submitLabel}
+            </button>
+          </form>
+        </div>
+      </details>
+
+      {/* Items list or empty state */}
+      {wishlist.items.length === 0 ? (
+        <div className="dashboard-empty" data-testid="wishlist-empty-state">
+          <p className="dashboard-empty-title">{messages.dashboard.emptyTitle}</p>
+          <p className="dashboard-empty-description">{messages.dashboard.emptyDescription}</p>
+          <a href="#wishlist-create-form-panel" className="ui-button">
+            {messages.dashboard.emptyActionLabel}
+          </a>
+        </div>
+      ) : (
+        <section>
+          <h2
+            style={{
+              fontSize: "0.9375rem",
+              fontWeight: 700,
+              color: "var(--color-text-muted)",
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+              margin: "0 0 var(--space-3)",
+            }}
+          >
+            {messages.dashboard.itemsTitle}
+          </h2>
+          <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+            {wishlist.items.map((item) => (
+              <li key={item.id} className="item-card">
+                {/* Card view */}
+                <div className="item-card-view">
+                  <div className="item-card-top">
+                    <h3 className="item-card-title">{item.title}</h3>
+                    {item.reservation.status === "reserved" ? (
+                      <span className="ui-badge ui-badge-reserved">
+                        {messages.dashboard.itemReservation.reservedLabel}
+                      </span>
+                    ) : (
+                      <span className="ui-badge ui-badge-available">
+                        {messages.dashboard.itemReservation.availableLabel}
+                      </span>
+                    )}
+                  </div>
+                  {(item.price || item.url || item.note) ? (
+                    <div className="item-card-meta">
+                      {item.price ? (
+                        <span className="item-card-price">{item.price}</span>
+                      ) : null}
                       {item.url ? (
-                        <p className="text-sm text-[color:var(--color-text-base)] break-all">
-                          <span className="font-medium text-[color:var(--color-text-strong)]">
-                            {messages.dashboard.itemFields.url}: 
-                          </span>
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="item-card-url"
+                        >
                           {item.url}
-                        </p>
+                        </a>
                       ) : null}
                       {item.note ? (
-                        <p className="text-sm text-[color:var(--color-text-base)]">
-                          <span className="font-medium text-[color:var(--color-text-strong)]">
-                            {messages.dashboard.itemFields.note}: 
-                          </span>
+                        <span className="item-card-note" style={{ width: "100%" }}>
                           {item.note}
-                        </p>
+                        </span>
                       ) : null}
-                      {item.price ? (
-                        <p className="text-sm text-[color:var(--color-text-base)]">
-                          <span className="font-medium text-[color:var(--color-text-strong)]">
-                            {messages.dashboard.itemFields.price}: 
-                          </span>
-                          {item.price}
-                        </p>
-                      ) : null}
-                      <p className="ui-note font-medium text-[color:var(--color-text-strong)]">
-                        {item.reservation.status === "reserved"
-                          ? messages.dashboard.itemReservation.reservedLabel
-                          : messages.dashboard.itemReservation.availableLabel}
-                      </p>
                     </div>
-                    <form action={updateItemAction} className="ui-form max-w-none">
+                  ) : null}
+                </div>
+
+                {/* Inline edit toggle */}
+                <details className="item-edit-details">
+                  <summary className="item-edit-summary">
+                    ✏ {messages.dashboard.editToggleLabel}
+                  </summary>
+                  <div className="item-edit-form-inner">
+                    <form action={updateItemAction} className="ui-form" style={{ maxWidth: "none" }}>
                       <input type="hidden" name="itemId" value={item.id} />
                       <div className="ui-field">
                         <label className="ui-label" htmlFor={`title-${item.id}`}>
@@ -319,42 +294,31 @@ export default async function AppPage(props: AppPageProps) {
                         />
                         <p className="ui-note">{messages.dashboard.hints.price}</p>
                       </div>
-                      <div className="flex flex-col gap-3 sm:flex-row">
+                      <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
                         <button type="submit" className="ui-button">
                           {messages.dashboard.updateLabel}
                         </button>
                       </div>
                     </form>
-                    <form action={deleteItemAction}>
-                      <input type="hidden" name="itemId" value={item.id} />
-                      <button type="submit" className="ui-button ui-button-danger">
-                        {messages.dashboard.deleteLabel}
-                      </button>
-                    </form>
                   </div>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-      </div>
-    </PageShell>
+                </details>
+
+                {/* Delete action */}
+                <div className="item-card-actions">
+                  <form action={deleteItemAction}>
+                    <input type="hidden" name="itemId" value={item.id} />
+                    <button type="submit" className="ui-button ui-button-danger">
+                      {messages.dashboard.deleteLabel}
+                    </button>
+                  </form>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
   );
-}
-
-async function logoutAction() {
-  "use server";
-
-  const cookieStore = await cookies();
-  const [{ AUTH_SESSION_COOKIE_NAME, clearSessionCookie }, { logoutUser }] = await Promise.all([
-    import("@/modules/auth/server/session"),
-    import("@/modules/auth/server/logout"),
-  ]);
-
-  await logoutUser(cookieStore.get(AUTH_SESSION_COOKIE_NAME)?.value);
-  await clearSessionCookie();
-
-  redirect("/login?status=logged-out");
 }
 
 async function createItemAction(formData: FormData) {
@@ -465,26 +429,11 @@ function getActionErrorMessage(action: string | undefined, errorCode: string): s
     case "item-not-found":
       return messages.dashboard.errors.itemNotFound;
     default:
-      if (action === "share-create") {
-        return messages.dashboard.share.errors.unknownCreate;
-      }
-
-      if (action === "share-revoke") {
-        return messages.dashboard.share.errors.unknownRevoke;
-      }
-
-      if (action === "share-regenerate") {
-        return messages.dashboard.share.errors.unknownRegenerate;
-      }
-
-      if (action === "update") {
-        return messages.dashboard.errors.unknownUpdate;
-      }
-
-      if (action === "delete") {
-        return messages.dashboard.errors.unknownDelete;
-      }
-
+      if (action === "share-create") return messages.dashboard.share.errors.unknownCreate;
+      if (action === "share-revoke") return messages.dashboard.share.errors.unknownRevoke;
+      if (action === "share-regenerate") return messages.dashboard.share.errors.unknownRegenerate;
+      if (action === "update") return messages.dashboard.errors.unknownUpdate;
+      if (action === "delete") return messages.dashboard.errors.unknownDelete;
       return messages.dashboard.errors.unknownCreate;
   }
 }
