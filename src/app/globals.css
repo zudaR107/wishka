@@ -239,6 +239,7 @@
 
   .app-main {
     flex: 1;
+    padding: var(--space-6) var(--space-4);
   }
 
   /* Status badges */
@@ -369,12 +370,17 @@
 
   /* ── Dashboard page ─────────────────────────────────── */
   .dashboard-page {
+    width: 100%;
     max-width: 44rem;
     margin: 0 auto;
-    padding: var(--space-8) var(--space-4) var(--space-16);
+    padding: var(--space-8);
     display: flex;
     flex-direction: column;
     gap: var(--space-8);
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-surface);
   }
 
   .dashboard-header {
@@ -649,8 +655,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: calc(100dvh - 8rem);
-    padding: var(--space-6) var(--space-4);
+    min-height: calc(100dvh - 12rem);
   }
 
   .auth-card {
@@ -720,12 +725,17 @@
 
   /* ── Reservations & Share pages ─────────────────────── */
   .content-page {
+    width: 100%;
     max-width: 44rem;
     margin: 0 auto;
-    padding: var(--space-8) var(--space-4) var(--space-16);
+    padding: var(--space-8);
     display: flex;
     flex-direction: column;
     gap: var(--space-6);
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-surface);
   }
 
   .content-page-header {
@@ -841,9 +851,14 @@
 
   /* ── Legal pages ────────────────────────────────────── */
   .legal-page {
+    width: 100%;
     max-width: 44rem;
     margin: 0 auto;
-    padding: var(--space-8) var(--space-4) var(--space-16);
+    padding: var(--space-8);
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-surface);
   }
 
   .legal-page-header {
