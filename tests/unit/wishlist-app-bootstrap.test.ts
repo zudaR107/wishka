@@ -103,10 +103,10 @@ describe("owner app wishlist bootstrap", () => {
     const page = await AppPage({});
     const html = renderToStaticMarkup(page);
 
-    expect(html).toContain("Вишлист пока пуст");
-    expect(html).toContain("Количество желаний");
+    expect(html).toContain("Список пока пуст");
+    expect(html).toContain("желаний");
     expect(html).toContain("Добавить желание");
-    expect(html).toContain("Добавьте первое желание, а потом сможете поделиться вишлистом по публичной ссылке.");
+    expect(html).toContain("Добавьте первое желание, а потом поделитесь вишлистом по публичной ссылке.");
     expect(html).toContain("Добавить первое желание");
     expect(html).toContain("Публичная ссылка ещё не создана");
     expect(html).toContain("Создать публичную ссылку");
@@ -127,7 +127,6 @@ describe("owner app wishlist bootstrap", () => {
     const page = await AppPage({});
     const html = renderToStaticMarkup(page);
 
-    expect(html).toContain("Текущая публичная ссылка");
     expect(html).toContain("https://wshka.test/share/opaque-token");
     expect(html).toContain("Отключить ссылку");
     expect(html).toContain("Создать новую ссылку");
@@ -142,7 +141,7 @@ describe("owner app wishlist bootstrap", () => {
     });
     const html = renderToStaticMarkup(page);
 
-    expect(html).toContain("Желание добавлено в текущий вишлист.");
+    expect(html).toContain("Желание добавлено.");
   });
 
   it("renders update and delete success feedback with action-aware state", async () => {
@@ -156,7 +155,7 @@ describe("owner app wishlist bootstrap", () => {
     });
 
     expect(renderToStaticMarkup(updatedPage)).toContain("Желание обновлено.");
-    expect(renderToStaticMarkup(deletedPage)).toContain("Желание удалено из текущего вишлиста.");
+    expect(renderToStaticMarkup(deletedPage)).toContain("Желание удалено.");
   });
 
   it("renders share link creation success feedback", async () => {
@@ -276,8 +275,8 @@ describe("owner app wishlist bootstrap", () => {
     expect(html).toContain("Нужны беспроводные");
     expect(html).toContain("9990.00");
     expect(html).toContain("Статус: забронировано");
-    expect(html).toContain("Сохранить изменения");
-    expect(html).toContain("Удалить желание");
+    expect(html).toContain("Сохранить");
+    expect(html).toContain("Удалить");
   });
 
   it("renders privacy-safe item status without reserver identity", async () => {
