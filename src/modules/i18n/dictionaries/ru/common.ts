@@ -9,7 +9,7 @@ export const common = {
     register: "Создать аккаунт",
   },
   footer: {
-    copyright: "© 2025 Wshka",
+    copyright: "© 2026 Wshka",
     privacy: "Политика конфиденциальности",
     terms: "Условия использования",
   },
