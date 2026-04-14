@@ -15,6 +15,7 @@ import {
   deleteCurrentWishlistItem,
   updateCurrentWishlistItem,
 } from "@/modules/wishlist/server/manage-item";
+import { PriceInput } from "@/shared/ui/price-input";
 
 const messages = getTranslations("app");
 
@@ -232,27 +233,26 @@ async function DashboardView({
               <label className="ui-label" htmlFor="title">
                 {messages.dashboard.fields.title}
               </label>
-              <input id="title" name="title" className="ui-input" required />
+              <input id="title" name="title" className="ui-input" required maxLength={255} />
             </div>
             <div className="ui-field">
               <label className="ui-label" htmlFor="url">
                 {messages.dashboard.fields.url}
               </label>
-              <input id="url" name="url" type="url" className="ui-input" />
+              <input id="url" name="url" type="url" className="ui-input" maxLength={2048} />
               <p className="ui-note">{messages.dashboard.hints.url}</p>
             </div>
             <div className="ui-field">
               <label className="ui-label" htmlFor="note">
                 {messages.dashboard.fields.note}
               </label>
-              <textarea id="note" name="note" className="ui-input min-h-28 resize-y" />
+              <textarea id="note" name="note" className="ui-input min-h-28 resize-y" maxLength={2000} />
             </div>
             <div className="ui-field">
               <label className="ui-label" htmlFor="price">
                 {messages.dashboard.fields.price}
               </label>
-              <input id="price" name="price" inputMode="decimal" className="ui-input" />
-              <p className="ui-note">{messages.dashboard.hints.price}</p>
+              <PriceInput id="price" name="price" className="ui-input" />
             </div>
             <button type="submit" className="ui-button">
               {messages.dashboard.submitLabel}
@@ -343,6 +343,7 @@ async function DashboardView({
                           defaultValue={item.title}
                           className="ui-input"
                           required
+                          maxLength={255}
                         />
                       </div>
                       <div className="ui-field">
@@ -355,6 +356,7 @@ async function DashboardView({
                           type="url"
                           defaultValue={item.url ?? ""}
                           className="ui-input"
+                          maxLength={2048}
                         />
                         <p className="ui-note">{messages.dashboard.hints.url}</p>
                       </div>
@@ -367,20 +369,19 @@ async function DashboardView({
                           name="note"
                           defaultValue={item.note ?? ""}
                           className="ui-input min-h-28 resize-y"
+                          maxLength={2000}
                         />
                       </div>
                       <div className="ui-field">
                         <label className="ui-label" htmlFor={`price-${item.id}`}>
                           {messages.dashboard.fields.price}
                         </label>
-                        <input
+                        <PriceInput
                           id={`price-${item.id}`}
                           name="price"
-                          inputMode="decimal"
                           defaultValue={item.price ? formatPrice(item.price) : ""}
                           className="ui-input"
                         />
-                        <p className="ui-note">{messages.dashboard.hints.price}</p>
                       </div>
                       <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
                         <button type="submit" className="ui-button">

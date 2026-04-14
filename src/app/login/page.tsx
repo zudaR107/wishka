@@ -52,6 +52,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               autoComplete="email"
               className="ui-input"
               required
+              maxLength={320}
             />
           </div>
           <div className="ui-field">

@@ -58,6 +58,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
               autoComplete="email"
               className="ui-input"
               required
+              maxLength={320}
             />
           </div>
           <div className="ui-field">
