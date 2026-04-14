@@ -16,10 +16,66 @@ type SharePageProps = {
   }>;
 };
 
+type WishlistView = {
+  shareLink: { token: string };
+  viewer: { isAuthenticated: boolean; isOwner: boolean };
+  items: Array<{
+    id: string;
+    title: string;
+    url: string | null;
+    note: string | null;
+    price: string | null;
+    reservation: { status: "available" | "reserved" };
+  }>;
+};
+
+const DEV_MOCK_WISHLIST: WishlistView = {
+  shareLink: { token: "demo-token" },
+  viewer: { isAuthenticated: false, isOwner: false },
+  items: [
+    {
+      id: "mock-1",
+      title: "Беспроводные наушники Sony WH-1000XM5",
+      url: "https://example.com/sony-headphones",
+      note: "Чёрного цвета, если есть возможность",
+      price: "29 990 ₽",
+      reservation: { status: "available" },
+    },
+    {
+      id: "mock-2",
+      title: "Книга «Мастер и Маргарита»",
+      url: null,
+      note: null,
+      price: "850 ₽",
+      reservation: { status: "reserved" },
+    },
+    {
+      id: "mock-3",
+      title: "Подарочная карта Ozon",
+      url: "https://example.com/ozon-gift",
+      note: "На любую сумму",
+      price: null,
+      reservation: { status: "available" },
+    },
+  ],
+};
+
 export default async function SharePage(props: SharePageProps) {
   const params = props?.params ? await props.params : undefined;
   const search = props?.searchParams ? await props.searchParams : undefined;
   const token = params?.token ?? "";
+
+  if (process.env.NODE_ENV === "development" && token === "demo-token") {
+    return (
+      <SharePageView
+        wishlist={DEV_MOCK_WISHLIST}
+        status={undefined}
+        errorCode={undefined}
+        action={undefined}
+      />
+    );
+  }
+
   const [{ getCurrentUser }, { getPublicWishlistViewByShareToken }] = await Promise.all([
     import("@/modules/auth/server/current-user"),
     import("@/modules/share/server/public-wishlist"),
@@ -51,9 +107,20 @@ export default async function SharePage(props: SharePageProps) {
         </div>
         <div
           className="ui-surface"
-          style={{ padding: "var(--space-6)", display: "flex", flexDirection: "column", gap: "var(--space-4)" }}
+          style={{
+            padding: "var(--space-6)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--space-4)",
+          }}
         >
-          <p style={{ color: "var(--color-text-base)", fontSize: "var(--font-size-label)", margin: 0 }}>
+          <p
+            style={{
+              color: "var(--color-text-base)",
+              fontSize: "var(--font-size-label)",
+              margin: 0,
+            }}
+          >
             {messages.share.unavailableHint}
           </p>
           <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
@@ -69,6 +136,27 @@ export default async function SharePage(props: SharePageProps) {
     );
   }
 
+  return (
+    <SharePageView
+      wishlist={publicWishlist}
+      status={status}
+      errorCode={errorCode}
+      action={action}
+    />
+  );
+}
+
+function SharePageView({
+  wishlist,
+  status,
+  errorCode,
+  action,
+}: {
+  wishlist: WishlistView;
+  status: string | undefined;
+  errorCode: string | undefined;
+  action: string | undefined;
+}) {
   return (
     <div className="content-page">
       <div className="content-page-header">
@@ -97,7 +185,7 @@ export default async function SharePage(props: SharePageProps) {
         </p>
       ) : null}
 
-      {!publicWishlist.viewer.isAuthenticated ? (
+      {!wishlist.viewer.isAuthenticated ? (
         <div className="ui-message ui-message-info" data-testid="share-guest-guard">
           <p style={{ margin: "0 0 var(--space-3)", fontSize: "var(--font-size-label)" }}>
             {messages.share.guestHint}
@@ -106,7 +194,7 @@ export default async function SharePage(props: SharePageProps) {
             {messages.share.loginToReserveLabel}
           </Link>
         </div>
-      ) : publicWishlist.viewer.isOwner ? (
+      ) : wishlist.viewer.isOwner ? (
         <div className="ui-message ui-message-info">
           <p style={{ margin: 0, fontSize: "var(--font-size-label)" }}>
             {messages.share.ownerHint}
@@ -114,7 +202,7 @@ export default async function SharePage(props: SharePageProps) {
         </div>
       ) : null}
 
-      {publicWishlist.items.length === 0 ? (
+      {wishlist.items.length === 0 ? (
         <div className="dashboard-empty">
           <p className="dashboard-empty-title">{messages.share.emptyTitle}</p>
           <p className="dashboard-empty-description">{messages.share.emptyDescription}</p>
@@ -132,15 +220,17 @@ export default async function SharePage(props: SharePageProps) {
               gap: "var(--space-3)",
             }}
           >
-            {publicWishlist.items.map((item) => (
+            {wishlist.items.map((item) => (
               <li key={item.id} className="share-item-card" data-testid="share-item-card">
                 <div className="share-item-header">
                   <h3 className="share-item-title">{item.title}</h3>
                   {item.reservation.status === "reserved" ? (
-                    <span className="ui-badge ui-badge-reserved">{messages.share.reservedLabel}</span>
+                    <span className="ui-badge ui-badge-reserved">
+                      {messages.share.reservedLabel}
+                    </span>
                   ) : null}
                 </div>
-                {(item.price || item.url || item.note) ? (
+                {item.price || item.url || item.note ? (
                   <div className="share-item-meta">
                     {item.price ? (
                       <span style={{ fontWeight: 600, color: "var(--color-text-strong)" }}>
@@ -165,10 +255,10 @@ export default async function SharePage(props: SharePageProps) {
                   </div>
                 ) : null}
                 {item.reservation.status !== "reserved" &&
-                publicWishlist.viewer.isAuthenticated &&
-                !publicWishlist.viewer.isOwner ? (
+                wishlist.viewer.isAuthenticated &&
+                !wishlist.viewer.isOwner ? (
                   <form action={reservePublicWishlistItemAction}>
-                    <input type="hidden" name="token" value={publicWishlist.shareLink.token} />
+                    <input type="hidden" name="token" value={wishlist.shareLink.token} />
                     <input type="hidden" name="itemId" value={item.id} />
                     <button type="submit" className="ui-button">
                       {messages.share.reserveLabel}
