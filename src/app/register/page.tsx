@@ -73,7 +73,6 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
               name="consent"
               type="checkbox"
               className="ui-consent-checkbox"
-              required
             />
             <label htmlFor="consent" className="ui-consent-label">
               {messages.register.consentPrefix}{" "}
