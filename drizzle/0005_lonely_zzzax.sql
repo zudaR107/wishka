@@ -1,0 +1,1 @@
+ALTER TABLE "wishlist_items" ALTER COLUMN "price" SET DATA TYPE numeric(12, 0);

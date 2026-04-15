@@ -27,12 +27,11 @@ test("public wishlist and reserver journey works end to end", async ({ browser }
   try {
     const shareUrl = await test.step("owner prepares a public wishlist with one item", async () => {
       await registerUser(ownerPage, owner);
-      await loginUser(ownerPage, owner);
       await createWishlistItem(ownerPage, item);
 
       await ownerPage.getByRole("button", { name: "Создать публичную ссылку" }).click();
 
-      await expect(ownerPage).toHaveURL(/\/app\?status=share-link-created$/);
+      await expect(ownerPage).toHaveURL(/\/\?status=share-link-created$/);
       await expect(ownerPage.getByTestId("share-link-url")).toHaveValue(/\/share\//);
 
       return ownerPage.getByTestId("share-link-url").inputValue();
@@ -50,7 +49,7 @@ test("public wishlist and reserver journey works end to end", async ({ browser }
 
       await expect(guestItemCard).toContainText(item.url);
       await expect(guestItemCard).toContainText(item.note);
-      await expect(guestItemCard).toContainText("3490.00");
+      await expect(guestItemCard).toContainText("3490");
       await expect(guestItemCard.getByRole("button", { name: "Забронировать" })).toHaveCount(0);
       await expect(guestPage.getByText(owner.email)).toHaveCount(0);
       await expect(guestPage.getByText(reserver.email)).toHaveCount(0);
@@ -58,7 +57,6 @@ test("public wishlist and reserver journey works end to end", async ({ browser }
 
     await test.step("authenticated non-owner can reserve the shared item", async () => {
       await registerUser(reserverPage, reserver);
-      await loginUser(reserverPage, reserver);
       await reserverPage.goto(await shareUrl);
 
       const availableItemCard = getShareItemCard(reserverPage, item.title);
@@ -88,8 +86,8 @@ test("public wishlist and reserver journey works end to end", async ({ browser }
       await expect(guestPage.getByText(reserver.email)).toHaveCount(0);
     });
 
-    await test.step("reserver can cancel the reservation from /app/reservations", async () => {
-      await reserverPage.goto("/app/reservations");
+    await test.step("reserver can cancel the reservation from /reservations", async () => {
+      await reserverPage.goto("/reservations");
 
       await expect(reserverPage.getByRole("heading", { name: "Бронирования" })).toBeVisible();
 
@@ -97,10 +95,10 @@ test("public wishlist and reserver journey works end to end", async ({ browser }
 
       await expect(reservationCard).toContainText(item.url);
       await expect(reservationCard).toContainText(item.note);
-      await expect(reservationCard).toContainText("3490.00");
+      await expect(reservationCard).toContainText("3490");
       await reservationCard.getByRole("button", { name: "Отменить бронь" }).click();
 
-      await expect(reserverPage).toHaveURL(/\/app\/reservations\?status=reservation-cancelled$/);
+      await expect(reserverPage).toHaveURL(/\/reservations\?status=reservation-cancelled$/);
       await expect(reserverPage.getByText("Бронь отменена.")).toBeVisible();
       await expect(reserverPage.getByTestId("reservations-empty-state")).toBeVisible();
       await expect(reserverPage.getByRole("heading", { name: item.title, exact: true })).toHaveCount(0);
@@ -138,32 +136,25 @@ async function registerUser(page: Page, credentials: Credentials) {
   await page.getByLabel("Email").fill(credentials.email);
   await page.getByLabel("Пароль").fill(credentials.password);
   await page.getByRole("button", { name: "Создать аккаунт" }).click();
-  await expect(page).toHaveURL(/\/register\?status=success$/);
-}
-
-async function loginUser(page: Page, credentials: Credentials) {
-  await page.goto("/login");
-  await expect(page.getByRole("heading", { name: "Вход" })).toBeVisible();
-  await page.getByLabel("Email").fill(credentials.email);
-  await page.getByLabel("Пароль").fill(credentials.password);
-  await page.getByRole("button", { name: "Войти" }).click();
-  await expect(page).toHaveURL(/\/app(?:\?.*)?$/);
+  await expect(page).toHaveURL(/\/(?:\?.*)?$/);
 }
 
 async function createWishlistItem(
   page: Page,
   item: { title: string; url: string; note: string; price: string },
 ) {
+  await page.getByTestId("add-item-toggle").click();
+
   const createForm = page.getByTestId("wishlist-create-form");
 
   await createForm.getByLabel("Название").fill(item.title);
   await createForm.getByLabel("Ссылка").fill(item.url);
   await createForm.getByLabel("Заметка").fill(item.note);
   await createForm.getByLabel("Цена").fill(item.price);
-  await createForm.getByRole("button", { name: "Добавить в вишлист" }).click();
+  await createForm.getByRole("button", { name: "Добавить" }).click();
 
-  await expect(page).toHaveURL(/\/app\?status=item-created$/);
-  await expect(page.getByTestId("wishlist-item-count")).toHaveText("1");
+  await expect(page).toHaveURL(/\/\?status=item-created$/);
+  await expect(page.getByTestId("wishlist-item-count")).toContainText("1");
 }
 
 function getShareItemCard(page: Page, title: string) {

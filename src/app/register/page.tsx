@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/modules/auth/server/current-user";
 import { MIN_PASSWORD_LENGTH } from "@/modules/auth/server/register-input";
 import { getTranslations } from "@/modules/i18n";
-import { PageShell } from "@/shared/ui/page-shell";
 
 const common = getTranslations("common");
 const messages = getTranslations("app");
@@ -19,32 +18,26 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
   const currentUser = await getCurrentUser();
 
   if (currentUser) {
-    redirect("/app");
+    redirect("/");
   }
 
   const params = searchParams ? await searchParams : undefined;
-  const status = params?.status;
   const errorCode = params?.error;
 
   return (
-    <PageShell
-      eyebrow={common.routeSkeleton}
-      title={messages.register.title}
-      description={messages.register.description}
-    >
-      {status === "success" ? (
-        <div className="ui-message ui-message-success space-y-3">
-          <p>{messages.register.successMessage}</p>
-          <Link href="/login" className="ui-button ui-button-secondary inline-flex">
-            {messages.register.successLinkLabel}
-          </Link>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-card-header">
+          <p className="auth-card-logo">{common.brand}</p>
+          <h1 className="auth-card-title">{messages.register.title}</h1>
+          <p className="auth-card-description">{messages.register.description}</p>
         </div>
-      ) : null}
-      {errorCode ? (
-        <p className="ui-message ui-message-error">{getRegisterErrorMessage(errorCode)}</p>
-      ) : null}
-      <div className="space-y-6">
-        <form action={registerAction} className="ui-form">
+
+        {errorCode ? (
+          <p className="ui-message ui-message-error">{getRegisterErrorMessage(errorCode)}</p>
+        ) : null}
+
+        <form action={registerAction} className="ui-form" style={{ maxWidth: "none" }}>
           <div className="ui-field">
             <label className="ui-label" htmlFor="email">
               {messages.register.emailLabel}
@@ -56,6 +49,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
               autoComplete="email"
               className="ui-input"
               required
+              maxLength={320}
             />
           </div>
           <div className="ui-field">
@@ -73,18 +67,19 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
             />
             <p className="ui-note">{messages.register.minPasswordHint}</p>
           </div>
-          <button type="submit" className="ui-button">
+          <button type="submit" className="ui-button ui-button-full">
             {messages.register.submitLabel}
           </button>
         </form>
-        <p className="text-sm text-[color:var(--color-text-base)]">
+
+        <p className="auth-card-footer">
           {messages.register.loginHint}{" "}
-          <Link href="/login" className="font-medium underline underline-offset-2">
+          <Link href="/login" className="auth-card-footer-link">
             {messages.register.loginLinkLabel}
           </Link>
         </p>
       </div>
-    </PageShell>
+    </div>
   );
 }
 
@@ -92,6 +87,7 @@ async function registerAction(formData: FormData) {
   "use server";
 
   const { registerUser } = await import("@/modules/auth/server/register");
+  const { createSession, setSessionCookie } = await import("@/modules/auth/server/session");
 
   const result = await registerUser({
     email: getFormValue(formData, "email"),
@@ -99,7 +95,9 @@ async function registerAction(formData: FormData) {
   });
 
   if (result.status === "success") {
-    redirect("/register?status=success");
+    const session = await createSession(result.userId);
+    await setSessionCookie(session.sessionToken, session.expiresAt);
+    redirect("/");
   }
 
   redirect(`/register?error=${result.code}`);

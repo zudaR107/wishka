@@ -71,7 +71,7 @@ describe("wishlist item update flow", () => {
         title: "Обновленные наушники",
         url: "https://example.com/item",
         note: "Новая заметка",
-        price: "2990.00",
+        price: "2990",
       }),
     );
   });

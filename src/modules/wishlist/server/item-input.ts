@@ -81,7 +81,7 @@ function normalizePrice(value: string): NormalizedPriceResult {
     return { status: "error", code: "invalid-price" };
   }
 
-  return { status: "success", value: parsedValue.toFixed(2) };
+  return { status: "success", value: String(Math.round(parsedValue)) };
 }
 
 function isValidHttpUrl(value: string): boolean {

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   requireCurrentUser: vi.fn(),
+  getCurrentUser: vi.fn(),
   getCurrentWishlistWithItems: vi.fn(),
   getCurrentOwnerWishlistWithReservations: vi.fn(),
   listCurrentUserActiveReservations: vi.fn(),
@@ -32,6 +33,7 @@ vi.mock("next/headers", () => ({
 
 vi.mock("../../src/modules/auth/server/current-user", () => ({
   requireCurrentUser: mocks.requireCurrentUser,
+  getCurrentUser: mocks.getCurrentUser,
 }));
 
 vi.mock("../../src/modules/wishlist/server/items", () => ({
@@ -59,6 +61,7 @@ describe("protected owner routes", () => {
   beforeEach(() => {
     Object.assign(globalThis, { React });
     mocks.requireCurrentUser.mockReset();
+    mocks.getCurrentUser.mockReset();
     mocks.getCurrentWishlistWithItems.mockReset();
     mocks.getCurrentOwnerWishlistWithReservations.mockReset();
     mocks.listCurrentUserActiveReservations.mockReset();
@@ -71,6 +74,7 @@ describe("protected owner routes", () => {
       id: "user-1",
       email: "user@example.com",
     });
+    mocks.getCurrentUser.mockResolvedValue(null);
     mocks.getCurrentWishlistWithItems.mockResolvedValue({
       id: "wishlist-1",
       userId: "user-1",
@@ -91,19 +95,20 @@ describe("protected owner routes", () => {
     mocks.getCurrentShareLink.mockResolvedValue(null);
   });
 
-  it("guards /app on the server", async () => {
-    const { default: AppPage } = await import("../../src/app/app/page");
-
-    await AppPage({});
-
-    expect(mocks.requireCurrentUser).toHaveBeenCalled();
-  });
-
-  it("guards /app/reservations on the server", async () => {
-    const { default: ReservationsPage } = await import("../../src/app/app/reservations/page");
+  it("guards /reservations on the server", async () => {
+    const { default: ReservationsPage } = await import("../../src/app/reservations/page");
 
     await ReservationsPage({});
 
     expect(mocks.requireCurrentUser).toHaveBeenCalled();
+  });
+
+  it("/ root page uses getCurrentUser (non-throwing) instead of requireCurrentUser", async () => {
+    const { default: RootPage } = await import("../../src/app/page");
+
+    await RootPage({});
+
+    expect(mocks.getCurrentUser).toHaveBeenCalled();
+    expect(mocks.requireCurrentUser).not.toHaveBeenCalled();
   });
 });

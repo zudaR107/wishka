@@ -1,0 +1,204 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+
+  <!-- === GIFT BOXES === -->
+
+  <!-- gift: top-left -->
+  <g transform="translate(30,22) rotate(-14)">
+    <rect x="-7" y="-5" width="14" height="10" rx="1.5" fill="#c2d5ef"/>
+    <rect x="-1.2" y="-5" width="2.4" height="10" fill="#afc5e8"/>
+    <path d="M0,-5 C-0.4,-8 -3.5,-7.5 -3,-5.8 C-2.5,-5 0,-5 0,-5Z" fill="#d4e4f8"/>
+    <path d="M0,-5 C0.4,-8  3.5,-7.5  3,-5.8 C2.5,-5 0,-5 0,-5Z" fill="#d4e4f8"/>
+    <circle cx="0" cy="-5" r="0.9" fill="#c2d5ef"/>
+  </g>
+
+  <!-- gift: right side, row 1 -->
+  <g transform="translate(172,28) rotate(10)">
+    <rect x="-9" y="-6" width="18" height="13" rx="2" fill="#c2d5ef"/>
+    <rect x="-1.5" y="-6" width="3" height="13" fill="#afc5e8"/>
+    <path d="M0,-6 C-0.5,-10 -5,-9.5 -4.5,-7 C-4,-5.5 0,-6 0,-6Z" fill="#d4e4f8"/>
+    <path d="M0,-6 C0.5,-10  5,-9.5  4.5,-7 C4,-5.5 0,-6 0,-6Z" fill="#d4e4f8"/>
+    <circle cx="0" cy="-6" r="1.1" fill="#c2d5ef"/>
+  </g>
+
+  <!-- gift: left, row 2 -->
+  <g transform="translate(14,72) rotate(18)">
+    <rect x="-6" y="-4" width="12" height="9" rx="1.5" fill="#cddaf2"/>
+    <rect x="-1.1" y="-4" width="2.2" height="9" fill="#b5c9e8"/>
+    <path d="M0,-4 C-0.4,-7 -3,-6.5 -2.6,-4.8 C-2.2,-4 0,-4 0,-4Z" fill="#dce8f8"/>
+    <path d="M0,-4 C0.4,-7  3,-6.5  2.6,-4.8 C2.2,-4 0,-4 0,-4Z" fill="#dce8f8"/>
+    <circle cx="0" cy="-4" r="0.8" fill="#cddaf2"/>
+  </g>
+
+  <!-- gift: center, row 2 -->
+  <g transform="translate(100,60) rotate(-9)">
+    <rect x="-9" y="-6" width="18" height="13" rx="2" fill="#c2d5ef"/>
+    <rect x="-1.5" y="-6" width="3" height="13" fill="#afc5e8"/>
+    <path d="M0,-6 C-0.5,-10 -5,-9.5 -4.5,-7 C-4,-5.5 0,-6 0,-6Z" fill="#d4e4f8"/>
+    <path d="M0,-6 C0.5,-10  5,-9.5  4.5,-7 C4,-5.5 0,-6 0,-6Z" fill="#d4e4f8"/>
+    <circle cx="0" cy="-6" r="1.1" fill="#c2d5ef"/>
+  </g>
+
+  <!-- gift: right, row 3 -->
+  <g transform="translate(185,115) rotate(-6)">
+    <rect x="-7" y="-5" width="14" height="10" rx="1.5" fill="#c2d5ef"/>
+    <rect x="-1.2" y="-5" width="2.4" height="10" fill="#afc5e8"/>
+    <path d="M0,-5 C-0.4,-8 -3.5,-7.5 -3,-5.8 C-2.5,-5 0,-5 0,-5Z" fill="#d4e4f8"/>
+    <path d="M0,-5 C0.4,-8  3.5,-7.5  3,-5.8 C2.5,-5 0,-5 0,-5Z" fill="#d4e4f8"/>
+    <circle cx="0" cy="-5" r="0.9" fill="#c2d5ef"/>
+  </g>
+
+  <!-- gift: center-left, row 4 -->
+  <g transform="translate(55,155) rotate(13)">
+    <rect x="-7" y="-5" width="14" height="10" rx="1.5" fill="#c2d5ef"/>
+    <rect x="-1.2" y="-5" width="2.4" height="10" fill="#afc5e8"/>
+    <path d="M0,-5 C-0.4,-8 -3.5,-7.5 -3,-5.8 C-2.5,-5 0,-5 0,-5Z" fill="#d4e4f8"/>
+    <path d="M0,-5 C0.4,-8  3.5,-7.5  3,-5.8 C2.5,-5 0,-5 0,-5Z" fill="#d4e4f8"/>
+    <circle cx="0" cy="-5" r="0.9" fill="#c2d5ef"/>
+  </g>
+
+  <!-- gift: bottom-right -->
+  <g transform="translate(148,178) rotate(-11)">
+    <rect x="-9" y="-6" width="18" height="13" rx="2" fill="#cddaf2"/>
+    <rect x="-1.5" y="-6" width="3" height="13" fill="#b5c9e8"/>
+    <path d="M0,-6 C-0.5,-10 -5,-9.5 -4.5,-7 C-4,-5.5 0,-6 0,-6Z" fill="#dce8f8"/>
+    <path d="M0,-6 C0.5,-10  5,-9.5  4.5,-7 C4,-5.5 0,-6 0,-6Z" fill="#dce8f8"/>
+    <circle cx="0" cy="-6" r="1.1" fill="#cddaf2"/>
+  </g>
+
+  <!-- === STARS === -->
+
+  <!-- star: top center -->
+  <g transform="translate(75,13) rotate(6)">
+    <polygon points="0,-6 1.4,-1.9 5.7,-1.9 2.3,0.7 3.5,4.7 0,2.2 -3.5,4.7 -2.3,0.7 -5.7,-1.9 -1.4,-1.9" fill="#c2d5ef"/>
+  </g>
+
+  <!-- star: center-right, row 2 -->
+  <g transform="translate(150,75) rotate(-18)">
+    <polygon points="0,-5 1.15,-1.6 4.75,-1.6 1.9,0.6 2.9,4 0,1.8 -2.9,4 -1.9,0.6 -4.75,-1.6 -1.15,-1.6" fill="#d4e4f8"/>
+  </g>
+
+  <!-- star: left, row 3 -->
+  <g transform="translate(38,125) rotate(22)">
+    <polygon points="0,-6 1.4,-1.9 5.7,-1.9 2.3,0.7 3.5,4.7 0,2.2 -3.5,4.7 -2.3,0.7 -5.7,-1.9 -1.4,-1.9" fill="#c2d5ef"/>
+  </g>
+
+  <!-- star: center, row 4 -->
+  <g transform="translate(110,143) rotate(-5)">
+    <polygon points="0,-5 1.15,-1.6 4.75,-1.6 1.9,0.6 2.9,4 0,1.8 -2.9,4 -1.9,0.6 -4.75,-1.6 -1.15,-1.6" fill="#c2d5ef"/>
+  </g>
+
+  <!-- star: bottom-left -->
+  <g transform="translate(20,188) rotate(8)">
+    <polygon points="0,-4.5 1.05,-1.4 4.3,-1.4 1.75,0.55 2.6,3.5 0,1.65 -2.6,3.5 -1.75,0.55 -4.3,-1.4 -1.05,-1.4" fill="#d4e4f8"/>
+  </g>
+
+  <!-- === HEARTS === -->
+
+  <!-- heart: top-right area -->
+  <g transform="translate(125,18) rotate(-7)">
+    <path d="M0,4 C0,1.5 -4,-2 -4,-4 C-4,-6.5 0,-7 0,-5 C0,-7 4,-6.5 4,-4 C4,-2 0,1.5 0,4Z" fill="#c2d5ef"/>
+  </g>
+
+  <!-- heart: right, row 2 -->
+  <g transform="translate(192,72) rotate(12)">
+    <path d="M0,3 C0,1 -3,-1.5 -3,-3 C-3,-4.8 0,-5.2 0,-3.8 C0,-5.2 3,-4.8 3,-3 C3,-1.5 0,1 0,3Z" fill="#d4e4f8"/>
+  </g>
+
+  <!-- heart: left, row 3 -->
+  <g transform="translate(68,118) rotate(-12)">
+    <path d="M0,4 C0,1.5 -4,-2 -4,-4 C-4,-6.5 0,-7 0,-5 C0,-7 4,-6.5 4,-4 C4,-2 0,1.5 0,4Z" fill="#c2d5ef"/>
+  </g>
+
+  <!-- heart: right, row 4 -->
+  <g transform="translate(178,152) rotate(8)">
+    <path d="M0,3 C0,1 -3,-1.5 -3,-3 C-3,-4.8 0,-5.2 0,-3.8 C0,-5.2 3,-4.8 3,-3 C3,-1.5 0,1 0,3Z" fill="#c2d5ef"/>
+  </g>
+
+  <!-- heart: bottom center -->
+  <g transform="translate(88,192) rotate(-10)">
+    <path d="M0,4 C0,1.5 -4,-2 -4,-4 C-4,-6.5 0,-7 0,-5 C0,-7 4,-6.5 4,-4 C4,-2 0,1.5 0,4Z" fill="#d4e4f8"/>
+  </g>
+
+  <!-- === SPARKLES (4-pointed) === -->
+
+  <!-- sparkle: top-right -->
+  <g transform="translate(190,12) rotate(15)">
+    <path d="M0,-6 C0.4,-1.5 0.4,-1.5 3.5,0 C0.4,1.5 0.4,1.5 0,6 C-0.4,1.5 -0.4,1.5 -3.5,0 C-0.4,-1.5 -0.4,-1.5 0,-6Z" fill="#c2d5ef"/>
+  </g>
+
+  <!-- sparkle: left, row 2 -->
+  <g transform="translate(58,65) rotate(-8)">
+    <path d="M0,-5 C0.3,-1.2 0.3,-1.2 3,0 C0.3,1.2 0.3,1.2 0,5 C-0.3,1.2 -0.3,1.2 -3,0 C-0.3,-1.2 -0.3,-1.2 0,-5Z" fill="#d4e4f8"/>
+  </g>
+
+  <!-- sparkle: center-right, row 3 -->
+  <g transform="translate(155,118) rotate(20)">
+    <path d="M0,-6 C0.4,-1.5 0.4,-1.5 3.5,0 C0.4,1.5 0.4,1.5 0,6 C-0.4,1.5 -0.4,1.5 -3.5,0 C-0.4,-1.5 -0.4,-1.5 0,-6Z" fill="#c2d5ef"/>
+  </g>
+
+  <!-- sparkle: bottom-left -->
+  <g transform="translate(12,160) rotate(-20)">
+    <path d="M0,-5 C0.3,-1.2 0.3,-1.2 3,0 C0.3,1.2 0.3,1.2 0,5 C-0.3,1.2 -0.3,1.2 -3,0 C-0.3,-1.2 -0.3,-1.2 0,-5Z" fill="#d4e4f8"/>
+  </g>
+
+  <!-- sparkle: bottom right -->
+  <g transform="translate(190,185) rotate(5)">
+    <path d="M0,-5 C0.3,-1.2 0.3,-1.2 3,0 C0.3,1.2 0.3,1.2 0,5 C-0.3,1.2 -0.3,1.2 -3,0 C-0.3,-1.2 -0.3,-1.2 0,-5Z" fill="#c2d5ef"/>
+  </g>
+
+  <!-- === BOWS (standalone) === -->
+
+  <!-- bow: center -->
+  <g transform="translate(90,90) rotate(-8)">
+    <path d="M0,0 C-0.8,-4 -6,-3.5 -5.5,-1.2 C-5,0.5 0,0 0,0Z" fill="#c2d5ef"/>
+    <path d="M0,0 C0.8,-4  6,-3.5  5.5,-1.2 C5,0.5 0,0 0,0Z" fill="#c2d5ef"/>
+    <path d="M-0.8,0 C-1.2,1.5 -2,3.5 -1.2,4.5" stroke="#c2d5ef" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+    <path d="M0.8,0 C1.2,1.5  2,3.5  1.2,4.5" stroke="#c2d5ef" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+    <circle cx="0" cy="0" r="1.1" fill="#d4e4f8"/>
+  </g>
+
+  <!-- bow: right, row 2 -->
+  <g transform="translate(170,100) rotate(14)">
+    <path d="M0,0 C-0.8,-4 -6,-3.5 -5.5,-1.2 C-5,0.5 0,0 0,0Z" fill="#d4e4f8"/>
+    <path d="M0,0 C0.8,-4  6,-3.5  5.5,-1.2 C5,0.5 0,0 0,0Z" fill="#d4e4f8"/>
+    <path d="M-0.8,0 C-1.2,1.5 -2,3.5 -1.2,4.5" stroke="#d4e4f8" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+    <path d="M0.8,0 C1.2,1.5  2,3.5  1.2,4.5" stroke="#d4e4f8" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+    <circle cx="0" cy="0" r="1.1" fill="#c2d5ef"/>
+  </g>
+
+  <!-- bow: bottom-left area -->
+  <g transform="translate(10,138) rotate(-18)">
+    <path d="M0,0 C-0.8,-4 -6,-3.5 -5.5,-1.2 C-5,0.5 0,0 0,0Z" fill="#c2d5ef"/>
+    <path d="M0,0 C0.8,-4  6,-3.5  5.5,-1.2 C5,0.5 0,0 0,0Z" fill="#c2d5ef"/>
+    <path d="M-0.8,0 C-1.2,1.5 -2,3.5 -1.2,4.5" stroke="#c2d5ef" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+    <path d="M0.8,0 C1.2,1.5  2,3.5  1.2,4.5" stroke="#c2d5ef" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+    <circle cx="0" cy="0" r="1.1" fill="#d4e4f8"/>
+  </g>
+
+  <!-- === GIFT TAGS === -->
+
+  <!-- tag: top area -->
+  <g transform="translate(47,42) rotate(-12)">
+    <rect x="-5" y="-4" width="10" height="13" rx="2.5" fill="#c2d5ef"/>
+    <circle cx="0" cy="-4" r="1.6" fill="#afc5e8"/>
+    <line x1="-2.5" y1="1" x2="2.5" y2="1" stroke="#afc5e8" stroke-width="1" stroke-linecap="round"/>
+    <line x1="-2.5" y1="3.5" x2="1.5" y2="3.5" stroke="#afc5e8" stroke-width="1" stroke-linecap="round"/>
+  </g>
+
+  <!-- tag: center-right -->
+  <g transform="translate(130,100) rotate(10)">
+    <rect x="-5" y="-4" width="10" height="13" rx="2.5" fill="#d4e4f8"/>
+    <circle cx="0" cy="-4" r="1.6" fill="#b5c9e8"/>
+    <line x1="-2.5" y1="1" x2="2.5" y2="1" stroke="#b5c9e8" stroke-width="1" stroke-linecap="round"/>
+    <line x1="-2.5" y1="3.5" x2="1.5" y2="3.5" stroke="#b5c9e8" stroke-width="1" stroke-linecap="round"/>
+  </g>
+
+  <!-- tag: bottom area -->
+  <g transform="translate(195,148) rotate(-7)">
+    <rect x="-5" y="-4" width="10" height="13" rx="2.5" fill="#c2d5ef"/>
+    <circle cx="0" cy="-4" r="1.6" fill="#afc5e8"/>
+    <line x1="-2.5" y1="1" x2="2.5" y2="1" stroke="#afc5e8" stroke-width="1" stroke-linecap="round"/>
+    <line x1="-2.5" y1="3.5" x2="1.5" y2="3.5" stroke="#afc5e8" stroke-width="1" stroke-linecap="round"/>
+  </g>
+
+</svg>

@@ -35,7 +35,7 @@ describe("auth page behavior", () => {
     const { default: LoginPage } = await import("../../src/app/login/page");
 
     await expect(LoginPage({})).rejects.toThrow(redirectSignal);
-    expect(mocks.redirect).toHaveBeenCalledWith("/app");
+    expect(mocks.redirect).toHaveBeenCalledWith("/");
   });
 
   it("redirects authenticated users away from /register", async () => {
@@ -47,7 +47,7 @@ describe("auth page behavior", () => {
     const { default: RegisterPage } = await import("../../src/app/register/page");
 
     await expect(RegisterPage({})).rejects.toThrow(redirectSignal);
-    expect(mocks.redirect).toHaveBeenCalledWith("/app");
+    expect(mocks.redirect).toHaveBeenCalledWith("/");
   });
 
   it("renders the login form for unauthenticated users", async () => {

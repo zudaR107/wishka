@@ -10,16 +10,16 @@ export async function cancelReservationAction(formData: FormData) {
   const result = await cancelReservation(user.id, reservationId);
 
   if (result.status === "success") {
-    redirect("/app/reservations?status=reservation-cancelled");
+    redirect("/reservations?status=reservation-cancelled");
   }
 
   switch (result.code) {
     case "not-reservation-owner":
-      redirect("/app/reservations?action=cancel&error=not-reservation-owner");
+      redirect("/reservations?action=cancel&error=not-reservation-owner");
     case "reservation-not-found":
-      redirect("/app/reservations?action=cancel&error=reservation-not-found");
+      redirect("/reservations?action=cancel&error=reservation-not-found");
     default:
-      redirect("/app/reservations?action=cancel&error=unknown");
+      redirect("/reservations?action=cancel&error=unknown");
   }
 }
 

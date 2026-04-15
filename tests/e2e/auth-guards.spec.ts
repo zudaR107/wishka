@@ -9,15 +9,8 @@ test("login route renders the auth form", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Войти" })).toBeVisible();
 });
 
-test("unauthenticated user is redirected from /app to /login", async ({ page }) => {
-  await page.goto("/app");
-
-  await expect(page).toHaveURL(/\/login$/);
-  await expect(page.getByRole("heading", { name: "Вход" })).toBeVisible();
-});
-
-test("unauthenticated user is redirected from /app/reservations to /login", async ({ page }) => {
-  await page.goto("/app/reservations");
+test("unauthenticated user is redirected from /reservations to /login", async ({ page }) => {
+  await page.goto("/reservations");
 
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByRole("heading", { name: "Вход" })).toBeVisible();

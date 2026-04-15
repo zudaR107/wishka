@@ -1,9 +1,10 @@
 import React from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+import { renderToReadableStream } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   requireCurrentUser: vi.fn(),
+  getCurrentUser: vi.fn(),
   getCurrentOwnerWishlistWithReservations: vi.fn(),
   getCurrentShareLink: vi.fn(),
   getOrCreateCurrentShareLink: vi.fn(),
@@ -37,6 +38,7 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("../../src/modules/auth/server/current-user", () => ({
   requireCurrentUser: mocks.requireCurrentUser,
+  getCurrentUser: mocks.getCurrentUser,
 }));
 
 vi.mock("../../src/modules/share", () => ({
@@ -59,10 +61,21 @@ vi.mock("../../src/modules/wishlist/server/manage-item", () => ({
   deleteCurrentWishlistItem: mocks.deleteCurrentWishlistItem,
 }));
 
+/**
+ * Render a React element (including async RSC components) to an HTML string.
+ * renderToReadableStream supports Suspense and async server components (React 19).
+ */
+async function render(element: React.ReactElement): Promise<string> {
+  const stream = await renderToReadableStream(element);
+  await stream.allReady;
+  return new Response(stream).text();
+}
+
 describe("owner app wishlist bootstrap", () => {
   beforeEach(() => {
     Object.assign(globalThis, { React });
     mocks.requireCurrentUser.mockReset();
+    mocks.getCurrentUser.mockReset();
     mocks.getCurrentOwnerWishlistWithReservations.mockReset();
     mocks.getCurrentShareLink.mockReset();
     mocks.getOrCreateCurrentShareLink.mockReset();
@@ -73,6 +86,10 @@ describe("owner app wishlist bootstrap", () => {
     mocks.deleteCurrentWishlistItem.mockReset();
 
     mocks.requireCurrentUser.mockResolvedValue({
+      id: "user-1",
+      email: "user@example.com",
+    });
+    mocks.getCurrentUser.mockResolvedValue({
       id: "user-1",
       email: "user@example.com",
     });
@@ -87,26 +104,26 @@ describe("owner app wishlist bootstrap", () => {
     mocks.getCurrentShareLink.mockResolvedValue(null);
   });
 
-  it("loads the current wishlist for the authenticated owner on /app", async () => {
-    const { default: AppPage } = await import("../../src/app/app/page");
+  it("loads the current wishlist for the authenticated owner on /", async () => {
+    const { default: AppPage } = await import("../../src/app/page");
 
-    await AppPage({});
+    // render triggers DashboardView which calls data-loading functions
+    await render(await AppPage({}));
 
-    expect(mocks.requireCurrentUser).toHaveBeenCalled();
+    expect(mocks.getCurrentUser).toHaveBeenCalled();
     expect(mocks.getCurrentOwnerWishlistWithReservations).toHaveBeenCalledWith("user-1");
     expect(mocks.getCurrentShareLink).toHaveBeenCalledWith("user-1");
   });
 
   it("renders an empty state when the wishlist has no items", async () => {
-    const { default: AppPage } = await import("../../src/app/app/page");
+    const { default: AppPage } = await import("../../src/app/page");
 
-    const page = await AppPage({});
-    const html = renderToStaticMarkup(page);
+    const html = await render(await AppPage({}));
 
-    expect(html).toContain("Вишлист пока пуст");
-    expect(html).toContain("Количество желаний");
+    expect(html).toContain("Список пока пуст");
+    expect(html).toContain("желаний");
     expect(html).toContain("Добавить желание");
-    expect(html).toContain("Добавьте первое желание, а потом сможете поделиться вишлистом по публичной ссылке.");
+    expect(html).toContain("Добавьте первое желание, а потом поделитесь вишлистом по публичной ссылке.");
     expect(html).toContain("Добавить первое желание");
     expect(html).toContain("Публичная ссылка ещё не создана");
     expect(html).toContain("Создать публичную ссылку");
@@ -122,12 +139,10 @@ describe("owner app wishlist bootstrap", () => {
       updatedAt: new Date("2026-04-12T00:00:00.000Z"),
     });
 
-    const { default: AppPage } = await import("../../src/app/app/page");
+    const { default: AppPage } = await import("../../src/app/page");
 
-    const page = await AppPage({});
-    const html = renderToStaticMarkup(page);
+    const html = await render(await AppPage({}));
 
-    expect(html).toContain("Текущая публичная ссылка");
     expect(html).toContain("https://wshka.test/share/opaque-token");
     expect(html).toContain("Отключить ссылку");
     expect(html).toContain("Создать новую ссылку");
@@ -135,109 +150,91 @@ describe("owner app wishlist bootstrap", () => {
   });
 
   it("renders create success feedback when redirected after item creation", async () => {
-    const { default: AppPage } = await import("../../src/app/app/page");
+    const { default: AppPage } = await import("../../src/app/page");
 
-    const page = await AppPage({
+    const html = await render(await AppPage({
       searchParams: Promise.resolve({ status: "item-created" }),
-    });
-    const html = renderToStaticMarkup(page);
+    }));
 
-    expect(html).toContain("Желание добавлено в текущий вишлист.");
+    expect(html).toContain("Желание добавлено.");
   });
 
   it("renders update and delete success feedback with action-aware state", async () => {
-    const { default: AppPage } = await import("../../src/app/app/page");
+    const { default: AppPage } = await import("../../src/app/page");
 
-    const updatedPage = await AppPage({
-      searchParams: Promise.resolve({ status: "item-updated" }),
-    });
-    const deletedPage = await AppPage({
-      searchParams: Promise.resolve({ status: "item-deleted" }),
-    });
+    const [updatedHtml, deletedHtml] = await Promise.all([
+      render(await AppPage({ searchParams: Promise.resolve({ status: "item-updated" }) })),
+      render(await AppPage({ searchParams: Promise.resolve({ status: "item-deleted" }) })),
+    ]);
 
-    expect(renderToStaticMarkup(updatedPage)).toContain("Желание обновлено.");
-    expect(renderToStaticMarkup(deletedPage)).toContain("Желание удалено из текущего вишлиста.");
+    expect(updatedHtml).toContain("Желание обновлено.");
+    expect(deletedHtml).toContain("Желание удалено.");
   });
 
   it("renders share link creation success feedback", async () => {
-    const { default: AppPage } = await import("../../src/app/app/page");
+    const { default: AppPage } = await import("../../src/app/page");
 
-    const page = await AppPage({
+    const html = await render(await AppPage({
       searchParams: Promise.resolve({ status: "share-link-created" }),
-    });
+    }));
 
-    expect(renderToStaticMarkup(page)).toContain("Публичная ссылка готова.");
+    expect(html).toContain("Публичная ссылка готова.");
   });
 
   it("renders share revoke and regenerate success feedback", async () => {
-    const { default: AppPage } = await import("../../src/app/app/page");
+    const { default: AppPage } = await import("../../src/app/page");
 
-    const revokedPage = await AppPage({
-      searchParams: Promise.resolve({ status: "share-link-revoked" }),
-    });
-    const regeneratedPage = await AppPage({
-      searchParams: Promise.resolve({ status: "share-link-regenerated" }),
-    });
+    const [revokedHtml, regeneratedHtml] = await Promise.all([
+      render(await AppPage({ searchParams: Promise.resolve({ status: "share-link-revoked" }) })),
+      render(await AppPage({ searchParams: Promise.resolve({ status: "share-link-regenerated" }) })),
+    ]);
 
-    expect(renderToStaticMarkup(revokedPage)).toContain("Публичная ссылка отключена.");
-    expect(renderToStaticMarkup(regeneratedPage)).toContain("Создана новая публичная ссылка.");
+    expect(revokedHtml).toContain("Публичная ссылка отключена.");
+    expect(regeneratedHtml).toContain("Создана новая публичная ссылка.");
   });
 
   it("renders action-aware error feedback for create, update, and delete flows", async () => {
-    const { default: AppPage } = await import("../../src/app/app/page");
+    const { default: AppPage } = await import("../../src/app/page");
 
-    const createPage = await AppPage({
-      searchParams: Promise.resolve({ action: "create", error: "unknown" }),
-    });
-    const updatePage = await AppPage({
-      searchParams: Promise.resolve({ action: "update", error: "unknown" }),
-    });
-    const deletePage = await AppPage({
-      searchParams: Promise.resolve({ action: "delete", error: "unknown" }),
-    });
+    const [createHtml, updateHtml, deleteHtml] = await Promise.all([
+      render(await AppPage({ searchParams: Promise.resolve({ action: "create", error: "unknown" }) })),
+      render(await AppPage({ searchParams: Promise.resolve({ action: "update", error: "unknown" }) })),
+      render(await AppPage({ searchParams: Promise.resolve({ action: "delete", error: "unknown" }) })),
+    ]);
 
-    expect(renderToStaticMarkup(createPage)).toContain("Не удалось добавить желание. Попробуйте ещё раз.");
-    expect(renderToStaticMarkup(updatePage)).toContain("Не удалось сохранить изменения. Попробуйте ещё раз.");
-    expect(renderToStaticMarkup(deletePage)).toContain("Не удалось удалить желание. Попробуйте ещё раз.");
+    expect(createHtml).toContain("Не удалось добавить желание. Попробуйте ещё раз.");
+    expect(updateHtml).toContain("Не удалось сохранить изменения. Попробуйте ещё раз.");
+    expect(deleteHtml).toContain("Не удалось удалить желание. Попробуйте ещё раз.");
   });
 
   it("renders share create error feedback", async () => {
-    const { default: AppPage } = await import("../../src/app/app/page");
+    const { default: AppPage } = await import("../../src/app/page");
 
-    const page = await AppPage({
+    const html = await render(await AppPage({
       searchParams: Promise.resolve({ action: "share-create", error: "unknown" }),
-    });
+    }));
 
-    expect(renderToStaticMarkup(page)).toContain(
-      "Не удалось создать публичную ссылку. Попробуйте ещё раз.",
-    );
+    expect(html).toContain("Не удалось создать публичную ссылку. Попробуйте ещё раз.");
   });
 
   it("renders share revoke and regenerate error feedback", async () => {
-    const { default: AppPage } = await import("../../src/app/app/page");
+    const { default: AppPage } = await import("../../src/app/page");
 
-    const revokePage = await AppPage({
-      searchParams: Promise.resolve({ action: "share-revoke", error: "unknown" }),
-    });
-    const regeneratePage = await AppPage({
-      searchParams: Promise.resolve({ action: "share-regenerate", error: "unknown" }),
-    });
+    const [revokeHtml, regenerateHtml] = await Promise.all([
+      render(await AppPage({ searchParams: Promise.resolve({ action: "share-revoke", error: "unknown" }) })),
+      render(await AppPage({ searchParams: Promise.resolve({ action: "share-regenerate", error: "unknown" }) })),
+    ]);
 
-    expect(renderToStaticMarkup(revokePage)).toContain(
-      "Не удалось отключить публичную ссылку. Попробуйте ещё раз.",
-    );
-    expect(renderToStaticMarkup(regeneratePage)).toContain(
-      "Не удалось создать новую публичную ссылку. Попробуйте ещё раз.",
-    );
+    expect(revokeHtml).toContain("Не удалось отключить публичную ссылку. Попробуйте ещё раз.");
+    expect(regenerateHtml).toContain("Не удалось создать новую публичную ссылку. Попробуйте ещё раз.");
   });
 
   it("renders item-not-found feedback for owner-scoped update or delete failures", async () => {
-    const { default: AppPage } = await import("../../src/app/app/page");
+    const { default: AppPage } = await import("../../src/app/page");
 
-    const page = await AppPage({
+    const html = await render(await AppPage({
       searchParams: Promise.resolve({ action: "update", error: "item-not-found" }),
-    });
-    const html = renderToStaticMarkup(page);
+    }));
 
     expect(html).toContain("Не удалось найти это желание в текущем вишлисте.");
   });
@@ -256,7 +253,7 @@ describe("owner app wishlist bootstrap", () => {
           title: "Наушники",
           url: "https://example.com/item",
           note: "Нужны беспроводные",
-          price: "9990.00",
+          price: "9990",
           createdAt: new Date("2026-04-11T00:00:00.000Z"),
           updatedAt: new Date("2026-04-11T00:00:00.000Z"),
           reservation: {
@@ -266,18 +263,17 @@ describe("owner app wishlist bootstrap", () => {
       ],
     });
 
-    const { default: AppPage } = await import("../../src/app/app/page");
+    const { default: AppPage } = await import("../../src/app/page");
 
-    const page = await AppPage({});
-    const html = renderToStaticMarkup(page);
+    const html = await render(await AppPage({}));
 
     expect(html).toContain("Наушники");
     expect(html).toContain("https://example.com/item");
     expect(html).toContain("Нужны беспроводные");
-    expect(html).toContain("9990.00");
+    expect(html).toContain("9990");
     expect(html).toContain("Статус: забронировано");
-    expect(html).toContain("Сохранить изменения");
-    expect(html).toContain("Удалить желание");
+    expect(html).toContain("Сохранить");
+    expect(html).toContain("Удалить");
   });
 
   it("renders privacy-safe item status without reserver identity", async () => {
@@ -317,10 +313,9 @@ describe("owner app wishlist bootstrap", () => {
       ],
     });
 
-    const { default: AppPage } = await import("../../src/app/app/page");
+    const { default: AppPage } = await import("../../src/app/page");
 
-    const page = await AppPage({});
-    const html = renderToStaticMarkup(page);
+    const html = await render(await AppPage({}));
 
     expect(html).toContain("Статус: доступно");
     expect(html).toContain("Статус: забронировано");

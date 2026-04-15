@@ -118,7 +118,7 @@ describe("public share route rendering", () => {
           title: "Наушники",
           url: "https://example.com/item",
           note: "Нужны беспроводные",
-          price: "9990.00",
+          price: "9990",
           createdAt: new Date("2026-04-11T00:00:00.000Z"),
           updatedAt: new Date("2026-04-11T00:00:00.000Z"),
           reservation: {
@@ -147,7 +147,7 @@ describe("public share route rendering", () => {
     expect(html).toContain("Наушники");
     expect(html).toContain("https://example.com/item");
     expect(html).toContain("Нужны беспроводные");
-    expect(html).toContain("9990.00");
+    expect(html).toContain("9990");
     expect(html).toContain(
       "Войдите, чтобы забронировать доступное желание и потом управлять бронями в своём разделе.",
     );

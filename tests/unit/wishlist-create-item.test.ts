@@ -103,7 +103,7 @@ describe("wishlist item creation flow", () => {
       title: "Наушники",
       url: "https://example.com/item",
       note: "Беспроводные",
-      price: "1990.00",
+      price: "1990",
     });
   });
 });

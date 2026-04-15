@@ -39,12 +39,12 @@ export async function registerUser({ email, password }: RegisterUserInput): Prom
   const passwordHash = await hashPassword(password);
 
   try {
-    await db.insert(users).values({
+    const [inserted] = await db.insert(users).values({
       email: normalizedEmail,
       passwordHash,
-    });
+    }).returning({ id: users.id });
 
-    return { status: "success" };
+    return { status: "success", userId: inserted.id };
   } catch (error) {
     if (isUniqueEmailViolation(error)) {
       return { status: "error", code: "email-taken" };

@@ -19,23 +19,15 @@ test("owner can complete the core wishlist journey end to end", async ({ page })
     title: `Updated owner journey item ${itemRunId}`,
     url: `https://example.com/items/${itemRunId}/updated`,
     note: `Updated note ${itemRunId}`,
-    price: "2490.5",
+    price: "2490",
   };
 
-  await test.step("register a new owner account", async () => {
+  await test.step("register and land on the bootstrapped / state", async () => {
     await registerOwner(page, credentials);
 
-    await expect(page).toHaveURL(/\/register\?status=success$/);
-    await expect(page.getByText("Аккаунт создан. Теперь войдите, чтобы открыть свой вишлист.")).toBeVisible();
-  });
-
-  await test.step("log in and land on the bootstrapped /app state", async () => {
-    await loginOwner(page, credentials);
-
-    await expect(page).toHaveURL(/\/app(?:\?.*)?$/);
+    await expect(page).toHaveURL(/\/(?:\?.*)?$/);
     await expect(page.getByRole("heading", { name: "Мой вишлист" })).toBeVisible();
-    await expect(page.getByTestId("wishlist-id")).toHaveText(/.+/);
-    await expect(page.getByTestId("wishlist-item-count")).toHaveText("0");
+    await expect(page.getByTestId("wishlist-item-count")).toContainText("0");
     await expect(page.getByTestId("wishlist-empty-state")).toBeVisible();
     await expect(page.getByRole("button", { name: "Создать публичную ссылку" })).toBeVisible();
 
@@ -47,36 +39,42 @@ test("owner can complete the core wishlist journey end to end", async ({ page })
   });
 
   await test.step("create and update a wishlist item", async () => {
+    // Open the collapsible create form
+    await page.getByTestId("add-item-toggle").click();
+
     const createForm = page.getByTestId("wishlist-create-form");
 
     await createForm.getByLabel("Название").fill(initialItem.title);
     await createForm.getByLabel("Ссылка").fill(initialItem.url);
     await createForm.getByLabel("Заметка").fill(initialItem.note);
     await createForm.getByLabel("Цена").fill(initialItem.price);
-    await createForm.getByRole("button", { name: "Добавить в вишлист" }).click();
+    await createForm.getByRole("button", { name: "Добавить" }).click();
 
-    await expect(page).toHaveURL(/\/app\?status=item-created$/);
-    await expect(page.getByText("Желание добавлено в текущий вишлист.")).toBeVisible();
-    await expect(page.getByTestId("wishlist-item-count")).toHaveText("1");
+    await expect(page).toHaveURL(/\/\?status=item-created$/);
+    await expect(page.getByText("Желание добавлено.")).toBeVisible();
+    await expect(page.getByTestId("wishlist-item-count")).toContainText("1");
 
     const createdItemCard = getWishlistItemCard(page, initialItem.title);
 
     await expect(createdItemCard).toContainText(initialItem.url);
     await expect(createdItemCard).toContainText(initialItem.note);
-    await expect(createdItemCard).toContainText("1990.00");
+    await expect(createdItemCard).toContainText("1990");
     await expect(createdItemCard).toContainText("Статус: доступно");
 
+    // Open the inline edit form
+    await createdItemCard.getByTestId("edit-item-toggle").click();
+
     const updateForm = createdItemCard.locator("form").filter({
-      has: page.getByRole("button", { name: "Сохранить изменения" }),
+      has: page.getByRole("button", { name: "Сохранить" }),
     });
 
     await updateForm.getByLabel("Название").fill(updatedItem.title);
     await updateForm.getByLabel("Ссылка").fill(updatedItem.url);
     await updateForm.getByLabel("Заметка").fill(updatedItem.note);
     await updateForm.getByLabel("Цена").fill(updatedItem.price);
-    await updateForm.getByRole("button", { name: "Сохранить изменения" }).click();
+    await updateForm.getByRole("button", { name: "Сохранить" }).click();
 
-    await expect(page).toHaveURL(/\/app\?status=item-updated$/);
+    await expect(page).toHaveURL(/\/\?status=item-updated$/);
     await expect(page.getByText("Желание обновлено.")).toBeVisible();
     await expect(page.getByRole("heading", { name: initialItem.title, exact: true })).toHaveCount(0);
 
@@ -84,13 +82,13 @@ test("owner can complete the core wishlist journey end to end", async ({ page })
 
     await expect(updatedItemCard).toContainText(updatedItem.url);
     await expect(updatedItemCard).toContainText(updatedItem.note);
-    await expect(updatedItemCard).toContainText("2490.50");
+    await expect(updatedItemCard).toContainText("2490");
   });
 
   await test.step("create, regenerate, and revoke a share link", async () => {
     await page.getByRole("button", { name: "Создать публичную ссылку" }).click();
 
-    await expect(page).toHaveURL(/\/app\?status=share-link-created$/);
+    await expect(page).toHaveURL(/\/\?status=share-link-created$/);
     await expect(page.getByText("Публичная ссылка готова.")).toBeVisible();
     await expect(page.getByTestId("share-link-url")).toHaveValue(/\/share\//);
 
@@ -108,7 +106,7 @@ test("owner can complete the core wishlist journey end to end", async ({ page })
 
     await page.getByRole("button", { name: "Создать новую ссылку" }).click();
 
-    await expect(page).toHaveURL(/\/app\?status=share-link-regenerated$/);
+    await expect(page).toHaveURL(/\/\?status=share-link-regenerated$/);
     await expect(page.getByText("Создана новая публичная ссылка.")).toBeVisible();
 
     const regeneratedShareUrl = await page.getByTestId("share-link-url").inputValue();
@@ -126,7 +124,7 @@ test("owner can complete the core wishlist journey end to end", async ({ page })
 
     await page.getByRole("button", { name: "Отключить ссылку" }).click();
 
-    await expect(page).toHaveURL(/\/app\?status=share-link-revoked$/);
+    await expect(page).toHaveURL(/\/\?status=share-link-revoked$/);
     await expect(page.getByText("Публичная ссылка отключена.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Создать публичную ссылку" })).toBeVisible();
 
@@ -141,11 +139,11 @@ test("owner can complete the core wishlist journey end to end", async ({ page })
   await test.step("delete the item and return to the empty state", async () => {
     const updatedItemCard = getWishlistItemCard(page, updatedItem.title);
 
-    await updatedItemCard.getByRole("button", { name: "Удалить желание" }).click();
+    await updatedItemCard.getByRole("button", { name: "Удалить" }).click();
 
-    await expect(page).toHaveURL(/\/app\?status=item-deleted$/);
-    await expect(page.getByText("Желание удалено из текущего вишлиста.")).toBeVisible();
-    await expect(page.getByTestId("wishlist-item-count")).toHaveText("0");
+    await expect(page).toHaveURL(/\/\?status=item-deleted$/);
+    await expect(page.getByText("Желание удалено.")).toBeVisible();
+    await expect(page.getByTestId("wishlist-item-count")).toContainText("0");
     await expect(page.getByTestId("wishlist-empty-state")).toBeVisible();
     await expect(page.getByRole("heading", { name: updatedItem.title, exact: true })).toHaveCount(0);
   });
@@ -166,14 +164,6 @@ async function registerOwner(page: Page, credentials: OwnerCredentials) {
   await page.getByLabel("Email").fill(credentials.email);
   await page.getByLabel("Пароль").fill(credentials.password);
   await page.getByRole("button", { name: "Создать аккаунт" }).click();
-}
-
-async function loginOwner(page: Page, credentials: OwnerCredentials) {
-  await page.goto("/login");
-  await expect(page.getByRole("heading", { name: "Вход" })).toBeVisible();
-  await page.getByLabel("Email").fill(credentials.email);
-  await page.getByLabel("Пароль").fill(credentials.password);
-  await page.getByRole("button", { name: "Войти" }).click();
 }
 
 function getWishlistItemCard(page: Page, title: string) {

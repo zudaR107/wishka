@@ -3,6 +3,10 @@ import { isValidEmail, normalizeEmail } from "@/modules/auth/server/email";
 const MIN_PASSWORD_LENGTH = 8;
 
 export type RegisterUserResult =
+  | { status: "success"; userId: string }
+  | { status: "error"; code: "invalid-email" | "password-too-short" | "email-taken" | "unknown" };
+
+type RegisterValidationResult =
   | { status: "success" }
   | { status: "error"; code: "invalid-email" | "password-too-short" | "email-taken" | "unknown" };
 
@@ -11,7 +15,7 @@ type RegisterUserInput = {
   password: string;
 };
 
-export function validateRegisterUserInput({ email, password }: RegisterUserInput): RegisterUserResult {
+export function validateRegisterUserInput({ email, password }: RegisterUserInput): RegisterValidationResult {
   const normalizedEmail = normalizeEmail(email);
 
   if (!isValidEmail(normalizedEmail)) {

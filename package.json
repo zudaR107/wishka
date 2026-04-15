@@ -1,17 +1,17 @@
 {
   "name": "wshka",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "rm -rf .next/standalone/.next/static && mkdir -p .next/standalone/.next/static && cp -R .next/static/. .next/standalone/.next/static && node --env-file-if-exists=.env.local .next/standalone/server.js",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio",
+    "start": "rm -rf .next/standalone/.next/static && mkdir -p .next/standalone/.next/static && cp -R .next/static/. .next/standalone/.next/static && cp -R public/. .next/standalone/public && node --env-file-if-exists=.env.local .next/standalone/server.js",
+    "db:generate": "drizzle-kit generate --config config/drizzle.config.ts",
+    "db:migrate": "drizzle-kit migrate --config config/drizzle.config.ts",
+    "db:studio": "drizzle-kit studio --config config/drizzle.config.ts",
     "typecheck": "rm -rf .next && next typegen && tsc --noEmit",
-    "test:unit": "vitest run tests/unit",
-    "test:e2e": "playwright test tests/e2e"
+    "test:unit": "vitest run tests/unit --config config/vitest.config.mts",
+    "test:e2e": "playwright test --config config/playwright.config.ts"
   },
   "dependencies": {
     "@types/node": "^22.19.17",
