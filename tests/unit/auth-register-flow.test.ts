@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   findFirst: vi.fn(),
   insert: vi.fn(),
   insertValues: vi.fn(),
+  insertReturning: vi.fn(),
   hashPassword: vi.fn(),
 }));
 
@@ -35,6 +36,9 @@ describe("register user flow", () => {
     mocks.insert.mockReturnValue({
       values: mocks.insertValues,
     });
+    mocks.insertValues.mockReturnValue({
+      returning: mocks.insertReturning,
+    });
   });
 
   it("rejects invalid input before querying the database", async () => {
@@ -49,11 +53,11 @@ describe("register user flow", () => {
   it("creates a user for valid new credentials", async () => {
     mocks.findFirst.mockResolvedValue(undefined);
     mocks.hashPassword.mockResolvedValue("hashed-password");
-    mocks.insertValues.mockResolvedValue(undefined);
+    mocks.insertReturning.mockResolvedValue([{ id: "new-user-id" }]);
 
     await expect(
       registerUser({ email: " User@Example.com ", password: "password123" }),
-    ).resolves.toEqual({ status: "success" });
+    ).resolves.toEqual({ status: "success", userId: "new-user-id" });
     expect(mocks.hashPassword).toHaveBeenCalledWith("password123");
     expect(mocks.insertValues).toHaveBeenCalledWith({
       email: "user@example.com",
@@ -80,7 +84,7 @@ describe("register user flow", () => {
 
     mocks.findFirst.mockResolvedValue(undefined);
     mocks.hashPassword.mockResolvedValue("hashed-password");
-    mocks.insertValues.mockRejectedValue(error);
+    mocks.insertReturning.mockRejectedValue(error);
 
     await expect(
       registerUser({ email: "user@example.com", password: "password123" }),
