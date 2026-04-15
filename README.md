@@ -47,7 +47,7 @@ Create a wishlist, share it by link, and let another person reserve an item.
 - Current-user reservations page and cancel flow on `/reservations`.
 - Focused reservation coverage across helper logic and owner/public/reserver routes.
 - Runtime env and deploy contract for local, CI, and production.
-- Production `Next.js standalone` image build through `ops/Dockerfile`.
+- Production `Next.js standalone` image build through the repository `Dockerfile`.
 - Production-oriented Docker Compose stack for `app`, `postgres`, and `caddy`.
 - Caddy reverse proxy and HTTPS foundation for `wshka.ru`.
 - GHCR image publish on `main` and SemVer tag pushes.
