@@ -12,7 +12,7 @@
   wishlist
 
 ## Current Behavior
-- `/app` always resolves one current wishlist for the authenticated owner.
+- `/` resolves one current wishlist for the authenticated owner when a session is present.
 - The owner dashboard renders either an empty state or the current ordered item
   list.
 - Owners can create, update, and delete items through server-side actions.

@@ -14,11 +14,23 @@
 | `DATABASE_URL` | yes | yes | local, CI with DB work, production | PostgreSQL connection string for app runtime and Drizzle CLI | Required by `src/shared/db/env.ts` and `drizzle.config.ts` |
 | `DATABASE_SSL` | no | no | local, CI, production | Enables PostgreSQL SSL mode when set to `true`, `1`, or `yes` | Default behavior is `false` |
 
+### Process Runtime Variables
+| Variable | Required | Secret | Environments | Purpose | Notes |
+|---|---|---|---|---|---|
+| `HOSTNAME` | no | no | local host-run, container, production | Bind address for the standalone Next.js server | Defaults to the runtime default when unset; the production image sets `0.0.0.0` |
+| `PORT` | no | no | local host-run, container, production | Listen port for the standalone Next.js server | Defaults to `3000` when unset; the production image also sets `3000` |
+
 ### Current Non-Env Runtime Assumptions
 - There is still no separate auth secret env.
 - Session tokens are opaque random values stored in the database.
 - The auth cookie name is fixed in code as `wshka_session`.
 - Production requires HTTPS so the secure auth cookie path works correctly.
+
+### Current Failure Behavior
+- `npm run db:migrate` fails immediately and explicitly when `DATABASE_URL` is missing.
+- DB-backed runtime actions and pages fail explicitly with `DATABASE_URL is required.` when the app reaches database code without `DATABASE_URL`.
+- `next build` can still succeed without `DATABASE_URL` because build-time rendering does not require a live database for the current route set.
+- `/healthz` remains a process-level readiness endpoint only and does not confirm database connectivity.
 
 ### Public URL And Share-Link Assumptions
 - There is no dedicated `APP_URL`, `SITE_URL`, or `NEXT_PUBLIC_*` runtime variable yet.
@@ -83,7 +95,7 @@
 ## GitHub Actions Publish Flow
 - PR build validation is handled by `.github/workflows/baseline-pr-validation.yml`.
 - GHCR image publish is handled by `.github/workflows/image-publish.yml`.
-- The publish workflow uses the existing production `ops/Dockerfile` from `M6-I2`.
+- The publish workflow uses the existing production `Dockerfile` from `M6-I2`.
 - Publish events are:
   - push to `main`
   - push of SemVer tags matching `v*.*.*`
@@ -162,7 +174,7 @@
 - Local verification without Compose should use a container-specific env file when the database stays on the host machine.
 - `.env.docker.example` documents the expected host alias pattern for that case.
 - Local verification commands:
-  - `docker build -f ops/Dockerfile -t wshka-app .`
+  - `docker build -t wshka-app .`
   - `docker run -p 3000:3000 --env-file .env.docker.local wshka-app`
 
 ## Compose Stack Foundation

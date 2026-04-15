@@ -18,7 +18,8 @@
 - `/register` supports email/password signup with validation and duplicate-email
   handling.
 - `/login` supports email/password signin and issues a server-side session.
-- `/app` and `/app/reservations` require an authenticated session.
+- Authenticated dashboard state on `/` and `/reservations` relies on the same
+  server-side session foundation.
 - Auth state stays server-first through the `sessions` table and an HTTP-only
   cookie.
 - The same auth foundation now backs owner wishlist bootstrap and item CRUD on

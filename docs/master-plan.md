@@ -83,11 +83,10 @@ Excluded:
 ## Route Map
 | Route | Access | Purpose |
 |---|---|---|
-| `/` | public | Entry page; authenticated users may later be redirected to `/app` |
+| `/` | public + auth | Guest entry page and authenticated owner dashboard |
 | `/login` | public | Login |
 | `/register` | public | Registration |
-| `/app` | auth | Owner dashboard for the current wishlist |
-| `/app/reservations` | auth | List of reservations created by the current user |
+| `/reservations` | auth | List of reservations created by the current user |
 | `/share/[token]` | public | Public read-only wishlist page |
 | `/healthz` | public-safe | Health endpoint for runtime checks and deploy verification |
 
@@ -274,7 +273,7 @@ Scope notes:
 - Use `users` and `sessions` as the first auth tables.
 - Keep auth flow email/password only in `v0.3.0`.
 - Do not add email verification or password reset in this milestone.
-- Keep route protection minimal: enough for `/app` and `/app/reservations`.
+- Keep route protection minimal: enough for the authenticated dashboard state on `/` and for `/reservations`.
 - Prefer HTTP-only secure session cookies over client-managed auth state.
 
 Acceptance targets:
@@ -347,14 +346,14 @@ Dependencies:
 Scope notes:
 - Treat `wishlists` as a first-class table even though `v1.0.0` UI exposes one
   active wishlist per owner.
-- The owner dashboard at `/app` should become the first real wishlist screen.
+- The owner dashboard at `/` should become the first real wishlist screen.
 - Keep item fields minimal for this milestone: `title`, `url?`, `note?`, `price?`.
 - Use the existing authenticated session guard foundation; do not expand into
   share or reservation behavior yet.
 - Prefer server actions and server-rendered data loading over client state.
 
 Acceptance targets:
-- authenticated owner sees their current wishlist on `/app`
+- authenticated owner sees their current wishlist on `/`
 - if the owner has no wishlist yet, the app creates or bootstraps the single
   active wishlist needed for `v1.0.0`
 - owner can create wishlist items
@@ -364,7 +363,7 @@ Acceptance targets:
 
 Exit criteria:
 - `wishlists` and `wishlist_items` schema exist
-- authenticated owner can load their current wishlist on `/app`
+- authenticated owner can load their current wishlist on `/`
 - owner can create an item
 - owner can edit an item
 - owner can delete an item
@@ -521,7 +520,7 @@ Acceptance targets:
 - owner cannot reserve their own wishlist items
 - owner dashboard shows privacy-safe reserved status for items
 - reserver can view and cancel their own active reservations on
-  `/app/reservations`
+  `/reservations`
 - reservation rules are covered by focused tests for owner, reserver, and guard
   cases
 
@@ -531,7 +530,7 @@ Exit criteria:
 - public share page can create reservations for eligible authenticated
   non-owners
 - owner dashboard shows reserved state without exposing reserver identity
-- `/app/reservations` lists the current user's reservations and supports
+- `/reservations` lists the current user's reservations and supports
   cancellation
 - canceled or superseded reservations no longer count as active
 - reservation coverage exists for rule enforcement and key UI states
@@ -741,6 +740,3 @@ Recommended planning rule:
 - `v1.4.0`: dark theme
 - `v1.5.0`: email verification and password reset
 - `v1.6.0`: api documentation (swagger / openapi)
-- Add a password repeat on registration
-- Fix UI
-- Reorganize the repository structure

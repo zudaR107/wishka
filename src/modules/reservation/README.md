@@ -5,15 +5,15 @@
 - `src/modules/reservation/server/lifecycle.ts` owns reservation lifecycle and
   eligibility rules.
 - `src/modules/reservation/server/owner-wishlist.ts` builds the privacy-safe
-  owner read model used on `/app`.
+  owner read model used on `/`.
 - `src/modules/reservation/server/current-user-reservations.ts` builds the
-  current-user active reservation list used on `/app/reservations`.
+  current-user active reservation list used on `/reservations`.
 - `reservations` stores reservation history per wishlist item without adding
   reserved flags to `wishlist_items`.
 - `/share/[token]` supports public reservation create flow for eligible
   authenticated non-owners.
-- `/app` shows privacy-safe reserved status without reserver identity.
-- `/app/reservations` is a protected reserver page with active reservation list
+- `/` shows privacy-safe reserved status without reserver identity.
+- `/reservations` is a protected reserver page with active reservation list
   and cancel flow.
 
 ## Schema Foundation
@@ -42,10 +42,10 @@
 - Active reservation state is derived only from reservation records.
 - Authenticated non-owners can reserve available items from public share pages.
 - Guests can view public wishlists but cannot reserve.
-- Owners can see `available` or `reserved` state on `/app` without seeing who
+- Owners can see `available` or `reserved` state on `/` without seeing who
   reserved an item.
 - Reservers can review and cancel only their own active reservations on
-  `/app/reservations`.
+  `/reservations`.
 
 ## Test Coverage
 - Focused tests cover lifecycle rules, reservation-aware public loading, public

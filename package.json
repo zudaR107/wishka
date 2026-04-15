@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "rm -rf .next && next dev",
+    "dev": "next dev",
     "build": "next build",
     "start": "rm -rf .next/standalone/.next/static && mkdir -p .next/standalone/.next/static && cp -R .next/static/. .next/standalone/.next/static && cp -R public/. .next/standalone/public && node --env-file-if-exists=.env.local .next/standalone/server.js",
     "db:generate": "drizzle-kit generate --config config/drizzle.config.ts",

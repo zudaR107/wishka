@@ -32,7 +32,7 @@
   - push to `main`
   - push of `v*.*.*` tags
 - Source-of-truth image build path:
-  - `ops/Dockerfile`
+  - repository `Dockerfile`
 - Expected GHCR tags:
   - every publish run: `sha-<full-commit-sha>`
   - default branch publish: `main`
@@ -85,7 +85,7 @@ How to validate in GHCR:
 What success looks like:
 - the package exists in GHCR
 - the expected tag is present
-- the publish workflow did not rebuild through any path other than `ops/Dockerfile`
+- the publish workflow did not rebuild through any path other than the repository `Dockerfile`
 
 ### 3. Deploy Validation On VPS
 How deploy is triggered:

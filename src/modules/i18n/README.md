@@ -14,7 +14,7 @@
 
 ## Current Usage
 - The `app` namespace now covers owner dashboard empty states, CRUD form labels,
-  per-action success messages, and action-aware error feedback on `/app`.
+  per-action success messages, and action-aware error feedback on `/`.
 
 ## Growth Rule
 - Add future locales by mirroring the same namespace files, for example

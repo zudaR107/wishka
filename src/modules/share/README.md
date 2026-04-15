@@ -13,7 +13,7 @@
   auth-sensitive public reservation UX.
 
 ## Current Behavior
-- `/app` shows the owner a share section for the current wishlist.
+- `/` shows the owner a share section for the current wishlist.
 - Owners can create, view, revoke, and regenerate the current public share
   link through server-side actions.
 - `/share/[token]` renders a public wishlist for valid active tokens with

@@ -7,10 +7,12 @@
 
 ## Current State
 - `src/app/login` and `src/app/register` contain working auth entry flows.
-- `src/app/app` is a server-rendered owner dashboard with wishlist bootstrap,
-  read state, item CRUD, share-link controls, and privacy-safe reserved status.
-- `src/app/app/reservations` is now a protected reserver page with active
-  reservations and cancel flow.
+- `src/app/page.tsx` is the server-rendered root route. Guests see the public
+  entry state there, and authenticated users see the owner dashboard with
+  wishlist bootstrap, item CRUD, share-link controls, and privacy-safe reserved
+  status.
+- `src/app/reservations` is the protected reserver page with active reservations
+  and cancel flow.
 - `src/app/healthz` is a public-safe health route used by compose, reverse
   proxy, and deploy verification flows.
 - `src/app/share/[token]` is now a real public route backed by the `share`
