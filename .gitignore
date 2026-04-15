@@ -30,3 +30,6 @@ pnpm-debug.log*
 
 # misc
 .DS_Store
+
+# local docs
+COMMANDS.md
