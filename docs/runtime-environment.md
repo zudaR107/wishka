@@ -83,7 +83,7 @@
 ## GitHub Actions Publish Flow
 - PR build validation is handled by `.github/workflows/baseline-pr-validation.yml`.
 - GHCR image publish is handled by `.github/workflows/image-publish.yml`.
-- The publish workflow uses the existing production `Dockerfile` from `M6-I2`.
+- The publish workflow uses the existing production `ops/Dockerfile` from `M6-I2`.
 - Publish events are:
   - push to `main`
   - push of SemVer tags matching `v*.*.*`
@@ -162,7 +162,7 @@
 - Local verification without Compose should use a container-specific env file when the database stays on the host machine.
 - `.env.docker.example` documents the expected host alias pattern for that case.
 - Local verification commands:
-  - `docker build -t wshka-app .`
+  - `docker build -f ops/Dockerfile -t wshka-app .`
   - `docker run -p 3000:3000 --env-file .env.docker.local wshka-app`
 
 ## Compose Stack Foundation

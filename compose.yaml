@@ -22,6 +22,7 @@ services:
     image: ${APP_IMAGE:-wshka-app:local}
     build:
       context: .
+      dockerfile: ops/Dockerfile
     restart: unless-stopped
     depends_on:
       postgres:
