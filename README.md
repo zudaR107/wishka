@@ -1,66 +1,81 @@
 # Wshka
 
-Minimal, fast wishlist app.
+A minimal, fast wishlist app. Create a wishlist, share it by link, let
+another person reserve a gift.
 
-## Status
-Milestone 6 complete. Delivery and ops flow is in place.
+**Live:** [wshka.ru](https://wshka.ru)
 
-## Core Idea
-Create a wishlist, share it by link, and let another person reserve an item.
+## What it does
 
-## Planned Stack
-- Next.js
-- TypeScript
-- PostgreSQL
-- Drizzle
-- Tailwind
-- Radix
-- Vitest
-- Playwright
-- Docker Compose
-- Caddy
+- Create an account and add items to your wishlist
+- Share a public link with friends or family
+- They reserve what they plan to give — no duplicates, no spoilers
+- You see what's reserved without knowing who reserved it
 
-## Project Rules
-- `v1.0.0` stays minimal: email/password auth, one wishlist per user in UI, item CRUD, public share link, reservation flow, Russian UI, and light theme.
-- Releases follow SemVer.
-- Commits follow Conventional Commits.
-- `main` is protected and updated only through PRs.
+## Stack
 
-## Current Focus
-- Milestone 7: MVP hardening and release prep.
+Next.js · TypeScript · PostgreSQL · Drizzle · Tailwind · Vitest · Playwright ·
+Docker Compose · Caddy
 
-## Current Capabilities
-- Email/password registration.
-- Email/password login and logout.
-- Server-side sessions with HTTP-only auth cookie.
-- Server-side auth guards for the authenticated dashboard state on `/` and for `/reservations`.
-- Automatic current wishlist bootstrap for authenticated owners.
-- Server-rendered owner dashboard with empty state and item list.
-- Owner-side wishlist item create, update, and delete flows.
-- Owner-side share-link create, revoke, and regenerate flows on `/`.
-- Public wishlist access on `/share/[token]` by active opaque token.
-- Predictable unavailable state for invalid, inactive, and revoked share links.
-- Reservation lifecycle helpers with active/inactive history and ownership rules.
-- Reservation-aware public wishlist loading without reserver identity leakage.
-- Public reservation create flow for authenticated non-owners on `/share/[token]`.
-- Privacy-safe reserved status on the owner dashboard `/`.
-- Current-user reservations page and cancel flow on `/reservations`.
-- Focused reservation coverage across helper logic and owner/public/reserver routes.
-- Runtime env and deploy contract for local, CI, and production.
-- Production `Next.js standalone` image build through the repository `Dockerfile`.
-- Production-oriented Docker Compose stack for `app`, `postgres`, and `caddy`.
-- Caddy reverse proxy and HTTPS foundation for `wshka.ru`.
-- GHCR image publish on `main` and SemVer tag pushes.
-- Release-triggered VPS deploy with production migrations and `/healthz` verification.
-- Delivery validation and rollback runbook for the current release path.
+## Development
 
-## Project Docs
-- Product and delivery plan: `master-plan.md`
-- Release checklist: `docs/release-checklist.md`
-- Runtime env and deploy foundation: `docs/runtime-environment.md`
-- Delivery validation runbook: `docs/delivery-validation.md`
-- GitHub Actions workflows: `.github/workflows/`
-- Agent guidance: `AGENTS.md`
+```bash
+# Install dependencies
+npm ci
+
+# Start dev server (clears .next first to avoid conflicts with prod builds)
+npm run dev
+```
+
+Requires a local PostgreSQL database. Copy `.env.example` to `.env.local` and
+set `DATABASE_URL`.
+
+```bash
+# Apply migrations
+npm run db:migrate
+
+# Type check
+npm run typecheck
+
+# Unit tests
+npm run test:unit
+
+# E2E tests (requires running server)
+npm run test:e2e
+```
+
+See `docs/COMMANDS.md` for the full command reference.
+
+## Production build
+
+```bash
+npm run build && npm run start
+```
+
+## Docker
+
+```bash
+# Build image
+docker build -f ops/Dockerfile -t wshka-app .
+
+# Run (requires external PostgreSQL in .env.docker.local)
+docker run --rm -p 3000:3000 --env-file .env.docker.local wshka-app
+```
+
+See `docs/runtime-environment.md` for the full runtime env contract and
+`docs/delivery-validation.md` for the release and deploy runbook.
+
+## Project docs
+
+| Document | Purpose |
+|---|---|
+| `docs/master-plan.md` | Product scope, milestones, roadmap |
+| `docs/COMMANDS.md` | Full command reference |
+| `docs/release-checklist.md` | Pre-release validation checklist |
+| `docs/runtime-environment.md` | Runtime env contract and deploy foundation |
+| `docs/delivery-validation.md` | Release and deploy validation runbook |
+| `docs/AGENTS.md` | Agent guidance |
 
 ## License
+
 MIT

@@ -163,6 +163,7 @@ async function registerOwner(page: Page, credentials: OwnerCredentials) {
   await expect(page.getByRole("heading", { name: "Регистрация" })).toBeVisible();
   await page.getByLabel("Email").fill(credentials.email);
   await page.getByLabel("Пароль").fill(credentials.password);
+  await page.locator("#consent").check();
   await page.getByRole("button", { name: "Создать аккаунт" }).click();
 }
 

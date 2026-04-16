@@ -4,6 +4,7 @@ import { defaultLocale, getTranslations } from "@/modules/i18n";
 import { getCurrentUser } from "@/modules/auth/server/current-user";
 import { Header } from "@/shared/ui/header";
 import { Footer } from "@/shared/ui/footer";
+import { CookieBanner } from "@/shared/ui/cookie-banner";
 import { logoutAction } from "@/app/auth-actions";
 import "./globals.css";
 
@@ -24,6 +25,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           <Header user={user} onLogout={logoutAction} />
           <main className="app-main">{children}</main>
           <Footer />
+          <CookieBanner />
         </div>
       </body>
     </html>

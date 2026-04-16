@@ -14,4 +14,9 @@ export const common = {
     privacy: "Политика конфиденциальности",
     terms: "Условия использования",
   },
+  cookieBanner: {
+    text: "Мы используем файлы cookie исключительно для хранения сессии авторизации.",
+    linkLabel: "Подробнее",
+    dismissLabel: "Понятно",
+  },
 } as const;

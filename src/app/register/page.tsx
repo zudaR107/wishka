@@ -67,6 +67,21 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
             />
             <p className="ui-note">{messages.register.minPasswordHint}</p>
           </div>
+          <div className="ui-consent">
+            <input
+              id="consent"
+              name="consent"
+              type="checkbox"
+              className="ui-consent-checkbox"
+            />
+            <label htmlFor="consent" className="ui-consent-label">
+              {messages.register.consentPrefix}{" "}
+              <Link href="/privacy" className="ui-consent-link" target="_blank">
+                {messages.register.consentLinkLabel}
+              </Link>{" "}
+              {messages.register.consentSuffix}
+            </label>
+          </div>
           <button type="submit" className="ui-button ui-button-full">
             {messages.register.submitLabel}
           </button>
@@ -85,6 +100,11 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
 
 async function registerAction(formData: FormData) {
   "use server";
+
+  const consent = formData.get("consent");
+  if (consent !== "on") {
+    redirect("/register?error=consent-required");
+  }
 
   const { registerUser } = await import("@/modules/auth/server/register");
   const { createSession, setSessionCookie } = await import("@/modules/auth/server/session");
@@ -117,6 +137,8 @@ function getRegisterErrorMessage(errorCode: string): string {
       return messages.register.errors.passwordTooShort;
     case "email-taken":
       return messages.register.errors.emailTaken;
+    case "consent-required":
+      return messages.register.errors.consentRequired;
     default:
       return messages.register.errors.unknown;
   }

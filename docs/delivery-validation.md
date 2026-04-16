@@ -1,7 +1,7 @@
 # Delivery Validation Runbook
 
 ## Scope
-- This document was introduced in `M6-I7` and is now the current validation runbook for the delivery flow.
+- This document is the current validation runbook for the delivery flow.
 - It describes how to validate the path from PR to production health check.
 - It reuses the runtime, image, compose, publish, and deploy foundations that are now part of the current project baseline.
 
@@ -32,7 +32,7 @@
   - push to `main`
   - push of `v*.*.*` tags
 - Source-of-truth image build path:
-  - repository `Dockerfile`
+  - `ops/Dockerfile`
 - Expected GHCR tags:
   - every publish run: `sha-<full-commit-sha>`
   - default branch publish: `main`
@@ -71,7 +71,7 @@ If this stage fails:
 ### 2. Image Publish Validation
 How to validate on GitHub:
 1. Open `Actions`.
-2. Check the `M6 Image Publish` workflow run for the relevant `main` push or SemVer tag push.
+2. Check the `Image Publish` workflow run for the relevant `main` push or SemVer tag push.
 3. Confirm the `docker-publish` job succeeded.
 
 How to validate in GHCR:
@@ -90,12 +90,12 @@ What success looks like:
 ### 3. Deploy Validation On VPS
 How deploy is triggered:
 1. Push a SemVer tag.
-2. Let `M6 Image Publish` finish for that tag.
+2. Let `Image Publish` finish for that tag.
 3. Publish the matching GitHub Release.
 
 How to validate on GitHub:
 1. Open `Actions`.
-2. Check the `M6 Production Deploy` workflow run.
+2. Check the `Production Deploy` workflow run.
 3. Confirm these stages succeed:
    - SSH setup
    - deploy artifact upload

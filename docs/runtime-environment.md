@@ -1,8 +1,7 @@
 # Runtime Environment And Deploy Foundation
 
 ## Scope
-- This document is the `M6-I1` foundation for runtime env rules and one-VPS deployment assumptions.
-- It documents the stable contract that later delivery, release, and hardening work should reuse.
+- This document is the canonical runtime env contract and one-VPS deployment reference.
 - It does not replace the dedicated production image, compose, Caddy, workflow, or deploy-script files.
 - End-to-end delivery validation steps are documented in `docs/delivery-validation.md`.
 
@@ -95,7 +94,7 @@
 ## GitHub Actions Publish Flow
 - PR build validation is handled by `.github/workflows/baseline-pr-validation.yml`.
 - GHCR image publish is handled by `.github/workflows/image-publish.yml`.
-- The publish workflow uses the existing production `Dockerfile` from `M6-I2`.
+- The publish workflow uses `ops/Dockerfile`.
 - Publish events are:
   - push to `main`
   - push of SemVer tags matching `v*.*.*`
@@ -111,13 +110,13 @@
   - `GHCR_IMAGE` as a repository variable or environment variable
 - If `GHCR_IMAGE` is not set, the workflow falls back to `ghcr.io/<owner>/wshka-app`.
 - No extra registry secret is expected for GHCR publish; the workflow uses `secrets.GITHUB_TOKEN`.
-- `M6-I6` should consume one of the published immutable tags for deploy and rollback decisions rather than rebuilding on the server.
+- The deploy workflow consumes an immutable published tag rather than rebuilding on the server.
 
 ## GitHub Actions Deploy Flow
 - Production deploy is handled by `.github/workflows/production-deploy.yml`.
 - The deploy workflow triggers on `release.published` only.
 - The deployed image tag is the GitHub Release tag name.
-- The deploy workflow uses the already-published GHCR image from `M6-I5` and does not rebuild on the VPS.
+- The deploy workflow uses the already-published GHCR image and does not rebuild on the VPS.
 - The workflow uploads these tracked deployment artifacts to the VPS application directory:
   - `compose.yaml`
   - `ops/caddy/Caddyfile`
@@ -174,7 +173,7 @@
 - Local verification without Compose should use a container-specific env file when the database stays on the host machine.
 - `.env.docker.example` documents the expected host alias pattern for that case.
 - Local verification commands:
-  - `docker build -t wshka-app .`
+  - `docker build -f ops/Dockerfile -t wshka-app .`
   - `docker run -p 3000:3000 --env-file .env.docker.local wshka-app`
 
 ## Compose Stack Foundation
