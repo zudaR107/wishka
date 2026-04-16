@@ -1,5 +1,9 @@
 # Wshka
 
+[![CI](https://github.com/zudar107/wshka/actions/workflows/baseline-pr-validation.yml/badge.svg)](https://github.com/zudar107/wshka/actions/workflows/baseline-pr-validation.yml)
+[![Release](https://img.shields.io/github/v/release/zudar107/wshka)](https://github.com/zudar107/wshka/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A minimal, fast wishlist app. Create a wishlist, share it by link, let
 another person reserve a gift.
 
@@ -11,6 +15,13 @@ another person reserve a gift.
 - Share a public link with friends or family
 - They reserve what they plan to give — no duplicates, no spoilers
 - You see what's reserved without knowing who reserved it
+
+## Screenshots
+
+<!-- TODO: replace placeholders with actual screenshots -->
+<!-- Screenshot 1: Owner dashboard — authenticated view of / with wishlist items and share link -->
+<!-- Screenshot 2: Public wishlist — /share/[token] as seen by a logged-in reserver -->
+<!-- Screenshot 3: Reservations page — /reservations with an active booking and cancel button -->
 
 ## Stack
 
@@ -71,7 +82,6 @@ See `docs/runtime-environment.md` for the full runtime env contract and
 |---|---|
 | `docs/master-plan.md` | Product scope, milestones, roadmap |
 | `docs/COMMANDS.md` | Full command reference |
-| `docs/release-checklist.md` | Pre-release validation checklist |
 | `docs/runtime-environment.md` | Runtime env contract and deploy foundation |
 | `docs/delivery-validation.md` | Release and deploy validation runbook |
 | `docs/AGENTS.md` | Agent guidance |
