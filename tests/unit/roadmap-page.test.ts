@@ -12,26 +12,26 @@ describe("roadmap page", () => {
     const html = renderToStaticMarkup(React.createElement(RoadmapPage));
 
     expect(html).toContain("Дорожная карта");
-    expect(html).toContain("Что уже сделано, что в работе, и что ждёт впереди.");
+    expect(html).toContain("Что уже сделано и что ждёт впереди.");
   });
 
   it("renders all milestone versions", async () => {
     const { default: RoadmapPage } = await import("../../src/app/roadmap/page");
     const html = renderToStaticMarkup(React.createElement(RoadmapPage));
 
-    expect(html).toContain("v0.1");
     expect(html).toContain("v1.0");
     expect(html).toContain("v1.1");
     expect(html).toContain("v1.2");
-    expect(html).toContain("v2.0");
+    expect(html).toContain("v1.3");
+    expect(html).toContain("v1.4");
+    expect(html).toContain("v1.5");
   });
 
-  it("renders status labels for all three states", async () => {
+  it("renders status labels", async () => {
     const { default: RoadmapPage } = await import("../../src/app/roadmap/page");
     const html = renderToStaticMarkup(React.createElement(RoadmapPage));
 
     expect(html).toContain("Выпущено");
-    expect(html).toContain("В разработке");
     expect(html).toContain("Запланировано");
   });
 
@@ -39,10 +39,11 @@ describe("roadmap page", () => {
     const { default: RoadmapPage } = await import("../../src/app/roadmap/page");
     const html = renderToStaticMarkup(React.createElement(RoadmapPage));
 
-    expect(html).toContain("Базовый каркас");
-    expect(html).toContain("Бронирование");
-    expect(html).toContain("UI Redesign");
-    expect(html).toContain("Уведомления");
-    expect(html).toContain("Многоязычность и валюты");
+    expect(html).toContain("Основы");
+    expect(html).toContain("Основные улучшения");
+    expect(html).toContain("Оформление");
+    expect(html).toContain("Шаринг и данные");
+    expect(html).toContain("Безопасность аккаунта");
+    expect(html).toContain("Обогащение");
   });
 });
