@@ -293,45 +293,54 @@ async function DashboardView({
                 {/* Card view */}
                 <div className="item-card-view">
                   <div className="item-card-top">
-                    <h3 className="item-card-title">{item.title}</h3>
-                    {item.reservation.status === "reserved" ? (
-                      <span className="ui-badge ui-badge-reserved">
-                        {messages.dashboard.itemReservation.reservedLabel}
-                      </span>
-                    ) : (
-                      <span className="ui-badge ui-badge-available">
-                        {messages.dashboard.itemReservation.availableLabel}
-                      </span>
-                    )}
-                  </div>
-                  {(item.price || item.url || item.note) ? (
-                    <div className="item-card-meta">
-                      {item.price ? (
-                        <span className="item-card-price">{formatPrice(item.price)}</span>
-                      ) : null}
-                      {item.url ? (
-                        <a
-                          href={item.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="item-card-url"
-                        >
-                          {item.url}
-                        </a>
-                      ) : null}
-                      {item.note ? (
-                        <span className="item-card-note" style={{ width: "100%" }}>
-                          {item.note}
-                        </span>
+                    <div className="item-card-top-left">
+                      <h3 className="item-card-title">{item.title}</h3>
+                      {(item.price || item.url || item.note) ? (
+                        <div className="item-card-meta">
+                          {item.price ? (
+                            <span className="item-card-price">{formatPrice(item.price)}</span>
+                          ) : null}
+                          {item.url ? (
+                            <a
+                              href={item.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="item-card-url"
+                            >
+                              {item.url}
+                            </a>
+                          ) : null}
+                          {item.note ? (
+                            <span className="item-card-note">{item.note}</span>
+                          ) : null}
+                        </div>
                       ) : null}
                     </div>
-                  ) : null}
+                    <div className="item-card-top-right">
+                      {item.reservation.status === "reserved" ? (
+                        <span className="ui-badge ui-badge-reserved">
+                          {messages.dashboard.itemReservation.reservedLabel}
+                        </span>
+                      ) : (
+                        <span className="ui-badge ui-badge-available">
+                          {messages.dashboard.itemReservation.availableLabel}
+                        </span>
+                      )}
+                      <form action={deleteItemAction}>
+                        <input type="hidden" name="itemId" value={item.id} />
+                        <button type="submit" className="item-delete-btn">
+                          {messages.dashboard.deleteLabel}
+                        </button>
+                      </form>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Inline edit toggle */}
-                <details className="item-edit-details">
+                <AddItemFormFocus formId={`item-edit-panel-${item.id}`} inputName="title" />
+                <details className="item-edit-details" id={`item-edit-panel-${item.id}`}>
                   <summary className="item-edit-summary" data-testid="edit-item-toggle">
-                    ✏ {messages.dashboard.editToggleLabel}
+                    ✎ {messages.dashboard.editToggleLabel}
                   </summary>
                   <div className="item-edit-form-inner">
                     <form action={updateItemAction} className="ui-form" style={{ maxWidth: "none" }}>
@@ -395,15 +404,6 @@ async function DashboardView({
                   </div>
                 </details>
 
-                {/* Delete action */}
-                <div className="item-card-actions">
-                  <form action={deleteItemAction}>
-                    <input type="hidden" name="itemId" value={item.id} />
-                    <button type="submit" className="ui-button ui-button-danger">
-                      {messages.dashboard.deleteLabel}
-                    </button>
-                  </form>
-                </div>
               </li>
             ))}
           </ul>
