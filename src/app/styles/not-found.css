@@ -1,0 +1,37 @@
+@layer components {
+  /* ── Not-found page ──────────────────────────────────── */
+  .not-found-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-16) var(--space-4);
+    flex: 1;
+  }
+
+  .not-found-code {
+    font-size: clamp(6rem, 20vw, 10rem);
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    color: var(--color-accent);
+    opacity: 0.15;
+    margin: 0 0 var(--space-4);
+    user-select: none;
+  }
+
+  .not-found-title {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-strong);
+    margin: 0 0 var(--space-3);
+  }
+
+  .not-found-description {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-8);
+  }
+}

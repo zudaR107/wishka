@@ -1,0 +1,203 @@
+@layer components {
+  /* ── Roadmap page ────────────────────────────────────── */
+  .roadmap-page {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: var(--space-12) var(--space-4);
+  }
+
+  .roadmap-header {
+    text-align: center;
+    margin-bottom: var(--space-10);
+  }
+
+  .roadmap-title {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--color-text-strong);
+    margin: 0 0 var(--space-5);
+  }
+
+  .roadmap-description {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text-strong);
+    margin: 0 0 var(--space-5);
+  }
+
+  .roadmap-legend {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+  }
+
+  .roadmap-legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-label);
+    font-weight: 500;
+    color: var(--color-text-strong);
+  }
+
+  /* ── Timeline ────────────────────────────────────────── */
+  .roadmap-timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+  }
+
+  .roadmap-timeline::before {
+    content: "";
+    position: absolute;
+    left: 1.125rem;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 2px;
+    background: var(--color-border-soft);
+  }
+
+  .roadmap-milestone {
+    display: flex;
+    gap: var(--space-5);
+    position: relative;
+    padding-bottom: var(--space-8);
+  }
+
+  .roadmap-milestone:last-child {
+    padding-bottom: 0;
+  }
+
+  /* ── Dot ─────────────────────────────────────────────── */
+  .roadmap-dot {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .roadmap-dot-released {
+    background: #16a34a;
+    color: #ffffff;
+    border: 2px solid #15803d;
+  }
+
+  .roadmap-dot-in-progress {
+    background: var(--color-accent);
+    color: #ffffff;
+    border: 2px solid var(--color-accent-hover);
+  }
+
+  .roadmap-dot-planned {
+    background: #475569;
+    color: #ffffff;
+    border: 2px solid #334155;
+  }
+
+  /* ── Milestone content ───────────────────────────────── */
+  .roadmap-milestone-content {
+    flex: 1;
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5) var(--space-6);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  }
+
+  .roadmap-milestone-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-4);
+  }
+
+  @media (max-width: 640px) {
+    .roadmap-milestone-header::after {
+      content: "";
+      display: block;
+      flex-basis: 100%;
+      order: 1;
+    }
+
+    .roadmap-status-badge {
+      order: 2;
+    }
+  }
+
+  .roadmap-version {
+    font-size: var(--font-size-label);
+    font-weight: 700;
+    font-family: monospace;
+    color: var(--color-text-muted);
+    background: var(--color-bg-canvas);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-sm);
+    padding: 0.125rem var(--space-2);
+  }
+
+  .roadmap-milestone-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-strong);
+    margin: 0;
+    flex: 1;
+  }
+
+  /* ── Status badge ────────────────────────────────────── */
+  .roadmap-status-badge {
+    font-size: var(--font-size-label);
+    font-weight: 600;
+    padding: 0.125rem var(--space-2);
+    border-radius: var(--radius-sm);
+  }
+
+  .roadmap-status-released {
+    background: #dcfce7;
+    color: #16a34a;
+  }
+
+  .roadmap-status-in-progress {
+    background: #eff6ff;
+    color: var(--color-accent);
+  }
+
+  .roadmap-status-planned {
+    background: var(--color-bg-canvas);
+    color: var(--color-text-muted);
+  }
+
+  /* ── Items list ──────────────────────────────────────── */
+  .roadmap-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .roadmap-item {
+    font-size: var(--font-size-label);
+    color: var(--color-text-base);
+    padding-left: var(--space-5);
+    position: relative;
+  }
+
+  .roadmap-item::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: var(--color-text-muted);
+  }
+}
