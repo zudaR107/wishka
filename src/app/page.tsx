@@ -19,6 +19,7 @@ import { PriceInput } from "@/shared/ui/price-input";
 import { OpenFormButton, AddItemFormFocus } from "./open-form-button";
 import { DeleteItemButton } from "./delete-item-button";
 import { ItemEditSection } from "./item-edit-section";
+import { CopyUrlButton } from "./copy-url-button";
 
 const common = getTranslations("common");
 const messages = getTranslations("app");
@@ -182,6 +183,7 @@ async function DashboardView({
                 className="share-url-input"
                 aria-label={messages.dashboard.share.urlLabel}
               />
+              <CopyUrlButton url={currentShareUrl} />
             </div>
             <p className="ui-note">{messages.dashboard.share.copyHint}</p>
             <div className="share-panel-actions">
@@ -316,14 +318,17 @@ async function DashboardView({
                             <span className="item-card-price">{formatPrice(item.price)}</span>
                           ) : null}
                           {item.url ? (
-                            <a
-                              href={item.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="item-card-url"
-                            >
-                              {item.url}
-                            </a>
+                            <span className="item-card-url-row">
+                              <a
+                                href={item.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="item-card-url"
+                              >
+                                {item.url}
+                              </a>
+                              <CopyUrlButton url={item.url} />
+                            </span>
                           ) : null}
                           {item.note ? (
                             <span className="item-card-note">{item.note}</span>

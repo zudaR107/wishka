@@ -609,6 +609,69 @@
     text-underline-offset: 3px;
   }
 
+  .item-card-url-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .copy-url-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-surface);
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: color 120ms ease, border-color 120ms ease, background-color 120ms ease;
+  }
+
+  .copy-url-btn:hover {
+    border-color: var(--color-border-strong);
+    color: var(--color-text-base);
+  }
+
+  .share-url-row {
+    align-items: stretch;
+  }
+
+  .share-url-row .copy-url-btn {
+    width: 3rem;
+    height: auto;
+    font-size: 1rem;
+    background: var(--color-accent-soft);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .share-url-row .copy-url-btn:hover {
+    background: var(--color-accent-soft);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .share-url-row .copy-url-btn[data-copied="true"],
+  .share-url-row .copy-url-btn[data-copied="true"]:hover,
+  .share-url-row .copy-url-btn[data-copied="true"]:active {
+    background: #dcfce7;
+    border-color: var(--color-status-available);
+    color: var(--color-status-available);
+  }
+
+  .copy-url-btn[data-copied="true"] {
+    color: var(--color-status-available);
+    border-color: #bbf7d0;
+    background: #dcfce7;
+  }
+
   .item-card-note {
     color: var(--color-text-muted);
     font-size: var(--font-size-label);
