@@ -54,7 +54,7 @@ jobs:
           set -euo pipefail
           scp -P "$PRODUCTION_SSH_PORT" compose.yaml \
             "$PRODUCTION_SSH_USER@$PRODUCTION_HOST:$PRODUCTION_APP_DIR/compose.yaml"
-          scp -P "$PRODUCTION_SSH_PORT" ops/caddy/Caddyfile \
+          scp -P "$PRODUCTION_SSH_PORT" ops/caddy/Caddyfile.prod \
             "$PRODUCTION_SSH_USER@$PRODUCTION_HOST:$PRODUCTION_APP_DIR/ops/caddy/Caddyfile"
           scp -P "$PRODUCTION_SSH_PORT" ops/deploy/remote-deploy.sh \
             "$PRODUCTION_SSH_USER@$PRODUCTION_HOST:$PRODUCTION_APP_DIR/ops/deploy/remote-deploy.sh"
