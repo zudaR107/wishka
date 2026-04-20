@@ -44,6 +44,17 @@ describe("wishlist item creation validation", () => {
     ).toEqual({ status: "error", code: "invalid-url" });
   });
 
+  it("rejects bare words without a dot as urls", () => {
+    expect(
+      validateCreateWishlistItemInput({
+        title: "Наушники",
+        url: "helloworld",
+        note: "",
+        price: "",
+      }),
+    ).toEqual({ status: "error", code: "invalid-url" });
+  });
+
   it("rejects negative prices", () => {
     expect(
       validateCreateWishlistItemInput({

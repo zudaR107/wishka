@@ -93,7 +93,7 @@ function isValidHttpUrl(value: string): boolean {
   try {
     const url = new URL(value);
 
-    return url.protocol === "http:" || url.protocol === "https:";
+    return (url.protocol === "http:" || url.protocol === "https:") && url.hostname.includes(".");
   } catch {
     return false;
   }
