@@ -330,7 +330,7 @@
   }
 
   @media (max-width: 479px) {
-    .site-logo-text {
+    .site-header-inner:not(:has(.site-nav--guest)) .site-logo-text {
       display: none;
     }
 

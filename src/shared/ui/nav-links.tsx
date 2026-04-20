@@ -40,7 +40,7 @@ export function GuestLinks() {
   const pathname = usePathname();
 
   return (
-    <nav className="site-nav">
+    <nav className="site-nav site-nav--guest">
       <Link
         href="/login"
         className={`site-nav-link${pathname === "/login" ? " site-nav-link--active" : ""}`}
