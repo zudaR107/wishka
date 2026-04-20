@@ -18,10 +18,13 @@ another person reserve a gift.
 
 ## Screenshots
 
-<!-- TODO: replace placeholders with actual screenshots -->
-<!-- Screenshot 1: Owner dashboard — authenticated view of / with wishlist items and share link -->
-<!-- Screenshot 2: Public wishlist — /share/[token] as seen by a logged-in reserver -->
-<!-- Screenshot 3: Reservations page — /reservations with an active booking and cancel button -->
+| Main Page | Login |
+|:---------:|:-----:|
+| ![Main Page](docs/screenshots/main-page.png) | ![Login](docs/screenshots/login.png) |
+
+| My Wishlist | Reservation |
+|:-----------:|:-----------:|
+| ![My Wishlist](docs/screenshots/wishlist.png) | ![Reservation](docs/screenshots/reservation.png) |
 
 ## Stack
 
@@ -81,7 +84,6 @@ See `docs/runtime-environment.md` for the full runtime env contract and
 | Document | Purpose |
 |---|---|
 | `docs/master-plan.md` | Product scope, milestones, roadmap |
-| `docs/COMMANDS.md` | Full command reference |
 | `docs/runtime-environment.md` | Runtime env contract and deploy foundation |
 | `docs/delivery-validation.md` | Release and deploy validation runbook |
 | `docs/AGENTS.md` | Agent guidance |
