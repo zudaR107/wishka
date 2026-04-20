@@ -326,7 +326,7 @@ async function DashboardView({
                       title: item.title,
                       url: item.url,
                       note: item.note,
-                      priceFormatted: item.price ? formatPrice(item.price) : "",
+                      priceFormatted: item.price ?? "",
                     }}
                   />
                 </ItemEditSection>

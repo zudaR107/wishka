@@ -1,3 +1,5 @@
+export const MAX_PRICE = 999_999_999_999;
+
 export type WishlistItemInput = {
   title: string;
   url: string;
@@ -78,7 +80,7 @@ function normalizePrice(value: string): NormalizedPriceResult {
 
   const parsedValue = Number(trimmedValue);
 
-  if (!Number.isFinite(parsedValue) || parsedValue < 0) {
+  if (!Number.isFinite(parsedValue) || parsedValue < 0 || parsedValue > MAX_PRICE) {
     return { status: "error", code: "invalid-price" };
   }
 

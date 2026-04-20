@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MAX_PRICE } from "@/modules/wishlist/server/item-input";
 
 type PriceInputProps = {
   id: string;
@@ -10,22 +11,35 @@ type PriceInputProps = {
   autoFocus?: boolean;
 };
 
+type InputHint = "non-numeric" | "too-large" | null;
+
 const ALLOWED_KEYS = new Set([
   "Backspace", "Delete", "Tab", "Escape", "Enter",
   "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown",
   "Home", "End",
 ]);
 
+const MAX_PRICE_DISPLAY = MAX_PRICE.toLocaleString("ru-RU");
+
 export function PriceInput({ id, name, defaultValue, className, autoFocus }: PriceInputProps) {
-  const [error, setError] = useState(false);
+  const [hint, setHint] = useState<InputHint>(null);
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (ALLOWED_KEYS.has(e.key) || e.ctrlKey || e.metaKey) return;
     if (!/^[0-9]$/.test(e.key)) {
       e.preventDefault();
-      setError(true);
+      setHint("non-numeric");
+      return;
+    }
+    const { value, selectionStart, selectionEnd } = e.currentTarget;
+    const before = value.slice(0, selectionStart ?? value.length);
+    const after = value.slice(selectionEnd ?? value.length);
+    const next = Number(before + e.key + after);
+    if (next > MAX_PRICE) {
+      e.preventDefault();
+      setHint("too-large");
     } else {
-      setError(false);
+      setHint(null);
     }
   }
 
@@ -34,12 +48,19 @@ export function PriceInput({ id, name, defaultValue, className, autoFocus }: Pri
     const filtered = input.value.replace(/[^0-9]/g, "");
     if (filtered !== input.value) {
       input.value = filtered;
-      setError(true);
+      setHint("non-numeric");
+      return;
     }
+    if (Number(filtered) > MAX_PRICE) {
+      input.value = String(MAX_PRICE);
+      setHint("too-large");
+      return;
+    }
+    setHint(null);
   }
 
   function handleBlur() {
-    setError(false);
+    setHint(null);
   }
 
   return (
@@ -57,9 +78,13 @@ export function PriceInput({ id, name, defaultValue, className, autoFocus }: Pri
         onInput={handleInput}
         onBlur={handleBlur}
       />
-      {error ? (
+      {hint === "non-numeric" ? (
         <p className="ui-note" style={{ color: "var(--color-status-reserved)" }}>
           Только целые числа, например 1990.
+        </p>
+      ) : hint === "too-large" ? (
+        <p className="ui-note" style={{ color: "var(--color-status-reserved)" }}>
+          Слишком большое число. Максимум: {MAX_PRICE_DISPLAY}.
         </p>
       ) : null}
     </>
