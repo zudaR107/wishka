@@ -56,6 +56,7 @@ test("owner can complete the core wishlist journey end to end", async ({ page })
 
     const createdItemCard = getWishlistItemCard(page, initialItem.title);
 
+    await expect(createdItemCard).toBeVisible();
     await expect(createdItemCard).toContainText(initialItem.url);
     await expect(createdItemCard).toContainText(initialItem.note);
     await expect(createdItemCard).toContainText("1990");
@@ -80,6 +81,7 @@ test("owner can complete the core wishlist journey end to end", async ({ page })
 
     const updatedItemCard = getWishlistItemCard(page, updatedItem.title);
 
+    await expect(updatedItemCard).toBeVisible();
     await expect(updatedItemCard).toContainText(updatedItem.url);
     await expect(updatedItemCard).toContainText(updatedItem.note);
     await expect(updatedItemCard).toContainText("2490");

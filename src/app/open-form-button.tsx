@@ -1,13 +1,15 @@
 "use client";
 
-type Props = {
+import { useEffect } from "react";
+
+type OpenFormButtonProps = {
   formId: string;
   inputName: string;
   className?: string;
   children: React.ReactNode;
 };
 
-export function OpenFormButton({ formId, inputName, className, children }: Props) {
+export function OpenFormButton({ formId, inputName, className, children }: OpenFormButtonProps) {
   return (
     <button
       className={className}
@@ -24,29 +26,25 @@ export function OpenFormButton({ formId, inputName, className, children }: Props
   );
 }
 
-type SummaryProps = {
+type AddItemFormFocusProps = {
+  formId: string;
   inputName: string;
-  className?: string;
-  "data-testid"?: string;
-  children: React.ReactNode;
 };
 
-export function AddItemSummary({ inputName, className, children, ...rest }: SummaryProps) {
-  return (
-    <summary
-      className={className}
-      {...rest}
-      onClick={(e) => {
-        const details = (e.currentTarget as HTMLElement).closest("details");
-        if (details && !details.open) {
-          requestAnimationFrame(() => {
-            details.scrollIntoView({ behavior: "smooth", block: "start" });
-            details.querySelector<HTMLElement>(`[name="${inputName}"]`)?.focus({ preventScroll: true });
-          });
-        }
-      }}
-    >
-      {children}
-    </summary>
-  );
+export function AddItemFormFocus({ formId, inputName }: AddItemFormFocusProps) {
+  useEffect(() => {
+    const details = document.getElementById(formId) as HTMLDetailsElement | null;
+    if (!details) return;
+
+    function handleToggle() {
+      if (!details!.open) return;
+      details!.scrollIntoView({ behavior: "smooth", block: "start" });
+      details!.querySelector<HTMLElement>(`[name="${inputName}"]`)?.focus({ preventScroll: true });
+    }
+
+    details.addEventListener("toggle", handleToggle);
+    return () => details.removeEventListener("toggle", handleToggle);
+  }, [formId, inputName]);
+
+  return null;
 }

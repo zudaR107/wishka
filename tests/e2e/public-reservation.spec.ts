@@ -47,6 +47,7 @@ test("public wishlist and reserver journey works end to end", async ({ browser }
 
       const guestItemCard = getShareItemCard(guestPage, item.title);
 
+      await expect(guestItemCard).toBeVisible();
       await expect(guestItemCard).toContainText(item.url);
       await expect(guestItemCard).toContainText(item.note);
       await expect(guestItemCard).toContainText("3490");
