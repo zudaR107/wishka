@@ -18,6 +18,7 @@ import {
 import { PriceInput } from "@/shared/ui/price-input";
 import { OpenFormButton, AddItemFormFocus } from "./open-form-button";
 import { DeleteItemButton } from "./delete-item-button";
+import { ItemEditSection } from "./item-edit-section";
 
 const common = getTranslations("common");
 const messages = getTranslations("app");
@@ -317,99 +318,93 @@ async function DashboardView({
                         </div>
                       ) : null}
                     </div>
-                    <div className="item-card-top-right">
-                      {item.reservation.status === "reserved" ? (
-                        <span className="ui-badge ui-badge-reserved">
-                          {messages.dashboard.itemReservation.reservedLabel}
-                        </span>
-                      ) : (
-                        <span className="ui-badge ui-badge-available">
-                          {messages.dashboard.itemReservation.availableLabel}
-                        </span>
-                      )}
-                      <DeleteItemButton
-                        itemId={item.id}
-                        itemTitle={item.title}
-                        deleteAction={deleteItemAction}
-                        labels={{
-                          deleteLabel: messages.dashboard.deleteLabel,
-                          confirmTitle: messages.dashboard.deleteConfirmTitle,
-                          confirmDescription: messages.dashboard.deleteConfirmDescription,
-                          confirmLabel: messages.dashboard.deleteConfirmLabel,
-                          cancelLabel: messages.dashboard.deleteCancelLabel,
-                        }}
-                      />
-                    </div>
+                    {item.reservation.status === "reserved" ? (
+                      <span className="ui-badge ui-badge-reserved">
+                        {messages.dashboard.itemReservation.reservedLabel}
+                      </span>
+                    ) : (
+                      <span className="ui-badge ui-badge-available">
+                        {messages.dashboard.itemReservation.availableLabel}
+                      </span>
+                    )}
                   </div>
                 </div>
 
-                {/* Inline edit toggle */}
-                <AddItemFormFocus formId={`item-edit-panel-${item.id}`} inputName="title" />
-                <details className="item-edit-details" id={`item-edit-panel-${item.id}`}>
-                  <summary className="item-edit-summary" data-testid="edit-item-toggle">
-                    ✎ {messages.dashboard.editToggleLabel}
-                  </summary>
-                  <div className="item-edit-form-inner">
-                    <form action={updateItemAction} className="ui-form" style={{ maxWidth: "none" }}>
-                      <input type="hidden" name="itemId" value={item.id} />
-                      <div className="ui-field">
-                        <label className="ui-label" htmlFor={`title-${item.id}`}>
-                          {messages.dashboard.fields.title}
-                        </label>
-                        <input
-                          id={`title-${item.id}`}
-                          name="title"
-                          defaultValue={item.title}
-                          className="ui-input"
-                          required
-                          maxLength={255}
-                        />
-                      </div>
-                      <div className="ui-field">
-                        <label className="ui-label" htmlFor={`url-${item.id}`}>
-                          {messages.dashboard.fields.url}
-                        </label>
-                        <input
-                          id={`url-${item.id}`}
-                          name="url"
-                          type="text"
-                          defaultValue={item.url ?? ""}
-                          className="ui-input"
-                          maxLength={2048}
-                        />
-                        <p className="ui-note">{messages.dashboard.hints.url}</p>
-                      </div>
-                      <div className="ui-field">
-                        <label className="ui-label" htmlFor={`note-${item.id}`}>
-                          {messages.dashboard.fields.note}
-                        </label>
-                        <textarea
-                          id={`note-${item.id}`}
-                          name="note"
-                          defaultValue={item.note ?? ""}
-                          className="ui-input min-h-28 resize-y"
-                          maxLength={2000}
-                        />
-                      </div>
-                      <div className="ui-field">
-                        <label className="ui-label" htmlFor={`price-${item.id}`}>
-                          {messages.dashboard.fields.price}
-                        </label>
-                        <PriceInput
-                          id={`price-${item.id}`}
-                          name="price"
-                          defaultValue={item.price ? formatPrice(item.price) : ""}
-                          className="ui-input"
-                        />
-                      </div>
-                      <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
-                        <button type="submit" className="ui-button">
-                          {messages.dashboard.updateLabel}
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </details>
+                {/* Footer: edit toggle + delete */}
+                <ItemEditSection
+                  editLabel={messages.dashboard.editToggleLabel}
+                  deleteButton={
+                    <DeleteItemButton
+                      itemId={item.id}
+                      itemTitle={item.title}
+                      deleteAction={deleteItemAction}
+                      labels={{
+                        deleteLabel: messages.dashboard.deleteLabel,
+                        confirmTitle: messages.dashboard.deleteConfirmTitle,
+                        confirmDescription: messages.dashboard.deleteConfirmDescription,
+                        confirmLabel: messages.dashboard.deleteConfirmLabel,
+                        cancelLabel: messages.dashboard.deleteCancelLabel,
+                      }}
+                    />
+                  }
+                >
+                  <form action={updateItemAction} className="ui-form" style={{ maxWidth: "none" }}>
+                    <input type="hidden" name="itemId" value={item.id} />
+                    <div className="ui-field">
+                      <label className="ui-label" htmlFor={`title-${item.id}`}>
+                        {messages.dashboard.fields.title}
+                      </label>
+                      <input
+                        id={`title-${item.id}`}
+                        name="title"
+                        defaultValue={item.title}
+                        className="ui-input"
+                        required
+                        maxLength={255}
+                      />
+                    </div>
+                    <div className="ui-field">
+                      <label className="ui-label" htmlFor={`url-${item.id}`}>
+                        {messages.dashboard.fields.url}
+                      </label>
+                      <input
+                        id={`url-${item.id}`}
+                        name="url"
+                        type="text"
+                        defaultValue={item.url ?? ""}
+                        className="ui-input"
+                        maxLength={2048}
+                      />
+                      <p className="ui-note">{messages.dashboard.hints.url}</p>
+                    </div>
+                    <div className="ui-field">
+                      <label className="ui-label" htmlFor={`note-${item.id}`}>
+                        {messages.dashboard.fields.note}
+                      </label>
+                      <textarea
+                        id={`note-${item.id}`}
+                        name="note"
+                        defaultValue={item.note ?? ""}
+                        className="ui-input min-h-28 resize-y"
+                        maxLength={2000}
+                      />
+                    </div>
+                    <div className="ui-field">
+                      <label className="ui-label" htmlFor={`price-${item.id}`}>
+                        {messages.dashboard.fields.price}
+                      </label>
+                      <PriceInput
+                        id={`price-${item.id}`}
+                        name="price"
+                        defaultValue={item.price ? formatPrice(item.price) : ""}
+                        className="ui-input"
+                      />
+                    </div>
+                    <button type="submit" className="ui-button">
+                      {messages.dashboard.updateLabel}
+                    </button>
+                  </form>
+                </ItemEditSection>
 
               </li>
             ))}
