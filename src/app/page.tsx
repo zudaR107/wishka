@@ -292,6 +292,19 @@ async function DashboardView({
           <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
             {wishlist.items.map((item) => (
               <li key={item.id} className="item-card">
+                {/* Status strip */}
+                {item.reservation.status === "reserved" ? (
+                  <div className="item-card-status item-card-status-reserved">
+                    <span className="item-card-status-dot" />
+                    {messages.dashboard.itemReservation.reservedLabel}
+                  </div>
+                ) : (
+                  <div className="item-card-status item-card-status-available">
+                    <span className="item-card-status-dot" />
+                    {messages.dashboard.itemReservation.availableLabel}
+                  </div>
+                )}
+
                 {/* Card view */}
                 <div className="item-card-view">
                   <div className="item-card-top">
@@ -318,15 +331,6 @@ async function DashboardView({
                         </div>
                       ) : null}
                     </div>
-                    {item.reservation.status === "reserved" ? (
-                      <span className="ui-badge ui-badge-reserved">
-                        {messages.dashboard.itemReservation.reservedLabel}
-                      </span>
-                    ) : (
-                      <span className="ui-badge ui-badge-available">
-                        {messages.dashboard.itemReservation.availableLabel}
-                      </span>
-                    )}
                   </div>
                 </div>
 
