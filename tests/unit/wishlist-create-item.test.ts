@@ -37,7 +37,7 @@ describe("wishlist item creation validation", () => {
     expect(
       validateCreateWishlistItemInput({
         title: "Наушники",
-        url: "not-a-url",
+        url: "not a valid url",
         note: "",
         price: "",
       }),

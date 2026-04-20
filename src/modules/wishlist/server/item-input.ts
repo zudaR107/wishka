@@ -35,7 +35,8 @@ export function validateWishlistItemInput(
   input: WishlistItemInput,
 ): ValidWishlistItemInput | WishlistItemValidationError {
   const title = input.title.trim();
-  const url = normalizeOptionalField(input.url);
+  const rawUrl = normalizeOptionalField(input.url);
+  const url = rawUrl ? prependProtocol(rawUrl) : null;
   const note = normalizeOptionalField(input.note);
   const priceResult = normalizePrice(input.price);
 
@@ -82,6 +83,10 @@ function normalizePrice(value: string): NormalizedPriceResult {
   }
 
   return { status: "success", value: String(Math.round(parsedValue)) };
+}
+
+function prependProtocol(value: string): string {
+  return /^https?:\/\//i.test(value) ? value : `https://${value}`;
 }
 
 function isValidHttpUrl(value: string): boolean {

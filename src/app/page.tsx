@@ -241,7 +241,7 @@ async function DashboardView({
               <label className="ui-label" htmlFor="url">
                 {messages.dashboard.fields.url}
               </label>
-              <input id="url" name="url" type="url" className="ui-input" maxLength={2048} />
+              <input id="url" name="url" type="text" className="ui-input" maxLength={2048} />
               <p className="ui-note">{messages.dashboard.hints.url}</p>
             </div>
             <div className="ui-field">
@@ -355,7 +355,7 @@ async function DashboardView({
                         <input
                           id={`url-${item.id}`}
                           name="url"
-                          type="url"
+                          type="text"
                           defaultValue={item.url ?? ""}
                           className="ui-input"
                           maxLength={2048}
