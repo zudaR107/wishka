@@ -1131,7 +1131,7 @@
 
   .roadmap-header {
     text-align: center;
-    margin-bottom: var(--space-12);
+    margin-bottom: var(--space-10);
   }
 
   .roadmap-title {
@@ -1139,14 +1139,14 @@
     font-weight: 800;
     letter-spacing: -0.03em;
     color: var(--color-text-strong);
-    margin: 0 0 var(--space-3);
+    margin: 0 0 var(--space-5);
   }
 
   .roadmap-description {
     font-size: 1rem;
     font-weight: 500;
     color: var(--color-text-strong);
-    margin: 0 0 var(--space-6);
+    margin: 0 0 var(--space-5);
   }
 
   .roadmap-legend {
