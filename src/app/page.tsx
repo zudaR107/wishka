@@ -10,16 +10,14 @@ import {
   revokeCurrentShareLink,
 } from "@/modules/share";
 import { getCurrentOwnerWishlistWithReservations } from "@/modules/reservation";
-import { createCurrentWishlistItem } from "@/modules/wishlist/server/create-item";
-import {
-  deleteCurrentWishlistItem,
-  updateCurrentWishlistItem,
-} from "@/modules/wishlist/server/manage-item";
-import { PriceInput } from "@/shared/ui/price-input";
+import { deleteCurrentWishlistItem } from "@/modules/wishlist/server/manage-item";
 import { OpenFormButton, AddItemFormFocus } from "./open-form-button";
 import { DeleteItemButton } from "./delete-item-button";
 import { ItemEditSection } from "./item-edit-section";
 import { CopyUrlButton } from "./copy-url-button";
+import { CreateItemForm } from "./create-item-form";
+import { EditItemForm } from "./edit-item-form";
+import { formatPrice } from "./format-price";
 
 const common = getTranslations("common");
 const messages = getTranslations("app");
@@ -229,42 +227,7 @@ async function DashboardView({
           >
             {messages.dashboard.formDescription}
           </p>
-          <form
-            action={createItemAction}
-            className="ui-form"
-            style={{ maxWidth: "none" }}
-            id="wishlist-create-form"
-            data-testid="wishlist-create-form"
-          >
-            <div className="ui-field">
-              <label className="ui-label" htmlFor="title">
-                {messages.dashboard.fields.title}
-              </label>
-              <input id="title" name="title" className="ui-input" required maxLength={255} />
-            </div>
-            <div className="ui-field">
-              <label className="ui-label" htmlFor="url">
-                {messages.dashboard.fields.url}
-              </label>
-              <input id="url" name="url" type="text" className="ui-input" maxLength={2048} />
-              <p className="ui-note">{messages.dashboard.hints.url}</p>
-            </div>
-            <div className="ui-field">
-              <label className="ui-label" htmlFor="note">
-                {messages.dashboard.fields.note}
-              </label>
-              <textarea id="note" name="note" className="ui-input min-h-28 resize-y" maxLength={2000} />
-            </div>
-            <div className="ui-field">
-              <label className="ui-label" htmlFor="price">
-                {messages.dashboard.fields.price}
-              </label>
-              <PriceInput id="price" name="price" className="ui-input" />
-            </div>
-            <button type="submit" className="ui-button">
-              {messages.dashboard.submitLabel}
-            </button>
-          </form>
+          <CreateItemForm />
         </div>
       </details>
 
@@ -357,62 +320,15 @@ async function DashboardView({
                     />
                   }
                 >
-                  <form action={updateItemAction} className="ui-form" style={{ maxWidth: "none" }}>
-                    <input type="hidden" name="itemId" value={item.id} />
-                    <div className="ui-field">
-                      <label className="ui-label" htmlFor={`title-${item.id}`}>
-                        {messages.dashboard.fields.title}
-                      </label>
-                      <input
-                        id={`title-${item.id}`}
-                        name="title"
-                        defaultValue={item.title}
-                        className="ui-input"
-                        required
-                        maxLength={255}
-                      />
-                    </div>
-                    <div className="ui-field">
-                      <label className="ui-label" htmlFor={`url-${item.id}`}>
-                        {messages.dashboard.fields.url}
-                      </label>
-                      <input
-                        id={`url-${item.id}`}
-                        name="url"
-                        type="text"
-                        defaultValue={item.url ?? ""}
-                        className="ui-input"
-                        maxLength={2048}
-                      />
-                      <p className="ui-note">{messages.dashboard.hints.url}</p>
-                    </div>
-                    <div className="ui-field">
-                      <label className="ui-label" htmlFor={`note-${item.id}`}>
-                        {messages.dashboard.fields.note}
-                      </label>
-                      <textarea
-                        id={`note-${item.id}`}
-                        name="note"
-                        defaultValue={item.note ?? ""}
-                        className="ui-input min-h-28 resize-y"
-                        maxLength={2000}
-                      />
-                    </div>
-                    <div className="ui-field">
-                      <label className="ui-label" htmlFor={`price-${item.id}`}>
-                        {messages.dashboard.fields.price}
-                      </label>
-                      <PriceInput
-                        id={`price-${item.id}`}
-                        name="price"
-                        defaultValue={item.price ? formatPrice(item.price) : ""}
-                        className="ui-input"
-                      />
-                    </div>
-                    <button type="submit" className="ui-button">
-                      {messages.dashboard.updateLabel}
-                    </button>
-                  </form>
+                  <EditItemForm
+                    item={{
+                      id: item.id,
+                      title: item.title,
+                      url: item.url,
+                      note: item.note,
+                      priceFormatted: item.price ? formatPrice(item.price) : "",
+                    }}
+                  />
                 </ItemEditSection>
 
               </li>
@@ -427,42 +343,6 @@ async function DashboardView({
 // ---------------------------------------------------------------------------
 // Server actions
 // ---------------------------------------------------------------------------
-
-async function createItemAction(formData: FormData) {
-  "use server";
-
-  const user = await requireCurrentUser();
-  const result = await createCurrentWishlistItem(user.id, {
-    title: getFormValue(formData, "title"),
-    url: getFormValue(formData, "url"),
-    note: getFormValue(formData, "note"),
-    price: getFormValue(formData, "price"),
-  });
-
-  if (result.status === "success") {
-    redirect("/?status=item-created");
-  }
-
-  redirect(`/?action=create&error=${result.code}`);
-}
-
-async function updateItemAction(formData: FormData) {
-  "use server";
-
-  const user = await requireCurrentUser();
-  const result = await updateCurrentWishlistItem(user.id, getFormValue(formData, "itemId"), {
-    title: getFormValue(formData, "title"),
-    url: getFormValue(formData, "url"),
-    note: getFormValue(formData, "note"),
-    price: getFormValue(formData, "price"),
-  });
-
-  if (result.status === "success") {
-    redirect("/?status=item-updated");
-  }
-
-  redirect(`/?action=update&error=${result.code}`);
-}
 
 async function deleteItemAction(formData: FormData) {
   "use server";
@@ -563,12 +443,6 @@ async function getAppOrigin(): Promise<string> {
 
 function buildShareUrl(origin: string, token: string): string {
   return new URL(`/share/${token}`, origin).toString();
-}
-
-function formatPrice(price: string): string {
-  const num = parseFloat(price);
-  const amount = isNaN(num) ? price : String(Math.round(num));
-  return `${amount} ${common.currencySymbol}`;
 }
 
 function pluralize(n: number, forms: [string, string, string]): string {

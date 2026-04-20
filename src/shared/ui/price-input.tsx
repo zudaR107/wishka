@@ -7,6 +7,7 @@ type PriceInputProps = {
   name: string;
   defaultValue?: string;
   className?: string;
+  autoFocus?: boolean;
 };
 
 const ALLOWED_KEYS = new Set([
@@ -15,7 +16,7 @@ const ALLOWED_KEYS = new Set([
   "Home", "End",
 ]);
 
-export function PriceInput({ id, name, defaultValue, className }: PriceInputProps) {
+export function PriceInput({ id, name, defaultValue, className, autoFocus }: PriceInputProps) {
   const [error, setError] = useState(false);
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -51,6 +52,7 @@ export function PriceInput({ id, name, defaultValue, className }: PriceInputProp
         inputMode="numeric"
         min="0"
         autoComplete="off"
+        autoFocus={autoFocus}
         onKeyDown={handleKeyDown}
         onInput={handleInput}
         onBlur={handleBlur}
