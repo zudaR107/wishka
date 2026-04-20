@@ -31,15 +31,15 @@ export default function RoadmapPage() {
 
         <div className="roadmap-legend">
           <span className="roadmap-legend-item">
-            <span className={`roadmap-legend-dot roadmap-dot-released`} />
+            <span className="roadmap-dot roadmap-dot-released" aria-hidden="true">✓</span>
             {statusLabels.released}
           </span>
           <span className="roadmap-legend-item">
-            <span className={`roadmap-legend-dot roadmap-dot-in-progress`} />
+            <span className="roadmap-dot roadmap-dot-in-progress" aria-hidden="true">◐</span>
             {statusLabels.inProgress}
           </span>
           <span className="roadmap-legend-item">
-            <span className={`roadmap-legend-dot roadmap-dot-planned`} />
+            <span className="roadmap-dot roadmap-dot-planned" aria-hidden="true">○</span>
             {statusLabels.planned}
           </span>
         </div>
