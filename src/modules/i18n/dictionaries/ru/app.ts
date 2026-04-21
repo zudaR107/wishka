@@ -130,6 +130,7 @@ export const app = {
     description: "Создайте аккаунт по email и паролю, чтобы управлять своим вишлистом и делиться ссылкой.",
     emailLabel: "Email",
     passwordLabel: "Пароль",
+    confirmPasswordLabel: "Повторите пароль",
     submitLabel: "Создать аккаунт",
     minPasswordHint: "Минимум 8 символов.",
     successMessage: "Аккаунт создан. Теперь войдите, чтобы открыть свой вишлист.",
@@ -142,6 +143,7 @@ export const app = {
     errors: {
       invalidEmail: "Введите корректный email.",
       passwordTooShort: "Пароль должен быть не короче 8 символов.",
+      passwordMismatch: "Пароли не совпадают.",
       emailTaken: "Пользователь с таким email уже существует.",
       consentRequired: "Подтвердите ознакомление с Политикой конфиденциальности.",
       unknown: "Не удалось завершить регистрацию. Попробуйте ещё раз.",

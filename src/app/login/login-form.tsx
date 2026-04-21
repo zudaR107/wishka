@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { getTranslations } from "@/modules/i18n";
+import { PasswordInput } from "@/shared/ui/password-input";
 import { loginAction, type LoginState } from "./actions";
 
 const messages = getTranslations("app");
@@ -19,11 +20,12 @@ function getErrorMessage(code: string): string {
 
 export function LoginForm() {
   const [state, action] = useActionState<LoginState, FormData>(loginAction, null);
+  const err = state?.error ?? null;
 
   return (
     <>
-      {state?.error ? (
-        <p className="ui-message ui-message-error">{getErrorMessage(state.error)}</p>
+      {err ? (
+        <p className="ui-message ui-message-error">{getErrorMessage(err)}</p>
       ) : null}
       <form key={state?.key ?? 0} action={action} className="ui-form" style={{ maxWidth: "none" }}>
         <div className="ui-field">
@@ -35,7 +37,7 @@ export function LoginForm() {
             name="email"
             type="email"
             autoComplete="email"
-            className="ui-input"
+            className={err ? "ui-input ui-input-error" : "ui-input"}
             required
             maxLength={320}
             defaultValue={state?.values?.email ?? ""}
@@ -45,13 +47,12 @@ export function LoginForm() {
           <label className="ui-label" htmlFor="password">
             {messages.login.passwordLabel}
           </label>
-          <input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="current-password"
-            className="ui-input"
             required
+            error={!!err}
           />
         </div>
         <button type="submit" className="ui-button ui-button-full">

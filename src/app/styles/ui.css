@@ -55,6 +55,16 @@
     font: inherit;
   }
 
+  .ui-input-error {
+    background: #fff4f4;
+    border-color: #f3c6cc;
+  }
+
+  .ui-input-error:hover,
+  .ui-input-error:focus-visible {
+    border-color: #e5aeb7;
+  }
+
   .ui-input::placeholder {
     color: var(--color-text-muted);
   }
@@ -192,6 +202,36 @@
 
   .ui-consent-link:hover {
     color: var(--color-accent-hover);
+  }
+
+  /* Password input with visibility toggle */
+  .password-input-wrapper {
+    position: relative;
+    display: flex;
+  }
+
+  .password-input-wrapper .ui-input {
+    padding-right: 2.75rem;
+  }
+
+  .password-toggle-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    padding: 0;
+  }
+
+  .password-toggle-btn:hover {
+    color: var(--color-text-base);
   }
 
   /* App shell */

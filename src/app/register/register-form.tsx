@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { getTranslations } from "@/modules/i18n";
+import { PasswordInput } from "@/shared/ui/password-input";
 import { registerAction, type RegisterState } from "./actions";
 
 const messages = getTranslations("app");
@@ -16,6 +17,8 @@ function getErrorMessage(code: string): string {
       return errs.invalidEmail;
     case "password-too-short":
       return errs.passwordTooShort;
+    case "passwords-dont-match":
+      return errs.passwordMismatch;
     case "email-taken":
       return errs.emailTaken;
     case "consent-required":
@@ -27,11 +30,12 @@ function getErrorMessage(code: string): string {
 
 export function RegisterForm() {
   const [state, action] = useActionState<RegisterState, FormData>(registerAction, null);
+  const err = state?.error ?? null;
 
   return (
     <>
-      {state?.error ? (
-        <p className="ui-message ui-message-error">{getErrorMessage(state.error)}</p>
+      {err ? (
+        <p className="ui-message ui-message-error">{getErrorMessage(err)}</p>
       ) : null}
       <form key={state?.key ?? 0} action={action} className="ui-form" style={{ maxWidth: "none" }}>
         <div className="ui-field">
@@ -43,7 +47,7 @@ export function RegisterForm() {
             name="email"
             type="email"
             autoComplete="email"
-            className="ui-input"
+            className={err === "invalid-email" || err === "email-taken" ? "ui-input ui-input-error" : "ui-input"}
             required
             maxLength={320}
             defaultValue={state?.values?.email ?? ""}
@@ -53,16 +57,27 @@ export function RegisterForm() {
           <label className="ui-label" htmlFor="password">
             {messages.register.passwordLabel}
           </label>
-          <input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="new-password"
             minLength={MIN_PASSWORD_LENGTH}
-            className="ui-input"
             required
+            error={err === "password-too-short"}
           />
           <p className="ui-note">{messages.register.minPasswordHint}</p>
+        </div>
+        <div className="ui-field">
+          <label className="ui-label" htmlFor="confirmPassword">
+            {messages.register.confirmPasswordLabel}
+          </label>
+          <PasswordInput
+            id="confirmPassword"
+            name="confirmPassword"
+            autoComplete="new-password"
+            required
+            error={err === "passwords-dont-match"}
+          />
         </div>
         <div className="ui-consent">
           <input

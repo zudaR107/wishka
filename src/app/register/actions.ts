@@ -20,6 +20,11 @@ export async function registerAction(
   }
 
   const password = getString(formData, "password");
+  const confirmPassword = getString(formData, "confirmPassword");
+
+  if (password !== confirmPassword) {
+    return { error: "passwords-dont-match", key: (prev?.key ?? 0) + 1, values: { email, consent } };
+  }
 
   const { registerUser } = await import("@/modules/auth/server/register");
   const { createSession, setSessionCookie } = await import("@/modules/auth/server/session");
