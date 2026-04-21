@@ -2,7 +2,8 @@
 name: Feature request
 about: Propose a small focused improvement
 title: "feat: "
-labels: feature
+labels: enhancement
+assignees: zudaR107
 ---
 
 ## Goal
