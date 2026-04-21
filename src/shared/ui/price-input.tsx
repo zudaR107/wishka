@@ -9,6 +9,7 @@ type PriceInputProps = {
   defaultValue?: string;
   className?: string;
   autoFocus?: boolean;
+  error?: boolean;
 };
 
 type InputHint = "non-numeric" | "too-large" | null;
@@ -21,7 +22,7 @@ const ALLOWED_KEYS = new Set([
 
 const MAX_PRICE_DISPLAY = MAX_PRICE.toLocaleString("ru-RU");
 
-export function PriceInput({ id, name, defaultValue, className, autoFocus }: PriceInputProps) {
+export function PriceInput({ id, name, defaultValue, className, autoFocus, error }: PriceInputProps) {
   const [hint, setHint] = useState<InputHint>(null);
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -69,7 +70,7 @@ export function PriceInput({ id, name, defaultValue, className, autoFocus }: Pri
         id={id}
         name={name}
         defaultValue={defaultValue}
-        className={className}
+        className={error ? `${className ?? ""} ui-input-error`.trim() : className}
         inputMode="numeric"
         min="0"
         autoComplete="off"

@@ -36,6 +36,7 @@ export function CreateItemForm() {
         style={{ maxWidth: "none" }}
         id="wishlist-create-form"
         data-testid="wishlist-create-form"
+        noValidate
       >
         <div className="ui-field">
           <label className="ui-label" htmlFor="title">
@@ -44,7 +45,7 @@ export function CreateItemForm() {
           <input
             id="title"
             name="title"
-            className="ui-input"
+            className={err === "invalid-title" ? "ui-input ui-input-error" : "ui-input"}
             required
             maxLength={255}
             defaultValue={state?.values?.title ?? ""}
@@ -59,7 +60,7 @@ export function CreateItemForm() {
             id="url"
             name="url"
             type="text"
-            className="ui-input"
+            className={err === "invalid-url" ? "ui-input ui-input-error" : "ui-input"}
             maxLength={2048}
             defaultValue={state?.values?.url ?? ""}
             autoFocus={err === "invalid-url"}
@@ -88,6 +89,7 @@ export function CreateItemForm() {
             className="ui-input"
             defaultValue={state?.values?.price ?? ""}
             autoFocus={err === "invalid-price"}
+            error={err === "invalid-price"}
           />
         </div>
         <button type="submit" className="ui-button">

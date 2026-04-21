@@ -27,7 +27,7 @@ export function LoginForm() {
       {err ? (
         <p className="ui-message ui-message-error">{getErrorMessage(err)}</p>
       ) : null}
-      <form key={state?.key ?? 0} action={action} className="ui-form" style={{ maxWidth: "none" }}>
+      <form key={state?.key ?? 0} action={action} className="ui-form" style={{ maxWidth: "none" }} noValidate>
         <div className="ui-field">
           <label className="ui-label" htmlFor="email">
             {messages.login.emailLabel}

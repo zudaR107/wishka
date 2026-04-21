@@ -36,7 +36,7 @@ export async function createItemAction(
     redirect("/?status=item-created");
   }
 
-  return { error: result.code, key: (prev?.key ?? 0) + 1, values: clearInvalidField(result.code, values) };
+  return { error: result.code, key: (prev?.key ?? 0) + 1, values };
 }
 
 export async function updateItemAction(
@@ -57,20 +57,7 @@ export async function updateItemAction(
     redirect("/?status=item-updated");
   }
 
-  return { error: result.code, key: (prev?.key ?? 0) + 1, values: clearInvalidField(result.code, values) };
-}
-
-function clearInvalidField(errorCode: string, values: ItemValues): ItemValues {
-  switch (errorCode) {
-    case "invalid-title":
-      return { ...values, title: "" };
-    case "invalid-url":
-      return { ...values, url: "" };
-    case "invalid-price":
-      return { ...values, price: "" };
-    default:
-      return values;
-  }
+  return { error: result.code, key: (prev?.key ?? 0) + 1, values };
 }
 
 function getString(formData: FormData, name: string): string {

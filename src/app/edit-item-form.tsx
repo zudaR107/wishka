@@ -43,7 +43,7 @@ export function EditItemForm({ item }: EditItemFormProps) {
       {err ? (
         <p className="ui-message ui-message-error">{getErrorMessage(err)}</p>
       ) : null}
-      <form key={state?.key ?? 0} action={action} className="ui-form" style={{ maxWidth: "none" }}>
+      <form key={state?.key ?? 0} action={action} className="ui-form" style={{ maxWidth: "none" }} noValidate>
         <input type="hidden" name="itemId" value={item.id} />
         <div className="ui-field">
           <label className="ui-label" htmlFor={`title-${item.id}`}>
@@ -53,7 +53,7 @@ export function EditItemForm({ item }: EditItemFormProps) {
             id={`title-${item.id}`}
             name="title"
             defaultValue={v?.title ?? item.title}
-            className="ui-input"
+            className={err === "invalid-title" ? "ui-input ui-input-error" : "ui-input"}
             required
             maxLength={255}
             autoFocus={err === "invalid-title"}
@@ -68,7 +68,7 @@ export function EditItemForm({ item }: EditItemFormProps) {
             name="url"
             type="text"
             defaultValue={v?.url ?? item.url ?? ""}
-            className="ui-input"
+            className={err === "invalid-url" ? "ui-input ui-input-error" : "ui-input"}
             maxLength={2048}
             autoFocus={err === "invalid-url"}
           />
@@ -96,6 +96,7 @@ export function EditItemForm({ item }: EditItemFormProps) {
             defaultValue={v?.price ?? item.priceFormatted}
             className="ui-input"
             autoFocus={err === "invalid-price"}
+            error={err === "invalid-price"}
           />
         </div>
         <button type="submit" className="ui-button">
