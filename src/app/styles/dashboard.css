@@ -86,7 +86,7 @@
   .share-url-input {
     flex: 1;
     min-width: 0;
-    border: 1px solid var(--color-border-soft);
+    border: 1px solid var(--color-accent);
     border-radius: var(--radius-md);
     background: var(--color-bg-subtle);
     padding: var(--space-3) var(--space-4);
@@ -101,6 +101,7 @@
     gap: var(--space-2);
     flex-wrap: wrap;
   }
+
 
   /* ── Copy URL button ─────────────────────────────────── */
   .copy-url-btn {
@@ -140,15 +141,15 @@
     width: 3rem;
     height: auto;
     font-size: 1rem;
-    background: var(--color-accent-soft);
+    background: var(--color-bg-canvas);
     border-color: var(--color-accent);
-    color: var(--color-accent);
+    color: #1d4ed8;
   }
 
   .share-url-row .copy-url-btn:hover {
-    background: var(--color-accent-soft);
+    background: #dbeafe;
     border-color: var(--color-accent);
-    color: var(--color-accent);
+    color: #1d4ed8;
   }
 
   .share-url-row .copy-url-btn[data-copied="true"],
@@ -163,6 +164,15 @@
     .copy-url-btn {
       width: 2.75rem;
       height: 2.75rem;
+    }
+
+    .share-panel-actions {
+      width: 100%;
+    }
+
+    .share-panel-actions .ui-button {
+      width: 100%;
+      justify-content: center;
     }
   }
 
@@ -337,6 +347,7 @@
   .item-edit-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: var(--space-2);
     border: 1px solid var(--color-border-strong);
     border-radius: var(--radius-md);
@@ -367,6 +378,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: var(--space-3);
     border: 1px solid #f3c6cc;
     border-radius: var(--radius-md);
     background: #fff4f4;
@@ -394,13 +406,14 @@
   }
 
   @media (max-width: 479px) {
-    .item-card-footer {
-      flex-direction: column;
-      align-items: flex-start;
+    .item-btn-label {
+      display: none;
     }
 
+    .item-edit-btn,
     .item-delete-btn {
-      margin-left: 0;
+      padding: var(--space-3);
+      min-width: 4.5rem;
     }
   }
 
@@ -475,8 +488,18 @@
   }
 
   .confirm-dialog-actions {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: var(--space-3);
-    flex-wrap: wrap;
+  }
+
+  .confirm-dialog-actions > form {
+    display: flex;
+  }
+
+  .confirm-dialog-actions > form .ui-button,
+  .confirm-dialog-actions > .ui-button {
+    width: 100%;
+    justify-content: center;
   }
 }

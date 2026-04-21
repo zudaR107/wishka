@@ -28,7 +28,7 @@ export function RegenerateLinkButton({ regenerateAction, labels }: RegenerateLin
     <>
       <button
         type="button"
-        className="ui-button ui-button-secondary"
+        className="ui-button ui-button-soft"
         onClick={() => dialogRef.current?.showModal()}
       >
         {labels.regenerateLabel}
@@ -46,7 +46,7 @@ export function RegenerateLinkButton({ regenerateAction, labels }: RegenerateLin
             </form>
             <button
               type="button"
-              className="ui-button ui-button-secondary"
+              className="ui-button ui-button-soft"
               onClick={() => dialogRef.current?.close()}
             >
               {labels.cancelLabel}

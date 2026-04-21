@@ -118,6 +118,18 @@
     background: #ffe9eb;
   }
 
+  .ui-button.ui-button-soft {
+    background: var(--color-bg-canvas);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .ui-button.ui-button-soft:hover {
+    background: #dbeafe;
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
   .ui-button-full {
     width: 100%;
     justify-content: center;
