@@ -7,16 +7,16 @@ import {
   getOrCreateCurrentShareLink,
   regenerateCurrentShareLink,
 } from "@/modules/share";
-import type { DeleteItemState, RegenerateState } from "./item-actions";
+import type { DeleteItemState, RegenerateState } from "./_dashboard/item-actions";
 import { getCurrentOwnerWishlistWithReservations } from "@/modules/reservation";
 import { deleteCurrentWishlistItem } from "@/modules/wishlist/server/manage-item";
-import { OpenFormButton, AddItemFormFocus } from "./open-form-button";
-import { DeleteItemButton } from "./delete-item-button";
-import { ItemEditSection } from "./item-edit-section";
-import { CopyUrlButton } from "./copy-url-button";
-import { CreateItemForm } from "./create-item-form";
-import { EditItemForm } from "./edit-item-form";
-import { RegenerateLinkButton } from "./regenerate-link-button";
+import { OpenFormButton, AddItemFormFocus } from "./_dashboard/open-form-button";
+import { DeleteItemButton } from "./_dashboard/delete-item-button";
+import { ItemEditSection } from "./_dashboard/item-edit-section";
+import { CopyUrlButton } from "./_dashboard/copy-url-button";
+import { CreateItemForm } from "./_dashboard/create-item-form";
+import { EditItemForm } from "./_dashboard/edit-item-form";
+import { RegenerateLinkButton } from "./_dashboard/regenerate-link-button";
 import { formatPrice } from "./format-price";
 
 const common = getTranslations("common");
