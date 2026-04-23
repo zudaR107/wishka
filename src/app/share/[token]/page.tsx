@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  robots: { index: false },
+};
 import { getTranslations } from "@/modules/i18n";
 import { reservePublicWishlistItemAction } from "@/app/share/[token]/actions";
 import { formatPrice } from "@/app/format-price";

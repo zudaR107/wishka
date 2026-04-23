@@ -11,8 +11,17 @@ import "./globals.css";
 const metadataMessages = getTranslations("metadata");
 
 export const metadata: Metadata = {
-  title: metadataMessages.title,
+  metadataBase: new URL("https://wshka.ru"),
+  title: {
+    default: metadataMessages.title,
+    template: "%s | WSHKA",
+  },
   description: metadataMessages.description,
+  openGraph: {
+    type: "website",
+    locale: "ru_RU",
+    siteName: "WSHKA",
+  },
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {

@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { getTranslations } from "@/modules/i18n";
+
+export const metadata: Metadata = {
+  title: "Дорожная карта",
+  description: "Публичная дорожная карта WSHKA — что уже сделано и что планируется.",
+};
 
 const messages = getTranslations("app");
 

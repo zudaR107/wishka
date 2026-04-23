@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { getCurrentUser, requireCurrentUser } from "@/modules/auth/server/current-user";
@@ -28,6 +29,11 @@ const devLinks = [
   { href: "/reservations", label: messages.home.devLinks.reservations },
   { href: "/share/demo-token", label: messages.home.devLinks.share },
 ];
+
+export const metadata: Metadata = {
+  title: "WSHKA — вишлист с бронированием подарков",
+  description: "Создай список желаний, отправь ссылку близким — и получи именно то, о чём мечтал. Каждый видит, что уже забронировано.",
+};
 
 export default async function RootPage() {
   const user = await getCurrentUser();
