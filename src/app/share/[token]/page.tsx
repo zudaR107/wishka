@@ -97,7 +97,7 @@ export default async function SharePage(props: SharePageProps) {
               fontWeight: 600,
               textTransform: "uppercase",
               letterSpacing: "0.1em",
-              color: "var(--color-text-muted)",
+              color: "var(--color-text-strong)",
               margin: 0,
             }}
           >
@@ -117,7 +117,7 @@ export default async function SharePage(props: SharePageProps) {
         >
           <p
             style={{
-              color: "var(--color-text-base)",
+              color: "var(--color-text-strong)",
               fontSize: "var(--font-size-label)",
               margin: 0,
             }}

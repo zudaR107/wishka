@@ -19,11 +19,22 @@
     margin: 0 0 var(--space-5);
   }
 
+  .roadmap-subtitle-group {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    background: rgba(255, 255, 255, 0.82);
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--space-5);
+  }
+
   .roadmap-description {
     font-size: 1rem;
     font-weight: 500;
     color: var(--color-text-strong);
-    margin: 0 0 var(--space-5);
+    margin: 0;
   }
 
   .roadmap-legend {

@@ -27,9 +27,10 @@ export default function RoadmapPage() {
     <div className="roadmap-page">
       <div className="roadmap-header">
         <h1 className="roadmap-title">{title}</h1>
-        <p className="roadmap-description">{description}</p>
+        <div className="roadmap-subtitle-group">
+          <p className="roadmap-description">{description}</p>
 
-        <div className="roadmap-legend">
+          <div className="roadmap-legend">
           <span className="roadmap-legend-item">
             <span className="roadmap-dot roadmap-dot-released" aria-hidden="true">✓</span>
             {statusLabels.released}
@@ -42,6 +43,7 @@ export default function RoadmapPage() {
             <span className="roadmap-dot roadmap-dot-planned" aria-hidden="true">○</span>
             {statusLabels.planned}
           </span>
+          </div>
         </div>
       </div>
 
