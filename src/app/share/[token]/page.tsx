@@ -104,7 +104,6 @@ export default async function SharePage(props: SharePageProps) {
             {common.brand}
           </p>
           <h1 className="content-page-title">{messages.share.unavailableTitle}</h1>
-          <p className="content-page-description">{messages.share.unavailableDescription}</p>
         </div>
         <div
           className="ui-surface"
@@ -112,7 +111,9 @@ export default async function SharePage(props: SharePageProps) {
             padding: "var(--space-6)",
             display: "flex",
             flexDirection: "column",
+            alignItems: "center",
             gap: "var(--space-4)",
+            textAlign: "center",
           }}
         >
           <p
@@ -124,12 +125,13 @@ export default async function SharePage(props: SharePageProps) {
           >
             {messages.share.unavailableHint}
           </p>
-          <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
-            <Link href="/" className="ui-button ui-button-secondary">
+          <div style={{ display: "flex", justifyContent: "center", gap: "var(--space-3)", flexWrap: "wrap" }}>
+            <Link
+              href="/"
+              className="ui-button ui-button-secondary"
+              style={{ background: "var(--color-bg-canvas)" }}
+            >
               {messages.share.unavailableHomeLabel}
-            </Link>
-            <Link href="/login" className="ui-button">
-              {messages.share.loginToReserveLabel}
             </Link>
           </div>
         </div>
