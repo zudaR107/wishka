@@ -33,3 +33,5 @@ pnpm-debug.log*
 
 # local docs
 docs/COMMANDS.md
+.claude/
+CLAUDE.md

@@ -290,8 +290,7 @@ function SharePageView({
                   </div>
                 ) : null}
                 {item.reservation.status !== "reserved" &&
-                wishlist.viewer.isAuthenticated &&
-                !wishlist.viewer.isOwner ? (
+                wishlist.viewer.isAuthenticated ? (
                   <form action={reservePublicWishlistItemAction}>
                     <input type="hidden" name="token" value={wishlist.shareLink.token} />
                     <input type="hidden" name="itemId" value={item.id} />
@@ -317,8 +316,6 @@ function getShareActionErrorMessage(action: string | undefined, errorCode: strin
   switch (errorCode) {
     case "already-reserved":
       return messages.share.errors.alreadyReserved;
-    case "own-item":
-      return messages.share.errors.ownItem;
     case "invalid-share":
       return messages.share.errors.invalidShare;
     default:

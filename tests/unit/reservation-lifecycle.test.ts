@@ -167,7 +167,7 @@ describe("reservation lifecycle helpers", () => {
     });
   });
 
-  it("blocks the owner from reserving their own item", async () => {
+  it("marks the owner as eligible when reserving their own available item", async () => {
     mocks.findWishlistItem.mockResolvedValue({
       id: "item-1",
       wishlistId: "wishlist-1",
@@ -176,12 +176,11 @@ describe("reservation lifecycle helpers", () => {
       id: "wishlist-1",
       userId: "owner-1",
     });
+    mocks.findReservation.mockResolvedValue(undefined);
 
     await expect(getItemReservationEligibility("owner-1", "item-1")).resolves.toEqual({
-      status: "ineligible",
-      code: "own-item",
+      status: "eligible",
     });
-    expect(mocks.findReservation).not.toHaveBeenCalled();
   });
 
   it("creates a reservation for an eligible non-owner item", async () => {
@@ -219,6 +218,44 @@ describe("reservation lifecycle helpers", () => {
     expect(mocks.insertValues).toHaveBeenCalledWith({
       wishlistItemId: "item-1",
       userId: "user-2",
+    });
+  });
+
+  it("creates a reservation when the owner reserves their own item", async () => {
+    const createdAt = new Date("2026-04-12T00:00:00.000Z");
+
+    mocks.findWishlistItem.mockResolvedValue({
+      id: "item-1",
+      wishlistId: "wishlist-1",
+    });
+    mocks.findWishlist.mockResolvedValue({
+      id: "wishlist-1",
+      userId: "owner-1",
+    });
+    mocks.findReservation.mockResolvedValue(undefined);
+    mocks.insertReturning.mockResolvedValue([
+      {
+        id: "reservation-2",
+        wishlistItemId: "item-1",
+        userId: "owner-1",
+        cancelledAt: null,
+        createdAt,
+      },
+    ]);
+
+    await expect(createReservation("owner-1", "item-1")).resolves.toEqual({
+      status: "success",
+      reservation: {
+        id: "reservation-2",
+        wishlistItemId: "item-1",
+        userId: "owner-1",
+        cancelledAt: null,
+        createdAt,
+      },
+    });
+    expect(mocks.insertValues).toHaveBeenCalledWith({
+      wishlistItemId: "item-1",
+      userId: "owner-1",
     });
   });
 

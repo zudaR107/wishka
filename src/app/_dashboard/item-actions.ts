@@ -23,6 +23,16 @@ export type DeleteItemState = {
   error?: string;
 } | null;
 
+export type ReserveItemState = {
+  status: "success" | "error";
+  error?: string;
+} | null;
+
+export type CancelItemReservationState = {
+  status: "success" | "error";
+  error?: string;
+} | null;
+
 export type RegenerateState = {
   status: "success" | "error";
 } | null;

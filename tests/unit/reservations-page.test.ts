@@ -62,6 +62,7 @@ describe("current user reservations page", () => {
       {
         id: "reservation-1",
         createdAt: new Date("2026-04-12T00:00:00.000Z"),
+        isOwnItem: false,
         item: {
           id: "item-1",
           wishlistId: "wishlist-1",
@@ -86,6 +87,34 @@ describe("current user reservations page", () => {
     expect(html).toContain("Нужны беспроводные");
     expect(html).toContain("9\u00a0990");
     expect(html).toContain("Отменить бронь");
+    expect(html).not.toContain("Моё желание");
+  });
+
+  it("shows the own-item badge when the reservation is for the user's own wishlist", async () => {
+    mocks.listCurrentUserActiveReservations.mockResolvedValue([
+      {
+        id: "reservation-2",
+        createdAt: new Date("2026-04-12T00:00:00.000Z"),
+        isOwnItem: true,
+        item: {
+          id: "item-2",
+          wishlistId: "wishlist-1",
+          title: "Книга",
+          url: null,
+          note: null,
+          price: null,
+          createdAt: new Date("2026-04-11T00:00:00.000Z"),
+          updatedAt: new Date("2026-04-11T00:00:00.000Z"),
+        },
+      },
+    ]);
+
+    const { default: ReservationsPage } = await import("../../src/app/reservations/page");
+    const page = await ReservationsPage({});
+    const html = renderToStaticMarkup(page);
+
+    expect(html).toContain("Книга");
+    expect(html).toContain("Моё желание");
   });
 
   it("renders cancel success and error feedback", async () => {

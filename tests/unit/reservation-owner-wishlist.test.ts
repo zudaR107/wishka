@@ -77,9 +77,7 @@ describe("owner wishlist reservation-aware loading", () => {
           price: null,
           createdAt: new Date("2026-04-11T00:00:00.000Z"),
           updatedAt: new Date("2026-04-11T00:00:00.000Z"),
-          reservation: {
-            status: "available",
-          },
+          reservation: { status: "available" },
         },
         {
           id: "item-2",
@@ -90,12 +88,49 @@ describe("owner wishlist reservation-aware loading", () => {
           price: null,
           createdAt: new Date("2026-04-11T00:00:00.000Z"),
           updatedAt: new Date("2026-04-11T00:00:00.000Z"),
-          reservation: {
-            status: "reserved",
-          },
+          reservation: { status: "reserved", isOwn: false },
         },
       ],
     });
     expect(mocks.listActiveReservationsByItemIds).toHaveBeenCalledWith(["item-1", "item-2"]);
+  });
+
+  it("marks reservation as isOwn when the owner reserved their own item", async () => {
+    mocks.getCurrentWishlistWithItems.mockResolvedValue({
+      id: "wishlist-1",
+      userId: "owner-1",
+      isActive: true,
+      createdAt: new Date("2026-04-11T00:00:00.000Z"),
+      updatedAt: new Date("2026-04-11T00:00:00.000Z"),
+      items: [
+        {
+          id: "item-1",
+          wishlistId: "wishlist-1",
+          title: "Наушники",
+          url: null,
+          note: null,
+          price: null,
+          createdAt: new Date("2026-04-11T00:00:00.000Z"),
+          updatedAt: new Date("2026-04-11T00:00:00.000Z"),
+        },
+      ],
+    });
+    mocks.listActiveReservationsByItemIds.mockResolvedValue([
+      {
+        id: "reservation-1",
+        wishlistItemId: "item-1",
+        userId: "owner-1",
+        cancelledAt: null,
+        createdAt: new Date("2026-04-12T00:00:00.000Z"),
+      },
+    ]);
+
+    const result = await getCurrentOwnerWishlistWithReservations("owner-1");
+
+    expect(result.items[0].reservation).toEqual({
+      status: "reserved",
+      isOwn: true,
+      reservationId: "reservation-1",
+    });
   });
 });

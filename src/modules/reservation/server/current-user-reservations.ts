@@ -1,6 +1,6 @@
 import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import { reservations } from "@/modules/reservation/db/schema";
-import { wishlistItems } from "@/modules/wishlist/db/schema";
+import { wishlistItems, wishlists } from "@/modules/wishlist/db/schema";
 
 export type CurrentUserReservationItem = {
   id: string;
@@ -16,6 +16,7 @@ export type CurrentUserReservationItem = {
 export type CurrentUserReservation = {
   id: string;
   createdAt: Date;
+  isOwnItem: boolean;
   item: CurrentUserReservationItem;
 };
 
@@ -57,6 +58,18 @@ export async function listCurrentUserActiveReservations(
 
   const itemsById = new Map(items.map((item) => [item.id, item]));
 
+  const wishlistIds = [...new Set(items.map((item) => item.wishlistId))];
+  const ownWishlistIds = new Set(
+    wishlistIds.length > 0
+      ? (
+          await db.query.wishlists.findMany({
+            columns: { id: true },
+            where: and(inArray(wishlists.id, wishlistIds), eq(wishlists.userId, userId)),
+          })
+        ).map((w) => w.id)
+      : [],
+  );
+
   return activeReservations.flatMap((reservation) => {
     const item = itemsById.get(reservation.wishlistItemId);
 
@@ -67,6 +80,7 @@ export async function listCurrentUserActiveReservations(
     return {
       id: reservation.id,
       createdAt: reservation.createdAt,
+      isOwnItem: ownWishlistIds.has(item.wishlistId),
       item,
     };
   });

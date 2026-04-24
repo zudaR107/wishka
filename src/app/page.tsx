@@ -7,11 +7,13 @@ import {
   getOrCreateCurrentShareLink,
   regenerateCurrentShareLink,
 } from "@/modules/share";
-import type { DeleteItemState, RegenerateState } from "./_dashboard/item-actions";
-import { getCurrentOwnerWishlistWithReservations } from "@/modules/reservation";
+import type { DeleteItemState, RegenerateState, ReserveItemState, CancelItemReservationState } from "./_dashboard/item-actions";
+import { getCurrentOwnerWishlistWithReservations, createReservation, cancelReservation } from "@/modules/reservation";
 import { deleteCurrentWishlistItem } from "@/modules/wishlist/server/manage-item";
 import { OpenFormButton, AddItemFormFocus } from "./_dashboard/open-form-button";
 import { DeleteItemButton } from "./_dashboard/delete-item-button";
+import { ReserveItemButton } from "./_dashboard/reserve-item-button";
+import { CancelItemReservationButton } from "./_dashboard/cancel-item-reservation-button";
 import { ItemEditSection } from "./_dashboard/item-edit-section";
 import { CopyUrlButton } from "./_dashboard/copy-url-button";
 import { CreateItemForm } from "./_dashboard/create-item-form";
@@ -225,9 +227,11 @@ async function DashboardView({ userId }: { userId: string }) {
               <li key={item.id} className="item-card">
                 {/* Status strip */}
                 {item.reservation.status === "reserved" ? (
-                  <div className="item-card-status item-card-status-reserved">
+                  <div className={`item-card-status ${item.reservation.isOwn ? "item-card-status-self-reserved" : "item-card-status-reserved"}`}>
                     <span className="item-card-status-dot" />
-                    {messages.dashboard.itemReservation.reservedLabel}
+                    {item.reservation.isOwn
+                      ? messages.dashboard.itemReservation.selfReservedLabel
+                      : messages.dashboard.itemReservation.reservedLabel}
                   </div>
                 ) : (
                   <div className="item-card-status item-card-status-available">
@@ -268,9 +272,24 @@ async function DashboardView({ userId }: { userId: string }) {
                   </div>
                 </div>
 
-                {/* Footer: edit toggle + delete */}
+                {/* Footer: edit toggle + reserve + delete */}
                 <ItemEditSection
                   editLabel={messages.dashboard.editToggleLabel}
+                  reserveButton={
+                    item.reservation.status === "available" ? (
+                      <ReserveItemButton
+                        itemId={item.id}
+                        reserveLabel={messages.dashboard.reserveLabel}
+                        reserveAction={reserveItemAction}
+                      />
+                    ) : item.reservation.isOwn ? (
+                      <CancelItemReservationButton
+                        reservationId={item.reservation.reservationId}
+                        cancelLabel={messages.dashboard.cancelReservationLabel}
+                        cancelAction={cancelItemReservationAction}
+                      />
+                    ) : undefined
+                  }
                   deleteButton={
                     <DeleteItemButton
                       itemId={item.id}
@@ -319,6 +338,32 @@ async function deleteItemAction(
 
   const user = await requireCurrentUser();
   const result = await deleteCurrentWishlistItem(user.id, getFormValue(formData, "itemId"));
+
+  if (result.status === "success") return { status: "success" };
+  return { status: "error", error: result.code };
+}
+
+async function reserveItemAction(
+  prev: ReserveItemState,
+  formData: FormData,
+): Promise<ReserveItemState> {
+  "use server";
+
+  const user = await requireCurrentUser();
+  const result = await createReservation(user.id, getFormValue(formData, "itemId"));
+
+  if (result.status === "success") return { status: "success" };
+  return { status: "error", error: result.code };
+}
+
+async function cancelItemReservationAction(
+  prev: CancelItemReservationState,
+  formData: FormData,
+): Promise<CancelItemReservationState> {
+  "use server";
+
+  const user = await requireCurrentUser();
+  const result = await cancelReservation(user.id, getFormValue(formData, "reservationId"));
 
   if (result.status === "success") return { status: "success" };
   return { status: "error", error: result.code };
