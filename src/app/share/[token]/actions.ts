@@ -39,8 +39,6 @@ export async function reservePublicWishlistItemAction(formData: FormData) {
   switch (result.code) {
     case "already-reserved":
       redirect(`${sharePath}?action=reserve&error=already-reserved`);
-    case "own-item":
-      redirect(`${sharePath}?action=reserve&error=own-item`);
     case "item-not-found":
       redirect(`${sharePath}?action=reserve&error=invalid-share`);
     default:

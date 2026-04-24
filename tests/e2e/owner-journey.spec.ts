@@ -95,7 +95,7 @@ test("owner can complete the core wishlist journey end to end", async ({ page })
     await expect(sharePreviewPage.getByRole("heading", { name: "Публичный вишлист" })).toBeVisible();
     await expect(
       sharePreviewPage.getByText(
-        "Это ваш вишлист. Здесь можно только проверить, как он выглядит по публичной ссылке.",
+        "Это ваш вишлист. Здесь можно проверить, как он выглядит, и забронировать желания, которые уже исполнены.",
       ),
     ).toBeVisible();
     await expect(sharePreviewPage.getByRole("heading", { name: updatedItem.title })).toBeVisible();
@@ -116,6 +116,32 @@ test("owner can complete the core wishlist journey end to end", async ({ page })
     await sharePreviewPage.goto(regeneratedShareUrl);
     await expect(sharePreviewPage.getByRole("heading", { name: "Публичный вишлист" })).toBeVisible();
     await expect(sharePreviewPage.getByRole("heading", { name: updatedItem.title })).toBeVisible();
+
+    await sharePreviewPage.close();
+  });
+
+  await test.step("owner can reserve their own item via the share page", async () => {
+    const shareUrl = await page.getByTestId("share-link-url").inputValue();
+    const sharePreviewPage = await page.context().newPage();
+
+    await sharePreviewPage.goto(shareUrl);
+
+    const itemCard = sharePreviewPage.getByTestId("share-item-card").filter({
+      has: sharePreviewPage.getByRole("heading", { name: updatedItem.title, exact: true }),
+    });
+
+    await expect(itemCard.getByRole("button", { name: "Забронировать" })).toBeVisible();
+    await itemCard.getByRole("button", { name: "Забронировать" }).click();
+
+    await expect(sharePreviewPage).toHaveURL(/\/share\/.*\?status=reservation-created$/);
+    await expect(sharePreviewPage.getByText("Желание забронировано.")).toBeVisible();
+
+    const reservedCard = sharePreviewPage.getByTestId("share-item-card").filter({
+      has: sharePreviewPage.getByRole("heading", { name: updatedItem.title, exact: true }),
+    });
+
+    await expect(reservedCard).toContainText("Уже забронировано");
+    await expect(reservedCard.getByRole("button", { name: "Забронировать" })).toHaveCount(0);
 
     await sharePreviewPage.close();
   });

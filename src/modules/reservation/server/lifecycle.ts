@@ -22,7 +22,7 @@ export type ReservationEligibility =
   | { status: "eligible" }
   | {
       status: "ineligible";
-      code: "item-not-found" | "already-reserved" | "own-item";
+      code: "item-not-found" | "already-reserved";
     };
 
 export type CreateReservationResult =
@@ -32,7 +32,7 @@ export type CreateReservationResult =
     }
   | {
       status: "error";
-      code: "item-not-found" | "already-reserved" | "own-item" | "unknown";
+      code: "item-not-found" | "already-reserved" | "unknown";
     };
 
 export type CancelReservationResult =
@@ -146,10 +146,6 @@ export async function getItemReservationEligibility(
     return { status: "ineligible", code: "item-not-found" };
   }
 
-  if (itemContext.ownerUserId === userId) {
-    return { status: "ineligible", code: "own-item" };
-  }
-
   const activeReservation = await getActiveReservationByItemId(itemContext.itemId);
 
   if (activeReservation) {
@@ -168,10 +164,6 @@ export async function createReservation(
 
     if (!itemContext) {
       return { status: "error", code: "item-not-found" };
-    }
-
-    if (itemContext.ownerUserId === userId) {
-      return { status: "error", code: "own-item" };
     }
 
     const activeReservation = await getActiveReservationByItemId(itemContext.itemId);

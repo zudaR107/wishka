@@ -248,12 +248,28 @@
     border-bottom-color: #e9d5ff;
   }
 
+  .item-card-status-self-reserved {
+    background: #dbeafe;
+    color: #1d4ed8;
+    border-bottom-color: #bfdbfe;
+  }
+
   .item-card-status-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
     flex-shrink: 0;
     background: currentColor;
+  }
+
+  .item-own-badge {
+    margin-left: var(--space-2);
+    padding: 1px var(--space-2);
+    border-radius: var(--radius-sm);
+    background: #bfdbfe;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #1d4ed8;
   }
 
   .item-card-view {
@@ -337,11 +353,28 @@
   .item-card-footer {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
     border-top: 1px solid var(--color-border-soft);
     background: var(--color-bg-subtle);
     overflow: hidden;
+  }
+
+  .item-footer-start {
+    flex: 1;
+    display: flex;
+  }
+
+  .item-footer-center {
+    display: flex;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0 var(--space-2);
+  }
+
+  .item-footer-end {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
   }
 
   .item-edit-btn {
@@ -372,6 +405,52 @@
     border-color: var(--color-accent);
     color: var(--color-accent);
     background: var(--color-accent-surface);
+  }
+
+  .item-reserve-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface);
+    padding: var(--space-3) var(--space-4);
+    color: var(--color-accent);
+    font: inherit;
+    font-size: var(--font-size-label);
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .item-reserve-btn:hover {
+    border-color: var(--color-accent);
+    background: var(--color-accent-surface);
+  }
+
+  .item-cancel-reservation-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    border: 1px solid #bfdbfe;
+    border-radius: var(--radius-md);
+    background: #eff6ff;
+    padding: var(--space-3) var(--space-4);
+    color: #1d4ed8;
+    font: inherit;
+    font-size: var(--font-size-label);
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .item-cancel-reservation-btn:hover {
+    border-color: #93c5fd;
+    background: #dbeafe;
   }
 
   .item-delete-btn {
@@ -411,6 +490,8 @@
     }
 
     .item-edit-btn,
+    .item-reserve-btn,
+    .item-cancel-reservation-btn,
     .item-delete-btn {
       padding: var(--space-3);
       min-width: 4.5rem;

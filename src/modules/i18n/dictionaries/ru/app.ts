@@ -164,6 +164,8 @@ export const app = {
     deleteConfirmLabel: "Да, удалить",
     deleteCancelLabel: "Отмена",
     editToggleLabel: "Редактировать",
+    reserveLabel: "Забронировать",
+    cancelReservationLabel: "Отменить",
     summaryLabel: "Текущий вишлист",
     itemCountForms: ["желание", "желания", "желаний"] as [string, string, string],
     successMessage: "Желание добавлено.",
@@ -216,6 +218,7 @@ export const app = {
     itemReservation: {
       availableLabel: "Статус: доступно",
       reservedLabel: "Статус: забронировано",
+      selfReservedLabel: "Статус: забронировано мной",
     },
   },
   reservations: {
@@ -227,6 +230,7 @@ export const app = {
     emptyActionLabel: "Вернуться к вишлисту",
     cancelLabel: "Отменить бронь",
     cancelSuccessMessage: "Бронь отменена.",
+    ownItemBadge: "Моё желание",
     errors: {
       reservationNotFound: "Не удалось найти активную бронь для отмены.",
       notReservationOwner: "Можно отменить только свою активную бронь.",
@@ -250,13 +254,12 @@ export const app = {
     itemsTitle: "Желания",
     guestHint: "Войдите, чтобы забронировать доступное желание и потом управлять бронями в своём разделе.",
     loginToReserveLabel: "Войти, чтобы забронировать",
-    ownerHint: "Это ваш вишлист. Здесь можно только проверить, как он выглядит по публичной ссылке.",
+    ownerHint: "Это ваш вишлист. Здесь можно проверить, как он выглядит, и забронировать желания, которые уже исполнены.",
     reserveLabel: "Забронировать",
     reservedLabel: "Уже забронировано",
     successMessage: "Желание забронировано.",
     errors: {
       alreadyReserved: "Это желание уже забронировано. Обновите страницу или выберите другой подарок.",
-      ownItem: "Нельзя забронировать желание из собственного вишлиста.",
       invalidShare: "Не удалось забронировать желание по этой ссылке.",
       unknown: "Не удалось забронировать желание. Попробуйте ещё раз.",
     },

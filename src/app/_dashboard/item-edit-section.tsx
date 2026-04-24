@@ -13,11 +13,12 @@ function PencilIcon() {
 
 type ItemEditSectionProps = {
   editLabel: string;
+  reserveButton?: React.ReactNode;
   deleteButton: React.ReactNode;
   children: React.ReactNode;
 };
 
-export function ItemEditSection({ editLabel, deleteButton, children }: ItemEditSectionProps) {
+export function ItemEditSection({ editLabel, reserveButton, deleteButton, children }: ItemEditSectionProps) {
   const [open, setOpen] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const formAreaRef = useRef<HTMLDivElement>(null);
@@ -32,17 +33,24 @@ export function ItemEditSection({ editLabel, deleteButton, children }: ItemEditS
   return (
     <div ref={sectionRef} className="item-edit-section">
       <div className="item-card-footer">
-        <button
-          type="button"
-          className="item-edit-btn"
-          data-testid="edit-item-toggle"
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-        >
-          <PencilIcon />
-          <span className="item-btn-label">{editLabel}</span>
-        </button>
-        {deleteButton}
+        <div className="item-footer-start">
+          <button
+            type="button"
+            className="item-edit-btn"
+            data-testid="edit-item-toggle"
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <PencilIcon />
+            <span className="item-btn-label">{editLabel}</span>
+          </button>
+        </div>
+        <div className="item-footer-center">
+          {reserveButton}
+        </div>
+        <div className="item-footer-end">
+          {deleteButton}
+        </div>
       </div>
       {open && (
         <div ref={formAreaRef} className="item-edit-form-inner">

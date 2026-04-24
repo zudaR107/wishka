@@ -6,6 +6,11 @@ The format is based on Keep a Changelog, and this project follows SemVer.
 
 ## [Unreleased]
 
+### Added
+- Owners can now reserve their own wishlist items from the dashboard and
+  the share page. Self-reserved items are visually distinct on the dashboard
+  and the reservations page.
+
 ## [1.0.1] - 2026-04-23
 
 ### Added
