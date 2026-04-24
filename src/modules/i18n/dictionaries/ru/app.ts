@@ -164,6 +164,8 @@ export const app = {
     deleteConfirmLabel: "Да, удалить",
     deleteCancelLabel: "Отмена",
     editToggleLabel: "Редактировать",
+    starLabel: "Добавить в избранное",
+    unstarLabel: "Убрать из избранного",
     reserveLabel: "Забронировать",
     cancelReservationLabel: "Отменить",
     summaryLabel: "Текущий вишлист",
@@ -257,6 +259,7 @@ export const app = {
     ownerHint: "Это ваш вишлист. Здесь можно проверить, как он выглядит, и забронировать желания, которые уже исполнены.",
     reserveLabel: "Забронировать",
     reservedLabel: "Уже забронировано",
+    starredLabel: "Избранное",
     successMessage: "Желание забронировано.",
     errors: {
       alreadyReserved: "Это желание уже забронировано. Обновите страницу или выберите другой подарок.",

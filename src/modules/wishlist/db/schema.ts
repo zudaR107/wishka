@@ -33,6 +33,7 @@ export const wishlistItems = pgTable(
     url: varchar("url", { length: 2048 }),
     note: text("note"),
     price: numeric("price", { precision: 12, scale: 0 }),
+    starred: boolean("starred").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),

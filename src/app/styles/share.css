@@ -107,6 +107,19 @@
     gap: var(--space-3);
   }
 
+  .share-item-header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-shrink: 0;
+  }
+
+  .share-item-star {
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-star);
+  }
+
   .share-item-title {
     font-size: 1rem;
     font-weight: 700;

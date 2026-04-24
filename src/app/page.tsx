@@ -8,6 +8,7 @@ import {
   regenerateCurrentShareLink,
 } from "@/modules/share";
 import type { DeleteItemState, RegenerateState, ReserveItemState, CancelItemReservationState } from "./_dashboard/item-actions";
+import { StarButton } from "./_dashboard/star-item-button";
 import { getCurrentOwnerWishlistWithReservations, createReservation, cancelReservation } from "@/modules/reservation";
 import { deleteCurrentWishlistItem } from "@/modules/wishlist/server/manage-item";
 import { OpenFormButton, AddItemFormFocus } from "./_dashboard/open-form-button";
@@ -268,6 +269,14 @@ async function DashboardView({ userId }: { userId: string }) {
                           ) : null}
                         </div>
                       ) : null}
+                    </div>
+                    <div className="item-card-top-right">
+                      <StarButton
+                        itemId={item.id}
+                        starred={item.starred}
+                        starLabel={messages.dashboard.starLabel}
+                        unstarLabel={messages.dashboard.unstarLabel}
+                      />
                     </div>
                   </div>
                 </div>

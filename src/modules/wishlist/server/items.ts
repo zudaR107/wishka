@@ -1,4 +1,4 @@
-import { asc, eq } from "drizzle-orm";
+import { asc, desc, eq } from "drizzle-orm";
 import { wishlistItems, wishlists } from "@/modules/wishlist/db/schema";
 import {
   type CurrentWishlist,
@@ -12,6 +12,7 @@ export type WishlistItemRecord = {
   url: string | null;
   note: string | null;
   price: string | null;
+  starred: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -31,11 +32,12 @@ export async function listWishlistItems(wishlistId: string): Promise<WishlistIte
       url: true,
       note: true,
       price: true,
+      starred: true,
       createdAt: true,
       updatedAt: true,
     },
     where: eq(wishlistItems.wishlistId, wishlistId),
-    orderBy: [asc(wishlistItems.createdAt), asc(wishlistItems.id)],
+    orderBy: [desc(wishlistItems.starred), asc(wishlistItems.createdAt), asc(wishlistItems.id)],
   });
 }
 

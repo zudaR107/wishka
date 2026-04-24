@@ -176,6 +176,42 @@
     }
   }
 
+  /* ── Star button ─────────────────────────────────────── */
+  .item-card-top-right {
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .item-star-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 0;
+    transition: color 120ms ease, background-color 120ms ease;
+  }
+
+  .item-star-btn:hover {
+    color: var(--color-star);
+    background: #fef3c7;
+  }
+
+  .item-star-btn--starred {
+    color: var(--color-star);
+  }
+
+  .item-star-btn--starred:hover {
+    color: var(--color-star-hover);
+    background: #fef3c7;
+  }
+
   /* ── Add item collapsible ────────────────────────────── */
   .add-item-details {
     scroll-margin-top: 80px;

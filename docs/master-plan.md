@@ -94,13 +94,13 @@ Status:
 
 Execution backlog:
 1. Self-reservation — remove owner-check from reservation logic
-2. Item prioritization — schema addition, sort, and UI badge
+2. Item starring — boolean favourite toggle, sort order, and star badge
 3. Account profile «О себе» — bio field, settings page, display on share page
 4. Multiple wishlists — create/rename/switch UI, per-wishlist share links
 
 Recommended issue shape:
 - `M9-I1 Multiple wishlists — create, rename, switch UI and per-wishlist share links`
-- `M9-I2 Item prioritization — schema, sort, and priority badge`
+- `M9-I2 Item starring — boolean favourite toggle, sort order, and star badge`
 - `M9-I3 Self-reservation — remove owner restriction`
 - `M9-I4 Account profile — bio field, settings, share page display`
 
@@ -118,26 +118,26 @@ Dependencies:
 
 Scope notes:
 - Self-reservation (`M9-I3`) is a one-line logic change; keep the PR minimal.
-- Priority sort (`M9-I2`) must be consistent between the owner dashboard and the public share page.
+- Item starring (`M9-I2`) uses a boolean `starred` field (not an enum); starred items sort to the top on both the dashboard and the share page; sort must be consistent between both views.
 - Profile bio (`M9-I4`) is visible to authenticated users on the share page, not to guests. This is intentional: it helps gift-givers, not strangers.
 - Multiple wishlists (`M9-I1`): the schema already supports N wishlists per user. The effort is entirely in the UI: create/rename/switch, dashboard navigation, and wiring each wishlist to its own share link.
 - Do not add size/measurement fields to the profile in this milestone — start with bio only.
 
 Acceptance targets:
 - owner can reserve their own wishlist items
-- owner can mark items as high / medium / low priority; items sort by priority on the dashboard and share page
+- owner can mark items as starred (favourite); starred items sort to the top on the dashboard and share page
 - owner can write a short «О себе» bio in account settings; bio is shown on the share page to authenticated viewers
 - owner can create and name multiple wishlists, switch between them on the dashboard, and generate a separate share link per wishlist
 
 Exit criteria:
 - self-reservation works end-to-end without errors
-- priority enum migration applied; sort is consistent on dashboard and share page
+- starred boolean migration applied; sort is consistent on dashboard and share page
 - bio field migration applied; bio visible on share page to authenticated non-guest visitors
 - multiple wishlist create/rename/switch UI works; each wishlist has an independent share link
 
 Definition of small PRs for this milestone:
 - self-reservation PR only removes the owner-check guard and updates the related test
-- prioritization PR only adds the `priority` column migration, updates sort queries, adds the badge UI, and does not touch auth or share logic
+- starring PR only adds the `starred` boolean column migration, updates sort queries, adds the star toggle and read-only badge UI, and does not touch auth or share logic
 - profile PR only adds the `bio` column migration, adds an account settings form, and renders bio on the share page
 - multiple wishlists PR only adds wishlist create/rename/switch UI and wires share links; does not change item or reservation logic
 

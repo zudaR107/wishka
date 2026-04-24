@@ -10,6 +10,11 @@ The format is based on Keep a Changelog, and this project follows SemVer.
 - Owners can now reserve their own wishlist items from the dashboard and
   the share page. Self-reserved items are visually distinct on the dashboard
   and the reservations page.
+- Item starring: owners can mark any item as a favourite with a star toggle.
+  Starred items sort to the top of the list on both the dashboard and the
+  public share page. Unstarred items keep their creation order below.
+  The share page shows a read-only star badge on starred items so gift-givers
+  can see priorities at a glance.
 
 ## [1.0.1] - 2026-04-23
 

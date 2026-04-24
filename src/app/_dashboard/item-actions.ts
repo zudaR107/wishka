@@ -2,7 +2,10 @@
 
 import { requireCurrentUser } from "@/modules/auth/server/current-user";
 import { createCurrentWishlistItem } from "@/modules/wishlist/server/create-item";
-import { updateCurrentWishlistItem } from "@/modules/wishlist/server/manage-item";
+import {
+  toggleCurrentWishlistItemStarred,
+  updateCurrentWishlistItem,
+} from "@/modules/wishlist/server/manage-item";
 
 export type ItemValues = {
   title: string;
@@ -35,6 +38,11 @@ export type CancelItemReservationState = {
 
 export type RegenerateState = {
   status: "success" | "error";
+} | null;
+
+export type ToggleStarredState = {
+  status: "success" | "error";
+  starred?: boolean;
 } | null;
 
 export async function createItemAction(
@@ -77,6 +85,21 @@ export async function updateItemAction(
   }
 
   return { status: "error", error: result.code, key: (prev?.key ?? 0) + 1, values };
+}
+
+export async function toggleStarredAction(
+  _prev: ToggleStarredState,
+  formData: FormData,
+): Promise<ToggleStarredState> {
+  const user = await requireCurrentUser();
+  const itemId = getString(formData, "itemId");
+  const result = await toggleCurrentWishlistItemStarred(user.id, itemId);
+
+  if (result.status === "success") {
+    return { status: "success", starred: result.starred };
+  }
+
+  return { status: "error" };
 }
 
 function getString(formData: FormData, name: string): string {

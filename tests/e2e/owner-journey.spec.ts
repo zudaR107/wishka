@@ -85,6 +85,36 @@ test("owner can complete the core wishlist journey end to end", async ({ page })
     await expect(updatedItemCard).toContainText("2\u00a0490");
   });
 
+  await test.step("owner can star and unstar a wishlist item", async () => {
+    const itemCard = getWishlistItemCard(page, updatedItem.title);
+    const starBtn = itemCard.getByRole("button", { name: "Добавить в избранное" });
+
+    await expect(starBtn).toBeVisible();
+    await expect(starBtn).toHaveAttribute("aria-pressed", "false");
+
+    await starBtn.click();
+
+    await expect(itemCard.getByRole("button", { name: "Убрать из избранного" })).toBeVisible();
+    await expect(itemCard.getByRole("button", { name: "Убрать из избранного" })).toHaveAttribute("aria-pressed", "true");
+
+    // Share page shows a read-only star for starred items
+    const shareUrl = await page.getByTestId("share-link-url").inputValue();
+    const sharePreviewPage = await page.context().newPage();
+
+    await sharePreviewPage.goto(shareUrl);
+
+    const shareItemCard = sharePreviewPage.getByTestId("share-item-card").filter({
+      has: sharePreviewPage.getByRole("heading", { name: updatedItem.title, exact: true }),
+    });
+
+    await expect(shareItemCard.locator(".share-item-star")).toBeVisible();
+    await sharePreviewPage.close();
+
+    // Unstar to restore neutral state
+    await itemCard.getByRole("button", { name: "Убрать из избранного" }).click();
+    await expect(itemCard.getByRole("button", { name: "Добавить в избранное" })).toBeVisible();
+  });
+
   await test.step("regenerate the share link and verify the old one is invalid", async () => {
     await expect(page.getByTestId("share-link-url")).toHaveValue(/\/share\//);
 

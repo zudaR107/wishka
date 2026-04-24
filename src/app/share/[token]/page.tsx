@@ -27,6 +27,7 @@ type WishlistView = {
     url: string | null;
     note: string | null;
     price: string | null;
+    starred: boolean;
     reservation: { status: "available" | "reserved" };
   }>;
 };
@@ -41,6 +42,7 @@ const DEV_MOCK_WISHLIST: WishlistView = {
       url: "https://example.com/sony-headphones",
       note: "Чёрного цвета, если есть возможность",
       price: "29 990 ₽",
+      starred: true,
       reservation: { status: "available" },
     },
     {
@@ -49,6 +51,7 @@ const DEV_MOCK_WISHLIST: WishlistView = {
       url: null,
       note: null,
       price: "850 ₽",
+      starred: false,
       reservation: { status: "reserved" },
     },
     {
@@ -57,6 +60,7 @@ const DEV_MOCK_WISHLIST: WishlistView = {
       url: "https://example.com/ozon-gift",
       note: "На любую сумму",
       price: null,
+      starred: false,
       reservation: { status: "available" },
     },
   ],
@@ -259,11 +263,22 @@ function SharePageView({
               <li key={item.id} className="share-item-card" data-testid="share-item-card">
                 <div className="share-item-header">
                   <h3 className="share-item-title">{item.title}</h3>
-                  {item.reservation.status === "reserved" ? (
-                    <span className="ui-badge ui-badge-reserved">
-                      {messages.share.reservedLabel}
-                    </span>
-                  ) : null}
+                  <div className="share-item-header-right">
+                    {item.starred ? (
+                      <span className="share-item-star" aria-label={messages.share.starredLabel}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"
+                          stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                          strokeLinejoin="round" aria-hidden="true">
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
+                      </span>
+                    ) : null}
+                    {item.reservation.status === "reserved" ? (
+                      <span className="ui-badge ui-badge-reserved">
+                        {messages.share.reservedLabel}
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
                 {item.price || item.url || item.note ? (
                   <div className="share-item-meta">

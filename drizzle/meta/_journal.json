@@ -43,6 +43,13 @@
       "when": 1776235906196,
       "tag": "0005_lonely_zzzax",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1777033112363,
+      "tag": "0006_quick_patch",
+      "breakpoints": true
     }
   ]
 }
