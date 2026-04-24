@@ -11,6 +11,7 @@ import { listCurrentUserActiveReservations } from "@/modules/reservation";
 import { cancelReservationAction } from "@/app/reservations/actions";
 import { formatPrice } from "@/app/format-price";
 
+const common = getTranslations("common");
 const messages = getTranslations("app");
 
 type ReservationsPageProps = {
@@ -32,6 +33,7 @@ export default async function ReservationsPage(props: ReservationsPageProps) {
   return (
     <div className="content-page">
       <div className="content-page-header">
+        <p className="page-brand-label">{common.brand}</p>
         <h1 className="content-page-title">{messages.reservations.title}</h1>
         <p className="content-page-description">{messages.reservations.description}</p>
       </div>

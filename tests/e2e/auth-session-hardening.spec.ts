@@ -39,6 +39,7 @@ test("authenticated users are redirected away from auth pages and logout revokes
   await expect(page).toHaveURL(/\/(?:\?.*)?$/);
   await expect(page.getByRole("heading", { name: "Мой вишлист" })).toBeVisible();
 
+  await page.getByRole("button", { name: "Меню аккаунта" }).click();
   await page.getByRole("button", { name: "Выйти" }).click();
   await expect(page).toHaveURL(/\/(?:\?.*)?$/);
 

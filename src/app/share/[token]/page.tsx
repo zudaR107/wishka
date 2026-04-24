@@ -21,6 +21,7 @@ type SharePageProps = {
 type WishlistView = {
   shareLink: { token: string };
   viewer: { isAuthenticated: boolean; isOwner: boolean };
+  owner: { email: string; bio: string | null };
   items: Array<{
     id: string;
     title: string;
@@ -34,7 +35,8 @@ type WishlistView = {
 
 const DEV_MOCK_WISHLIST: WishlistView = {
   shareLink: { token: "demo-token" },
-  viewer: { isAuthenticated: false, isOwner: false },
+  viewer: { isAuthenticated: true, isOwner: false },
+  owner: { email: "demo@example.com", bio: "Люблю книги, путешествия и хорошие наушники. Подарки принимаю в любое время года 🎁" },
   items: [
     {
       id: "mock-1",
@@ -127,18 +129,7 @@ export default async function SharePage(props: SharePageProps) {
     return (
       <div className="share-unavailable">
         <div className="content-page-header">
-          <p
-            style={{
-              fontSize: "var(--font-size-label)",
-              fontWeight: 600,
-              textTransform: "uppercase",
-              letterSpacing: "0.1em",
-              color: "var(--color-text-strong)",
-              margin: 0,
-            }}
-          >
-            {common.brand}
-          </p>
+          <p className="page-brand-label">{common.brand}</p>
           <h1 className="content-page-title">{messages.share.unavailableTitle}</h1>
         </div>
         <div
@@ -199,21 +190,20 @@ function SharePageView({
   return (
     <div className="content-page">
       <div className="content-page-header">
-        <p
-          style={{
-            fontSize: "var(--font-size-label)",
-            fontWeight: 600,
-            textTransform: "uppercase",
-            letterSpacing: "0.1em",
-            color: "var(--color-text-muted)",
-            margin: 0,
-          }}
-        >
-          {common.brand}
-        </p>
-        <h1 className="content-page-title">{messages.share.title}</h1>
+        <p className="page-brand-label">{common.brand}</p>
+        <div className="share-page-title-row">
+          <h1 className="content-page-title">{messages.share.title}</h1>
+          <span className="share-page-owner-email">{wishlist.owner.email}</span>
+        </div>
         <p className="content-page-description">{messages.share.description}</p>
       </div>
+
+      {wishlist.viewer.isAuthenticated && wishlist.owner.bio ? (
+        <div className="share-owner-card" data-testid="share-owner-card">
+          <p className="content-section-label">{messages.share.ownerSection}</p>
+          <p className="share-owner-bio">{wishlist.owner.bio}</p>
+        </div>
+      ) : null}
 
       {status === "reservation-created" ? (
         <p className="ui-message ui-message-success">{messages.share.successMessage}</p>

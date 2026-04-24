@@ -6,6 +6,7 @@ const common = getTranslations("common");
 
 type HeaderUser = {
   id: string;
+  email: string;
 };
 
 type HeaderProps = {
@@ -34,7 +35,7 @@ export function Header({ user, onLogout }: HeaderProps) {
           </svg>
           <span className="site-logo-text">{common.brand}</span>
         </Link>
-        {user ? <NavLinks onLogout={onLogout} /> : <GuestLinks />}
+        {user ? <NavLinks email={user.email} onLogout={onLogout} /> : <GuestLinks />}
       </div>
     </header>
   );

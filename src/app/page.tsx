@@ -142,10 +142,13 @@ async function DashboardView({ userId }: { userId: string }) {
     <div className="dashboard-page">
       {/* Page header */}
       <div className="dashboard-header">
-        <h1 className="dashboard-title">{messages.dashboard.title}</h1>
-        <span className="dashboard-count" data-testid="wishlist-item-count">
-          {wishlist.items.length} {pluralize(wishlist.items.length, messages.dashboard.itemCountForms)}
-        </span>
+        <p className="page-brand-label">{common.brand}</p>
+        <div className="dashboard-title-row">
+          <h1 className="dashboard-title">{messages.dashboard.title}</h1>
+          <span className="dashboard-count" data-testid="wishlist-item-count">
+            {wishlist.items.length} {pluralize(wishlist.items.length, messages.dashboard.itemCountForms)}
+          </span>
+        </div>
       </div>
 
       {/* Share link panel */}

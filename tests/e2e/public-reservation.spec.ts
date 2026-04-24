@@ -49,7 +49,6 @@ test("public wishlist and reserver journey works end to end", async ({ browser }
       await expect(guestItemCard).toContainText(item.note);
       await expect(guestItemCard).toContainText("3\u00a0490");
       await expect(guestItemCard.getByRole("button", { name: "Забронировать" })).toHaveCount(0);
-      await expect(guestPage.getByText(owner.email)).toHaveCount(0);
       await expect(guestPage.getByText(reserver.email)).toHaveCount(0);
     });
 
@@ -69,8 +68,7 @@ test("public wishlist and reserver journey works end to end", async ({ browser }
 
       await expect(reservedItemCard).toContainText("Уже забронировано");
       await expect(reservedItemCard.getByRole("button", { name: "Забронировать" })).toHaveCount(0);
-      await expect(reserverPage.getByText(owner.email)).toHaveCount(0);
-      await expect(reserverPage.getByText(reserver.email)).toHaveCount(0);
+      await expect(reserverPage.locator("main").getByText(reserver.email)).toHaveCount(0);
     });
 
     await test.step("other viewers see the reserved state without identity leakage", async () => {
@@ -80,7 +78,6 @@ test("public wishlist and reserver journey works end to end", async ({ browser }
 
       await expect(guestReservedItemCard).toContainText("Уже забронировано");
       await expect(guestReservedItemCard.getByRole("button", { name: "Забронировать" })).toHaveCount(0);
-      await expect(guestPage.getByText(owner.email)).toHaveCount(0);
       await expect(guestPage.getByText(reserver.email)).toHaveCount(0);
     });
 

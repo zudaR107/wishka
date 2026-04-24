@@ -5,6 +5,8 @@ export const common = {
   nav: {
     wishlist: "Мой вишлист",
     reservations: "Мои брони",
+    settings: "Настройки",
+    accountMenu: "Меню аккаунта",
     logout: "Выйти",
     login: "Войти",
     register: "Создать аккаунт",

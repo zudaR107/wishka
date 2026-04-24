@@ -15,6 +15,16 @@ The format is based on Keep a Changelog, and this project follows SemVer.
   public share page. Unstarred items keep their creation order below.
   The share page shows a read-only star badge on starred items so gift-givers
   can see priorities at a glance.
+- Account profile bio: owners can write a short «О себе» description in the
+  new Settings page (`/settings`). The bio is shown on the public share page
+  in a dedicated «Об авторе» block, visible only to authenticated visitors.
+- Settings page (`/settings`): displays the account email and a bio textarea
+  with inline save feedback.
+- Gear icon menu in the site header: replaces the standalone logout button;
+  shows the account email, a link to Settings, and the logout action.
+- Owner email is shown in the share page title area, visible to all visitors.
+- Brand label "WSHKA" added above the page title on all content pages
+  (dashboard, reservations, settings, share) for visual consistency.
 
 ## [1.0.1] - 2026-04-23
 

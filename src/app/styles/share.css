@@ -14,6 +14,15 @@
     box-shadow: var(--shadow-surface);
   }
 
+  .page-brand-label {
+    font-size: var(--font-size-label);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
   .content-page-header {
     display: flex;
     flex-direction: column;
@@ -133,6 +142,51 @@
     gap: var(--space-1) var(--space-4);
     font-size: var(--font-size-label);
     color: var(--color-text-base);
+  }
+
+  /* ── Owner bio card ─────────────────────────────────────── */
+  .share-owner-card {
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-subtle);
+    padding: var(--space-5) var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .share-page-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: var(--space-2);
+    row-gap: 0;
+  }
+
+  .share-page-title-row .content-page-title {
+    flex-shrink: 0;
+  }
+
+  .share-page-title-row + .content-page-description {
+    margin-top: var(--space-3);
+  }
+
+  .share-page-owner-email {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--color-accent);
+    letter-spacing: -0.03em;
+    word-break: break-all;
+    overflow-wrap: break-word;
+  }
+
+  .share-owner-bio {
+    font-size: var(--font-size-label);
+    color: var(--color-text-base);
+    line-height: var(--line-height-body);
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
   }
 
   .share-unavailable {

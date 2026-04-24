@@ -6,6 +6,7 @@ import {
   getWishlistWithItems,
   type WishlistItemRecord,
 } from "@/modules/wishlist/server/items";
+import { users } from "@/modules/auth/db/schema";
 
 export type PublicWishlistItemReservation = {
   status: "available" | "reserved";
@@ -13,6 +14,11 @@ export type PublicWishlistItemReservation = {
 
 export type PublicWishlistItem = WishlistItemRecord & {
   reservation: PublicWishlistItemReservation;
+};
+
+export type PublicWishlistOwner = {
+  email: string;
+  bio: string | null;
 };
 
 export type PublicWishlist = {
@@ -31,6 +37,7 @@ export type PublicWishlistViewer = {
 
 export type PublicWishlistView = PublicWishlist & {
   viewer: PublicWishlistViewer;
+  owner: PublicWishlistOwner;
 };
 
 export async function getActiveShareLinkByToken(token: string): Promise<CurrentShareLink | null> {
@@ -71,11 +78,17 @@ export async function getPublicWishlistViewByShareToken(
     return null;
   }
 
+  const ownerProfile = await getOwnerProfile(data.wishlist.userId);
+
   return {
     ...buildPublicWishlist(data),
     viewer: {
       isAuthenticated: Boolean(viewerUserId),
       isOwner: viewerUserId === data.wishlist.userId,
+    },
+    owner: {
+      email: ownerProfile?.email ?? "",
+      bio: ownerProfile?.bio ?? null,
     },
   };
 }
@@ -149,6 +162,17 @@ function getPublicWishlistItemReservation(
   }
 
   return { status: "available" };
+}
+
+async function getOwnerProfile(userId: string): Promise<{ email: string; bio: string | null } | null> {
+  const db = await getDb();
+
+  const user = await db.query.users.findFirst({
+    columns: { email: true, bio: true },
+    where: eq(users.id, userId),
+  });
+
+  return user ?? null;
 }
 
 async function getDb() {

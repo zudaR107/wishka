@@ -16,6 +16,12 @@
 
   .dashboard-header {
     display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .dashboard-title-row {
+    display: flex;
     align-items: center;
     gap: var(--space-3);
   }

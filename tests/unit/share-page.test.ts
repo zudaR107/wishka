@@ -93,6 +93,7 @@ describe("public share route rendering", () => {
         isAuthenticated: false,
         isOwner: false,
       },
+      owner: { email: "owner@example.com", bio: null },
     });
 
     const { default: SharePage } = await import("../../src/app/share/[token]/page");
@@ -132,6 +133,7 @@ describe("public share route rendering", () => {
         isAuthenticated: false,
         isOwner: false,
       },
+      owner: { email: "owner@example.com", bio: null },
     });
 
     const { default: SharePage } = await import("../../src/app/share/[token]/page");
@@ -183,6 +185,7 @@ describe("public share route rendering", () => {
         isAuthenticated: true,
         isOwner: false,
       },
+      owner: { email: "owner@example.com", bio: null },
     });
 
     const { default: SharePage } = await import("../../src/app/share/[token]/page");
@@ -225,6 +228,7 @@ describe("public share route rendering", () => {
         isAuthenticated: true,
         isOwner: true,
       },
+      owner: { email: "owner@example.com", bio: null },
     });
 
     const { default: SharePage } = await import("../../src/app/share/[token]/page");
@@ -269,6 +273,7 @@ describe("public share route rendering", () => {
         isAuthenticated: true,
         isOwner: false,
       },
+      owner: { email: "owner@example.com", bio: null },
     });
 
     const { default: SharePage } = await import("../../src/app/share/[token]/page");
@@ -297,6 +302,7 @@ describe("public share route rendering", () => {
         isAuthenticated: true,
         isOwner: false,
       },
+      owner: { email: "owner@example.com", bio: null },
     });
 
     const { default: SharePage } = await import("../../src/app/share/[token]/page");
@@ -311,6 +317,74 @@ describe("public share route rendering", () => {
 
     expect(renderToStaticMarkup(successPage)).toContain("Желание забронировано.");
     expect(renderToStaticMarkup(errorPage)).toContain("Это желание уже забронировано.");
+  });
+
+  it("shows owner email in header and bio card for authenticated viewers when bio is set", async () => {
+    mocks.getCurrentUser.mockResolvedValue({
+      id: "user-2",
+      email: "user@example.com",
+    });
+    mocks.getPublicWishlistViewByShareToken.mockResolvedValue({
+      id: "wishlist-1",
+      items: [],
+      shareLink: { id: "share-1", token: "opaque-token" },
+      viewer: { isAuthenticated: true, isOwner: false },
+      owner: { email: "owner@example.com", bio: "Люблю книги и путешествия" },
+    });
+
+    const { default: SharePage } = await import("../../src/app/share/[token]/page");
+    const page = await SharePage({
+      params: Promise.resolve({ token: "opaque-token" }),
+    });
+    const html = renderToStaticMarkup(page);
+
+    expect(html).toContain("owner@example.com");
+    expect(html).toContain("Об авторе");
+    expect(html).toContain("Люблю книги и путешествия");
+  });
+
+  it("shows owner email in header for guest viewers but hides bio card", async () => {
+    mocks.getCurrentUser.mockResolvedValue(null);
+    mocks.getPublicWishlistViewByShareToken.mockResolvedValue({
+      id: "wishlist-1",
+      items: [],
+      shareLink: { id: "share-1", token: "opaque-token" },
+      viewer: { isAuthenticated: false, isOwner: false },
+      owner: { email: "owner@example.com", bio: "Люблю книги и путешествия" },
+    });
+
+    const { default: SharePage } = await import("../../src/app/share/[token]/page");
+    const page = await SharePage({
+      params: Promise.resolve({ token: "opaque-token" }),
+    });
+    const html = renderToStaticMarkup(page);
+
+    expect(html).toContain("owner@example.com");
+    expect(html).not.toContain("Об авторе");
+    expect(html).not.toContain("Люблю книги и путешествия");
+  });
+
+  it("shows owner email in header but hides bio card when bio is null", async () => {
+    mocks.getCurrentUser.mockResolvedValue({
+      id: "user-2",
+      email: "user@example.com",
+    });
+    mocks.getPublicWishlistViewByShareToken.mockResolvedValue({
+      id: "wishlist-1",
+      items: [],
+      shareLink: { id: "share-1", token: "opaque-token" },
+      viewer: { isAuthenticated: true, isOwner: false },
+      owner: { email: "owner@example.com", bio: null },
+    });
+
+    const { default: SharePage } = await import("../../src/app/share/[token]/page");
+    const page = await SharePage({
+      params: Promise.resolve({ token: "opaque-token" }),
+    });
+    const html = renderToStaticMarkup(page);
+
+    expect(html).toContain("owner@example.com");
+    expect(html).not.toContain("Об авторе");
   });
 
   it("redirects guests to login when reserve action is submitted", async () => {
@@ -346,6 +420,7 @@ describe("public share route rendering", () => {
       ],
       shareLink: { id: "share-1", token: "opaque-token" },
       viewer: { isAuthenticated: true, isOwner: false },
+      owner: { email: "owner@example.com", bio: null },
     });
     mocks.createReservation.mockResolvedValue({
       status: "success",
@@ -393,6 +468,7 @@ describe("public share route rendering", () => {
       items: [],
       shareLink: { id: "share-1", token: "opaque-token" },
       viewer: { isAuthenticated: true, isOwner: false },
+      owner: { email: "owner@example.com", bio: null },
     });
 
     await expectRedirectCall(
@@ -424,6 +500,7 @@ describe("public share route rendering", () => {
       ],
       shareLink: { id: "share-1", token: "opaque-token" },
       viewer: { isAuthenticated: true, isOwner: false },
+      owner: { email: "owner@example.com", bio: null },
     });
 
     const { reservePublicWishlistItemAction } = await import("../../src/app/share/[token]/actions");
