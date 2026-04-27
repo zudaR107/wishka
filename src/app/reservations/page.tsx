@@ -9,26 +9,15 @@ import { requireCurrentUser } from "@/modules/auth/server/current-user";
 import { getTranslations } from "@/modules/i18n";
 import { listCurrentUserActiveReservations } from "@/modules/reservation";
 import { cancelReservationAction } from "@/app/reservations/actions";
+import { CancelReservationButton } from "@/app/reservations/cancel-reservation-button";
 import { formatPrice } from "@/app/format-price";
 
 const common = getTranslations("common");
 const messages = getTranslations("app");
 
-type ReservationsPageProps = {
-  searchParams?: Promise<{
-    action?: string;
-    status?: string;
-    error?: string;
-  }>;
-};
-
-export default async function ReservationsPage(props: ReservationsPageProps) {
+export default async function ReservationsPage() {
   const user = await requireCurrentUser();
-  const params = props?.searchParams ? await props.searchParams : undefined;
   const reservations = await listCurrentUserActiveReservations(user.id);
-  const action = params?.action;
-  const status = params?.status;
-  const errorCode = params?.error;
 
   return (
     <div className="content-page">
@@ -37,17 +26,6 @@ export default async function ReservationsPage(props: ReservationsPageProps) {
         <h1 className="content-page-title">{messages.reservations.title}</h1>
         <p className="content-page-description">{messages.reservations.description}</p>
       </div>
-
-      {status === "reservation-cancelled" ? (
-        <p className="ui-message ui-message-success">
-          {messages.reservations.cancelSuccessMessage}
-        </p>
-      ) : null}
-      {errorCode ? (
-        <p className="ui-message ui-message-error">
-          {getReservationsActionErrorMessage(action, errorCode)}
-        </p>
-      ) : null}
 
       {reservations.length === 0 ? (
         <div className="dashboard-empty" data-testid="reservations-empty-state">
@@ -111,12 +89,16 @@ export default async function ReservationsPage(props: ReservationsPageProps) {
                       ) : null}
                     </div>
                   ) : null}
-                  <form action={cancelReservationAction}>
-                    <input type="hidden" name="reservationId" value={reservation.id} />
-                    <button type="submit" className="ui-button ui-button-danger">
-                      {messages.reservations.cancelLabel}
-                    </button>
-                  </form>
+                  <CancelReservationButton
+                    reservationId={reservation.id}
+                    cancelLabel={messages.reservations.cancelLabel}
+                    errorMessages={{
+                      notReservationOwner: messages.reservations.errors.notReservationOwner,
+                      reservationNotFound: messages.reservations.errors.reservationNotFound,
+                      unknown: messages.reservations.errors.unknown,
+                    }}
+                    cancelAction={cancelReservationAction}
+                  />
                 </div>
               </li>
             ))}
@@ -125,19 +107,4 @@ export default async function ReservationsPage(props: ReservationsPageProps) {
       )}
     </div>
   );
-}
-
-function getReservationsActionErrorMessage(action: string | undefined, errorCode: string): string {
-  if (action !== "cancel") {
-    return messages.reservations.errors.unknown;
-  }
-
-  switch (errorCode) {
-    case "not-reservation-owner":
-      return messages.reservations.errors.notReservationOwner;
-    case "reservation-not-found":
-      return messages.reservations.errors.reservationNotFound;
-    default:
-      return messages.reservations.errors.unknown;
-  }
 }

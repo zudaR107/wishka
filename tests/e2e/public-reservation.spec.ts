@@ -123,8 +123,6 @@ test("public wishlist and reserver journey works end to end", async ({ browser }
       await expect(reservationCard).toContainText("3\u00a0490");
       await reservationCard.getByRole("button", { name: "Отменить бронь" }).click();
 
-      await expect(reserverPage).toHaveURL(/\/reservations\?status=reservation-cancelled$/);
-      await expect(reserverPage.getByText("Бронь отменена.")).toBeVisible();
       await expect(reserverPage.getByTestId("reservations-empty-state")).toBeVisible();
       await expect(reserverPage.getByRole("heading", { name: item.title, exact: true })).toHaveCount(0);
     });
