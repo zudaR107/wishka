@@ -5,9 +5,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   requireCurrentUser: vi.fn(),
   getCurrentUser: vi.fn(),
-  getCurrentOwnerWishlistWithReservations: vi.fn(),
-  getOrCreateCurrentShareLink: vi.fn(),
-  regenerateCurrentShareLink: vi.fn(),
+  getAllOwnerWishlistsWithReservations: vi.fn(),
+  getOrCreateShareLinkForWishlist: vi.fn(),
+  regenerateShareLinkForWishlist: vi.fn(),
   createCurrentWishlistItem: vi.fn(),
   updateCurrentWishlistItem: vi.fn(),
   deleteCurrentWishlistItem: vi.fn(),
@@ -41,12 +41,14 @@ vi.mock("../../src/modules/auth/server/current-user", () => ({
 }));
 
 vi.mock("../../src/modules/share", () => ({
-  getOrCreateCurrentShareLink: mocks.getOrCreateCurrentShareLink,
-  regenerateCurrentShareLink: mocks.regenerateCurrentShareLink,
+  getOrCreateShareLinkForWishlist: mocks.getOrCreateShareLinkForWishlist,
+  regenerateShareLinkForWishlist: mocks.regenerateShareLinkForWishlist,
 }));
 
 vi.mock("../../src/modules/reservation", () => ({
-  getCurrentOwnerWishlistWithReservations: mocks.getCurrentOwnerWishlistWithReservations,
+  getAllOwnerWishlistsWithReservations: mocks.getAllOwnerWishlistsWithReservations,
+  createReservation: vi.fn(),
+  cancelReservation: vi.fn(),
 }));
 
 vi.mock("../../src/modules/wishlist/server/create-item", () => ({
@@ -68,14 +70,33 @@ async function render(element: React.ReactElement): Promise<string> {
   return new Response(stream).text();
 }
 
+const baseWishlist = {
+  id: "wishlist-1",
+  userId: "user-1",
+  name: "Мой список",
+  isActive: true,
+  createdAt: new Date("2026-04-11T00:00:00.000Z"),
+  updatedAt: new Date("2026-04-11T00:00:00.000Z"),
+  items: [],
+};
+
+const baseShareLink = {
+  id: "share-1",
+  wishlistId: "wishlist-1",
+  token: "default-token",
+  isActive: true,
+  createdAt: new Date("2026-04-11T00:00:00.000Z"),
+  updatedAt: new Date("2026-04-11T00:00:00.000Z"),
+};
+
 describe("owner app wishlist bootstrap", () => {
   beforeEach(() => {
     Object.assign(globalThis, { React });
     mocks.requireCurrentUser.mockReset();
     mocks.getCurrentUser.mockReset();
-    mocks.getCurrentOwnerWishlistWithReservations.mockReset();
-    mocks.getOrCreateCurrentShareLink.mockReset();
-    mocks.regenerateCurrentShareLink.mockReset();
+    mocks.getAllOwnerWishlistsWithReservations.mockReset();
+    mocks.getOrCreateShareLinkForWishlist.mockReset();
+    mocks.regenerateShareLinkForWishlist.mockReset();
     mocks.createCurrentWishlistItem.mockReset();
     mocks.updateCurrentWishlistItem.mockReset();
     mocks.deleteCurrentWishlistItem.mockReset();
@@ -88,33 +109,18 @@ describe("owner app wishlist bootstrap", () => {
       id: "user-1",
       email: "user@example.com",
     });
-    mocks.getCurrentOwnerWishlistWithReservations.mockResolvedValue({
-      id: "wishlist-1",
-      userId: "user-1",
-      isActive: true,
-      createdAt: new Date("2026-04-11T00:00:00.000Z"),
-      updatedAt: new Date("2026-04-11T00:00:00.000Z"),
-      items: [],
-    });
-    mocks.getOrCreateCurrentShareLink.mockResolvedValue({
-      id: "share-1",
-      wishlistId: "wishlist-1",
-      token: "default-token",
-      isActive: true,
-      createdAt: new Date("2026-04-11T00:00:00.000Z"),
-      updatedAt: new Date("2026-04-11T00:00:00.000Z"),
-    });
+    mocks.getAllOwnerWishlistsWithReservations.mockResolvedValue([baseWishlist]);
+    mocks.getOrCreateShareLinkForWishlist.mockResolvedValue(baseShareLink);
   });
 
-  it("loads the current wishlist for the authenticated owner on /", async () => {
+  it("loads all wishlists for the authenticated owner on /", async () => {
     const { default: AppPage } = await import("../../src/app/page");
 
-    // render triggers DashboardView which calls data-loading functions
     await render(await AppPage({}));
 
     expect(mocks.getCurrentUser).toHaveBeenCalled();
-    expect(mocks.getCurrentOwnerWishlistWithReservations).toHaveBeenCalledWith("user-1");
-    expect(mocks.getOrCreateCurrentShareLink).toHaveBeenCalledWith("user-1");
+    expect(mocks.getAllOwnerWishlistsWithReservations).toHaveBeenCalledWith("user-1");
+    expect(mocks.getOrCreateShareLinkForWishlist).toHaveBeenCalledWith("wishlist-1");
   });
 
   it("renders an empty state when the wishlist has no items", async () => {
@@ -141,12 +147,8 @@ describe("owner app wishlist bootstrap", () => {
   });
 
   it("renders wishlist items when they exist", async () => {
-    mocks.getCurrentOwnerWishlistWithReservations.mockResolvedValue({
-      id: "wishlist-1",
-      userId: "user-1",
-      isActive: true,
-      createdAt: new Date("2026-04-11T00:00:00.000Z"),
-      updatedAt: new Date("2026-04-11T00:00:00.000Z"),
+    mocks.getAllOwnerWishlistsWithReservations.mockResolvedValue([{
+      ...baseWishlist,
       items: [
         {
           id: "item-1",
@@ -155,6 +157,7 @@ describe("owner app wishlist bootstrap", () => {
           url: "https://example.com/item",
           note: "Нужны беспроводные",
           price: "9990",
+          starred: false,
           createdAt: new Date("2026-04-11T00:00:00.000Z"),
           updatedAt: new Date("2026-04-11T00:00:00.000Z"),
           reservation: {
@@ -162,7 +165,7 @@ describe("owner app wishlist bootstrap", () => {
           },
         },
       ],
-    });
+    }]);
 
     const { default: AppPage } = await import("../../src/app/page");
 
@@ -178,12 +181,8 @@ describe("owner app wishlist bootstrap", () => {
   });
 
   it("renders privacy-safe item status without reserver identity", async () => {
-    mocks.getCurrentOwnerWishlistWithReservations.mockResolvedValue({
-      id: "wishlist-1",
-      userId: "user-1",
-      isActive: true,
-      createdAt: new Date("2026-04-11T00:00:00.000Z"),
-      updatedAt: new Date("2026-04-11T00:00:00.000Z"),
+    mocks.getAllOwnerWishlistsWithReservations.mockResolvedValue([{
+      ...baseWishlist,
       items: [
         {
           id: "item-1",
@@ -192,6 +191,7 @@ describe("owner app wishlist bootstrap", () => {
           url: null,
           note: null,
           price: null,
+          starred: false,
           createdAt: new Date("2026-04-11T00:00:00.000Z"),
           updatedAt: new Date("2026-04-11T00:00:00.000Z"),
           reservation: {
@@ -205,6 +205,7 @@ describe("owner app wishlist bootstrap", () => {
           url: null,
           note: null,
           price: null,
+          starred: false,
           createdAt: new Date("2026-04-11T00:00:00.000Z"),
           updatedAt: new Date("2026-04-11T00:00:00.000Z"),
           reservation: {
@@ -212,7 +213,7 @@ describe("owner app wishlist bootstrap", () => {
           },
         },
       ],
-    });
+    }]);
 
     const { default: AppPage } = await import("../../src/app/page");
 

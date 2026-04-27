@@ -10,6 +10,8 @@ export {
   getActiveShareLinkByToken,
   getCurrentShareLink,
   getOrCreateCurrentShareLink,
+  getOrCreateShareLinkForWishlist,
+  regenerateShareLinkForWishlist,
   getPublicWishlistByShareToken,
   getPublicWishlistViewByShareToken,
   getReservationAwarePublicWishlistByShareToken,

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  getCurrentWishlist: vi.fn(),
+  getWishlistForUser: vi.fn(),
   update: vi.fn(),
   updateSet: vi.fn(),
   updateWhere: vi.fn(),
@@ -12,7 +12,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("../../src/modules/wishlist/server/current-wishlist", () => ({
-  getCurrentWishlist: mocks.getCurrentWishlist,
+  getWishlistForUser: mocks.getWishlistForUser,
 }));
 
 vi.mock("../../src/shared/db", () => ({
@@ -27,9 +27,18 @@ import {
   updateCurrentWishlistItem,
 } from "../../src/modules/wishlist/server/manage-item";
 
+const baseWishlist = {
+  id: "wishlist-1",
+  userId: "user-1",
+  name: "Мой список",
+  isActive: true,
+  createdAt: new Date("2026-04-11T00:00:00.000Z"),
+  updatedAt: new Date("2026-04-11T00:00:00.000Z"),
+};
+
 describe("wishlist item update flow", () => {
   beforeEach(() => {
-    mocks.getCurrentWishlist.mockReset();
+    mocks.getWishlistForUser.mockReset();
     mocks.update.mockReset();
     mocks.updateSet.mockReset();
     mocks.updateWhere.mockReset();
@@ -44,20 +53,14 @@ describe("wishlist item update flow", () => {
     mocks.deleteItem.mockReturnValue({ where: mocks.deleteWhere });
     mocks.deleteWhere.mockReturnValue({ returning: mocks.deleteReturning });
 
-    mocks.getCurrentWishlist.mockResolvedValue({
-      id: "wishlist-1",
-      userId: "user-1",
-      isActive: true,
-      createdAt: new Date("2026-04-11T00:00:00.000Z"),
-      updatedAt: new Date("2026-04-11T00:00:00.000Z"),
-    });
+    mocks.getWishlistForUser.mockResolvedValue(baseWishlist);
   });
 
   it("updates an item in the current owner wishlist", async () => {
     mocks.updateReturning.mockResolvedValue([{ id: "item-1" }]);
 
     await expect(
-      updateCurrentWishlistItem("user-1", "item-1", {
+      updateCurrentWishlistItem("user-1", "wishlist-1", "item-1", {
         title: " Обновленные наушники ",
         url: "https://example.com/item",
         note: " Новая заметка ",
@@ -65,7 +68,7 @@ describe("wishlist item update flow", () => {
       }),
     ).resolves.toEqual({ status: "success" });
 
-    expect(mocks.getCurrentWishlist).toHaveBeenCalledWith("user-1");
+    expect(mocks.getWishlistForUser).toHaveBeenCalledWith("wishlist-1", "user-1");
     expect(mocks.updateSet).toHaveBeenCalledWith(
       expect.objectContaining({
         title: "Обновленные наушники",
@@ -78,7 +81,7 @@ describe("wishlist item update flow", () => {
 
   it("rejects invalid update input", async () => {
     await expect(
-      updateCurrentWishlistItem("user-1", "item-1", {
+      updateCurrentWishlistItem("user-1", "wishlist-1", "item-1", {
         title: "",
         url: "",
         note: "",
@@ -92,7 +95,7 @@ describe("wishlist item update flow", () => {
     mocks.updateReturning.mockResolvedValue([]);
 
     await expect(
-      updateCurrentWishlistItem("user-1", "item-1", {
+      updateCurrentWishlistItem("user-1", "wishlist-1", "item-1", {
         title: "Наушники",
         url: "",
         note: "",
@@ -101,11 +104,11 @@ describe("wishlist item update flow", () => {
     ).resolves.toEqual({ status: "error", code: "item-not-found" });
   });
 
-  it("returns item-not-found without creating a wishlist when none exists", async () => {
-    mocks.getCurrentWishlist.mockResolvedValue(null);
+  it("returns item-not-found when the wishlist does not belong to the user", async () => {
+    mocks.getWishlistForUser.mockResolvedValue(null);
 
     await expect(
-      updateCurrentWishlistItem("user-1", "item-1", {
+      updateCurrentWishlistItem("user-1", "wishlist-1", "item-1", {
         title: "Наушники",
         url: "",
         note: "",
@@ -118,26 +121,20 @@ describe("wishlist item update flow", () => {
 
 describe("wishlist item delete flow", () => {
   beforeEach(() => {
-    mocks.getCurrentWishlist.mockReset();
+    mocks.getWishlistForUser.mockReset();
     mocks.deleteItem.mockReset();
     mocks.deleteWhere.mockReset();
     mocks.deleteReturning.mockReset();
 
     mocks.deleteItem.mockReturnValue({ where: mocks.deleteWhere });
     mocks.deleteWhere.mockReturnValue({ returning: mocks.deleteReturning });
-    mocks.getCurrentWishlist.mockResolvedValue({
-      id: "wishlist-1",
-      userId: "user-1",
-      isActive: true,
-      createdAt: new Date("2026-04-11T00:00:00.000Z"),
-      updatedAt: new Date("2026-04-11T00:00:00.000Z"),
-    });
+    mocks.getWishlistForUser.mockResolvedValue(baseWishlist);
   });
 
   it("deletes an item from the current owner wishlist", async () => {
     mocks.deleteReturning.mockResolvedValue([{ id: "item-1" }]);
 
-    await expect(deleteCurrentWishlistItem("user-1", "item-1")).resolves.toEqual({
+    await expect(deleteCurrentWishlistItem("user-1", "wishlist-1", "item-1")).resolves.toEqual({
       status: "success",
     });
   });
@@ -145,16 +142,16 @@ describe("wishlist item delete flow", () => {
   it("returns item-not-found when delete is outside the current owner wishlist", async () => {
     mocks.deleteReturning.mockResolvedValue([]);
 
-    await expect(deleteCurrentWishlistItem("user-1", "item-1")).resolves.toEqual({
+    await expect(deleteCurrentWishlistItem("user-1", "wishlist-1", "item-1")).resolves.toEqual({
       status: "error",
       code: "item-not-found",
     });
   });
 
-  it("returns item-not-found without creating a wishlist when none exists", async () => {
-    mocks.getCurrentWishlist.mockResolvedValue(null);
+  it("returns item-not-found when the wishlist does not belong to the user", async () => {
+    mocks.getWishlistForUser.mockResolvedValue(null);
 
-    await expect(deleteCurrentWishlistItem("user-1", "item-1")).resolves.toEqual({
+    await expect(deleteCurrentWishlistItem("user-1", "wishlist-1", "item-1")).resolves.toEqual({
       status: "error",
       code: "item-not-found",
     });

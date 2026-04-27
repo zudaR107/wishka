@@ -1,0 +1,1 @@
+ALTER TABLE "wishlists" ADD COLUMN "name" varchar(100) DEFAULT 'Мой список' NOT NULL;

@@ -3,6 +3,7 @@ import { wishlistItems, wishlists } from "@/modules/wishlist/db/schema";
 import {
   type CurrentWishlist,
   getOrCreateCurrentWishlist,
+  getUserWishlists,
 } from "@/modules/wishlist/server/current-wishlist";
 
 export type WishlistItemRecord = {
@@ -48,6 +49,7 @@ export async function getWishlistWithItems(wishlistId: string): Promise<Wishlist
     columns: {
       id: true,
       userId: true,
+      name: true,
       isActive: true,
       createdAt: true,
       updatedAt: true,
@@ -75,6 +77,16 @@ export async function getCurrentWishlistWithItems(userId: string): Promise<Wishl
     ...wishlist,
     items,
   };
+}
+
+export async function getAllUserWishlistsWithItems(userId: string): Promise<WishlistWithItems[]> {
+  const allWishlists = await getUserWishlists(userId);
+  return Promise.all(
+    allWishlists.map(async (wishlist) => ({
+      ...wishlist,
+      items: await listWishlistItems(wishlist.id),
+    })),
+  );
 }
 
 async function getDb() {
