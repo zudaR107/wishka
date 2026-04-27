@@ -2,7 +2,9 @@ export {
   type CurrentShareLink,
   getCurrentShareLink,
   getOrCreateCurrentShareLink,
+  getOrCreateShareLinkForWishlist,
   regenerateCurrentShareLink,
+  regenerateShareLinkForWishlist,
   revokeCurrentShareLink,
 } from "@/modules/share/server/current-share-link";
 export {

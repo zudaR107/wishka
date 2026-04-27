@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  getOrCreateCurrentWishlist: vi.fn(),
+  getWishlistForUser: vi.fn(),
   insert: vi.fn(),
   insertValues: vi.fn(),
 }));
 
 vi.mock("../../src/modules/wishlist/server/current-wishlist", () => ({
-  getOrCreateCurrentWishlist: mocks.getOrCreateCurrentWishlist,
+  getWishlistForUser: mocks.getWishlistForUser,
 }));
 
 vi.mock("../../src/shared/db", () => ({
@@ -133,27 +133,29 @@ describe("wishlist item creation validation", () => {
 
 describe("wishlist item creation flow", () => {
   beforeEach(() => {
-    mocks.getOrCreateCurrentWishlist.mockReset();
+    mocks.getWishlistForUser.mockReset();
     mocks.insert.mockReset();
     mocks.insertValues.mockReset();
 
     mocks.insert.mockReturnValue({
       values: mocks.insertValues,
     });
-  });
 
-  it("creates an item in the current owner wishlist", async () => {
-    mocks.getOrCreateCurrentWishlist.mockResolvedValue({
+    mocks.getWishlistForUser.mockResolvedValue({
       id: "wishlist-1",
       userId: "user-1",
+      name: "Мой список",
       isActive: true,
       createdAt: new Date("2026-04-11T00:00:00.000Z"),
       updatedAt: new Date("2026-04-11T00:00:00.000Z"),
     });
+  });
+
+  it("creates an item in the specified wishlist", async () => {
     mocks.insertValues.mockResolvedValue(undefined);
 
     await expect(
-      createCurrentWishlistItem("user-1", {
+      createCurrentWishlistItem("user-1", "wishlist-1", {
         title: " Наушники ",
         url: "https://example.com/item",
         note: " Беспроводные ",
@@ -161,7 +163,7 @@ describe("wishlist item creation flow", () => {
       }),
     ).resolves.toEqual({ status: "success" });
 
-    expect(mocks.getOrCreateCurrentWishlist).toHaveBeenCalledWith("user-1");
+    expect(mocks.getWishlistForUser).toHaveBeenCalledWith("wishlist-1", "user-1");
     expect(mocks.insertValues).toHaveBeenCalledWith({
       wishlistId: "wishlist-1",
       title: "Наушники",
@@ -169,5 +171,20 @@ describe("wishlist item creation flow", () => {
       note: "Беспроводные",
       price: "1990",
     });
+  });
+
+  it("returns error when the wishlist does not belong to the user", async () => {
+    mocks.getWishlistForUser.mockResolvedValue(null);
+
+    await expect(
+      createCurrentWishlistItem("user-1", "wishlist-1", {
+        title: "Наушники",
+        url: "",
+        note: "",
+        price: "",
+      }),
+    ).resolves.toEqual({ status: "error", code: "unknown" });
+
+    expect(mocks.insert).not.toHaveBeenCalled();
   });
 });

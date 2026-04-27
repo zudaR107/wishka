@@ -16,11 +16,12 @@ type RegenerateLinkButtonLabels = {
 };
 
 type RegenerateLinkButtonProps = {
-  regenerateAction: (prev: RegenerateState) => Promise<RegenerateState>;
+  wishlistId: string;
+  regenerateAction: (prev: RegenerateState, formData: FormData) => Promise<RegenerateState>;
   labels: RegenerateLinkButtonLabels;
 };
 
-export function RegenerateLinkButton({ regenerateAction, labels }: RegenerateLinkButtonProps) {
+export function RegenerateLinkButton({ wishlistId, regenerateAction, labels }: RegenerateLinkButtonProps) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -60,6 +61,7 @@ export function RegenerateLinkButton({ regenerateAction, labels }: RegenerateLin
           ) : null}
           <div className="confirm-dialog-actions">
             <form action={formAction}>
+              <input type="hidden" name="wishlistId" value={wishlistId} />
               <button type="submit" className="ui-button ui-button-danger">
                 {labels.confirmLabel}
               </button>

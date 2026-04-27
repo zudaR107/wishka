@@ -6,6 +6,11 @@ import {
   toggleCurrentWishlistItemStarred,
   updateCurrentWishlistItem,
 } from "@/modules/wishlist/server/manage-item";
+import {
+  createWishlist,
+  renameWishlist,
+  deleteWishlist,
+} from "@/modules/wishlist/server/current-wishlist";
 
 export type ItemValues = {
   title: string;
@@ -45,6 +50,22 @@ export type ToggleStarredState = {
   starred?: boolean;
 } | null;
 
+export type CreateWishlistState = {
+  status: "success" | "error";
+  wishlistId?: string;
+  error?: string;
+} | null;
+
+export type RenameWishlistState = {
+  status: "success" | "error";
+  error?: string;
+} | null;
+
+export type DeleteWishlistState = {
+  status: "success" | "error";
+  error?: string;
+} | null;
+
 export async function createItemAction(
   prev: ItemFormState,
   formData: FormData,
@@ -57,7 +78,8 @@ export async function createItemAction(
   };
 
   const user = await requireCurrentUser();
-  const result = await createCurrentWishlistItem(user.id, values);
+  const wishlistId = getString(formData, "wishlistId");
+  const result = await createCurrentWishlistItem(user.id, wishlistId, values);
 
   if (result.status === "success") {
     return { status: "success", key: (prev?.key ?? 0) + 1 };
@@ -78,7 +100,13 @@ export async function updateItemAction(
   };
 
   const user = await requireCurrentUser();
-  const result = await updateCurrentWishlistItem(user.id, getString(formData, "itemId"), values);
+  const wishlistId = getString(formData, "wishlistId");
+  const result = await updateCurrentWishlistItem(
+    user.id,
+    wishlistId,
+    getString(formData, "itemId"),
+    values,
+  );
 
   if (result.status === "success") {
     return { status: "success", key: (prev?.key ?? 0) + 1 };
@@ -92,14 +120,61 @@ export async function toggleStarredAction(
   formData: FormData,
 ): Promise<ToggleStarredState> {
   const user = await requireCurrentUser();
+  const wishlistId = getString(formData, "wishlistId");
   const itemId = getString(formData, "itemId");
-  const result = await toggleCurrentWishlistItemStarred(user.id, itemId);
+  const result = await toggleCurrentWishlistItemStarred(user.id, wishlistId, itemId);
 
   if (result.status === "success") {
     return { status: "success", starred: result.starred };
   }
 
   return { status: "error" };
+}
+
+export async function createWishlistAction(
+  _prev: CreateWishlistState,
+  formData: FormData,
+): Promise<CreateWishlistState> {
+  const user = await requireCurrentUser();
+  const name = getString(formData, "name");
+  const result = await createWishlist(user.id, name);
+
+  if (result.status === "success") {
+    return { status: "success", wishlistId: result.wishlistId };
+  }
+
+  return { status: "error", error: result.code };
+}
+
+export async function renameWishlistAction(
+  _prev: RenameWishlistState,
+  formData: FormData,
+): Promise<RenameWishlistState> {
+  const user = await requireCurrentUser();
+  const wishlistId = getString(formData, "wishlistId");
+  const name = getString(formData, "name");
+  const result = await renameWishlist(wishlistId, user.id, name);
+
+  if (result.status === "success") {
+    return { status: "success" };
+  }
+
+  return { status: "error", error: result.code };
+}
+
+export async function deleteWishlistAction(
+  _prev: DeleteWishlistState,
+  formData: FormData,
+): Promise<DeleteWishlistState> {
+  const user = await requireCurrentUser();
+  const wishlistId = getString(formData, "wishlistId");
+  const result = await deleteWishlist(wishlistId, user.id);
+
+  if (result.status === "success") {
+    return { status: "success" };
+  }
+
+  return { status: "error", error: result.code };
 }
 
 function getString(formData: FormData, name: string): string {

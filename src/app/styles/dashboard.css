@@ -538,6 +538,14 @@
       padding: var(--space-3);
       min-width: 4.5rem;
     }
+
+    .wishlist-btn-label {
+      display: none;
+    }
+
+    .wishlist-actions-row .ui-button {
+      padding: var(--space-3);
+    }
   }
 
   /* ── Dashboard empty state ───────────────────────────── */
@@ -624,5 +632,111 @@
   .confirm-dialog-actions > .ui-button {
     width: 100%;
     justify-content: center;
+  }
+
+  /* Wishlist dropdown (custom, replaces native select) */
+  .wishlist-dropdown {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .wishlist-dropdown-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: inherit;
+    text-align: left;
+    max-width: 100%;
+  }
+
+  .wishlist-dropdown-trigger .dashboard-title {
+    margin: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .wishlist-dropdown-trigger:hover .dashboard-title {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .wishlist-dropdown-menu {
+    position: absolute;
+    top: calc(100% + var(--space-1));
+    left: 0;
+    z-index: 50;
+    min-width: 200px;
+    max-width: 320px;
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    list-style: none;
+    margin: 0;
+    padding: var(--space-1) 0;
+    overflow: hidden;
+  }
+
+  .wishlist-dropdown-item {
+    display: block;
+    width: 100%;
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-bg-surface);
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-size: var(--font-size-body);
+    color: var(--color-text-base);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .wishlist-dropdown-item:hover {
+    background: var(--color-bg-subtle);
+    color: var(--color-text-strong);
+  }
+
+  .wishlist-dropdown-item--selected {
+    font-weight: 600;
+    color: var(--color-text-strong);
+  }
+
+  /* Wishlist action buttons row */
+  .wishlist-actions-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+  }
+
+  .wishlist-actions-row .ui-button {
+    justify-content: center;
+    width: 100%;
+  }
+
+  /* Wishlist create / rename form */
+  .wishlist-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+    width: 100%;
+  }
+
+  .wishlist-edit-form-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2);
+  }
+
+  .wishlist-edit-form-actions .ui-button {
+    justify-content: center;
+    width: 100%;
   }
 }

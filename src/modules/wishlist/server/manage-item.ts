@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { wishlistItems } from "@/modules/wishlist/db/schema";
-import { getCurrentWishlist } from "@/modules/wishlist/server/current-wishlist";
+import { getWishlistForUser } from "@/modules/wishlist/server/current-wishlist";
 import {
   type WishlistItemInput,
   type WishlistItemValidationErrorCode,
@@ -21,6 +21,7 @@ export type ToggleStarredResult =
 
 export async function updateCurrentWishlistItem(
   userId: string,
+  wishlistId: string,
   itemId: string,
   input: WishlistItemInput,
 ): Promise<UpdateWishlistItemResult> {
@@ -31,7 +32,7 @@ export async function updateCurrentWishlistItem(
   }
 
   try {
-    const wishlist = await getCurrentWishlist(userId);
+    const wishlist = await getWishlistForUser(wishlistId, userId);
 
     if (!wishlist) {
       return { status: "error", code: "item-not-found" };
@@ -59,10 +60,11 @@ export async function updateCurrentWishlistItem(
 
 export async function deleteCurrentWishlistItem(
   userId: string,
+  wishlistId: string,
   itemId: string,
 ): Promise<DeleteWishlistItemResult> {
   try {
-    const wishlist = await getCurrentWishlist(userId);
+    const wishlist = await getWishlistForUser(wishlistId, userId);
 
     if (!wishlist) {
       return { status: "error", code: "item-not-found" };
@@ -86,10 +88,11 @@ export async function deleteCurrentWishlistItem(
 
 export async function toggleCurrentWishlistItemStarred(
   userId: string,
+  wishlistId: string,
   itemId: string,
 ): Promise<ToggleStarredResult> {
   try {
-    const wishlist = await getCurrentWishlist(userId);
+    const wishlist = await getWishlistForUser(wishlistId, userId);
 
     if (!wishlist) {
       return { status: "error", code: "item-not-found" };

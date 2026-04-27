@@ -21,7 +21,11 @@ function getErrorMessage(code: string): string {
   }
 }
 
-export function CreateItemForm() {
+type CreateItemFormProps = {
+  wishlistId: string;
+};
+
+export function CreateItemForm({ wishlistId }: CreateItemFormProps) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [state, action] = useActionState<ItemFormState, FormData>(createItemAction, null);
@@ -47,6 +51,7 @@ export function CreateItemForm() {
         data-testid="wishlist-create-form"
         noValidate
       >
+        <input type="hidden" name="wishlistId" value={wishlistId} />
         <div className="ui-field">
           <label className="ui-label" htmlFor="title">
             {messages.dashboard.fields.title}

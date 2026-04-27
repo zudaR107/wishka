@@ -4,23 +4,13 @@ import { headers } from "next/headers";
 import { getCurrentUser, requireCurrentUser } from "@/modules/auth/server/current-user";
 import { getTranslations } from "@/modules/i18n";
 import {
-  getOrCreateCurrentShareLink,
-  regenerateCurrentShareLink,
+  getOrCreateShareLinkForWishlist,
+  regenerateShareLinkForWishlist,
 } from "@/modules/share";
-import type { DeleteItemState, RegenerateState, ReserveItemState, CancelItemReservationState } from "./_dashboard/item-actions";
-import { StarButton } from "./_dashboard/star-item-button";
-import { getCurrentOwnerWishlistWithReservations, createReservation, cancelReservation } from "@/modules/reservation";
+import type { DeleteItemState, ReserveItemState, CancelItemReservationState, RegenerateState } from "./_dashboard/item-actions";
+import { getAllOwnerWishlistsWithReservations, createReservation, cancelReservation } from "@/modules/reservation";
 import { deleteCurrentWishlistItem } from "@/modules/wishlist/server/manage-item";
-import { OpenFormButton, AddItemFormFocus } from "./_dashboard/open-form-button";
-import { DeleteItemButton } from "./_dashboard/delete-item-button";
-import { ReserveItemButton } from "./_dashboard/reserve-item-button";
-import { CancelItemReservationButton } from "./_dashboard/cancel-item-reservation-button";
-import { ItemEditSection } from "./_dashboard/item-edit-section";
-import { CopyUrlButton } from "./_dashboard/copy-url-button";
-import { CreateItemForm } from "./_dashboard/create-item-form";
-import { EditItemForm } from "./_dashboard/edit-item-form";
-import { RegenerateLinkButton } from "./_dashboard/regenerate-link-button";
-import { formatPrice } from "./format-price";
+import { WishlistManager, type DashboardWishlist } from "./_dashboard/wishlist-manager";
 
 const common = getTranslations("common");
 const messages = getTranslations("app");
@@ -129,211 +119,29 @@ export default async function RootPage() {
 // ---------------------------------------------------------------------------
 
 async function DashboardView({ userId }: { userId: string }) {
-  const [wishlist, currentShareLink, appOrigin] = await Promise.all([
-    getCurrentOwnerWishlistWithReservations(userId),
-    getOrCreateCurrentShareLink(userId),
+  const [allWishlists, appOrigin] = await Promise.all([
+    getAllOwnerWishlistsWithReservations(userId),
     getAppOrigin(),
   ]);
-  const currentShareUrl = currentShareLink
-    ? buildShareUrl(appOrigin, currentShareLink.token)
-    : null;
+
+  const shareLinks = await Promise.all(
+    allWishlists.map((w) => getOrCreateShareLinkForWishlist(w.id)),
+  );
+
+  const wishlistsData: DashboardWishlist[] = allWishlists.map((wishlist, i) => ({
+    ...wishlist,
+    shareUrl: shareLinks[i] ? buildShareUrl(appOrigin, shareLinks[i].token) : null,
+  }));
 
   return (
     <div className="dashboard-page">
-      {/* Page header */}
-      <div className="dashboard-header">
-        <p className="page-brand-label">{common.brand}</p>
-        <div className="dashboard-title-row">
-          <h1 className="dashboard-title">{messages.dashboard.title}</h1>
-          <span className="dashboard-count" data-testid="wishlist-item-count">
-            {wishlist.items.length} {pluralize(wishlist.items.length, messages.dashboard.itemCountForms)}
-          </span>
-        </div>
-      </div>
-
-      {/* Share link panel */}
-      <div className="share-panel">
-        <div>
-          <h2 className="share-panel-title">{messages.dashboard.share.title}</h2>
-          <p className="share-panel-description">{messages.dashboard.share.description}</p>
-        </div>
-        <div className="share-url-row">
-          <input
-            id="share-link-url"
-            data-testid="share-link-url"
-            value={currentShareUrl ?? ""}
-            readOnly
-            className="share-url-input"
-            aria-label={messages.dashboard.share.urlLabel}
-          />
-          {currentShareUrl ? <CopyUrlButton url={currentShareUrl} /> : null}
-        </div>
-        <p className="ui-note">{messages.dashboard.share.copyHint}</p>
-        <div className="share-panel-actions">
-          <RegenerateLinkButton
-            regenerateAction={regenerateShareLinkAction}
-            labels={{
-              regenerateLabel: messages.dashboard.share.regenerateLabel,
-              confirmTitle: messages.dashboard.share.regenerateConfirmTitle,
-              confirmDescription: messages.dashboard.share.regenerateConfirmDescription,
-              confirmLabel: messages.dashboard.share.regenerateConfirmLabel,
-              cancelLabel: messages.dashboard.share.regenerateCancelLabel,
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Add item collapsible */}
-      <AddItemFormFocus formId="wishlist-create-form-panel" inputName="title" />
-      <details className="add-item-details" id="wishlist-create-form-panel">
-        <summary className="add-item-summary" data-testid="add-item-toggle">
-          <span>{messages.dashboard.addItemToggleLabel}</span>
-        </summary>
-        <div className="add-item-form-inner">
-          <p
-            style={{
-              fontSize: "var(--font-size-label)",
-              color: "var(--color-text-muted)",
-              marginBottom: "var(--space-5)",
-            }}
-          >
-            {messages.dashboard.formDescription}
-          </p>
-          <CreateItemForm />
-        </div>
-      </details>
-
-      {/* Items list or empty state */}
-      {wishlist.items.length === 0 ? (
-        <div className="dashboard-empty" data-testid="wishlist-empty-state">
-          <p className="dashboard-empty-title">{messages.dashboard.emptyTitle}</p>
-          <p className="dashboard-empty-description">{messages.dashboard.emptyDescription}</p>
-          <OpenFormButton formId="wishlist-create-form-panel" inputName="title" className="ui-button">
-            {messages.dashboard.emptyActionLabel}
-          </OpenFormButton>
-        </div>
-      ) : (
-        <section>
-          <h2
-            style={{
-              fontSize: "0.9375rem",
-              fontWeight: 700,
-              color: "var(--color-text-muted)",
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              margin: "0 0 var(--space-3)",
-            }}
-          >
-            {messages.dashboard.itemsTitle}
-          </h2>
-          <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-            {wishlist.items.map((item) => (
-              <li key={item.id} className="item-card">
-                {/* Status strip */}
-                {item.reservation.status === "reserved" ? (
-                  <div className={`item-card-status ${item.reservation.isOwn ? "item-card-status-self-reserved" : "item-card-status-reserved"}`}>
-                    <span className="item-card-status-dot" />
-                    {item.reservation.isOwn
-                      ? messages.dashboard.itemReservation.selfReservedLabel
-                      : messages.dashboard.itemReservation.reservedLabel}
-                  </div>
-                ) : (
-                  <div className="item-card-status item-card-status-available">
-                    <span className="item-card-status-dot" />
-                    {messages.dashboard.itemReservation.availableLabel}
-                  </div>
-                )}
-
-                {/* Card view */}
-                <div className="item-card-view">
-                  <div className="item-card-top">
-                    <div className="item-card-top-left">
-                      <h3 className="item-card-title">{item.title}</h3>
-                      {(item.price || item.url || item.note) ? (
-                        <div className="item-card-meta">
-                          {item.price ? (
-                            <span className="item-card-price">{formatPrice(item.price)}</span>
-                          ) : null}
-                          {item.url ? (
-                            <span className="item-card-url-row">
-                              <a
-                                href={item.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="item-card-url"
-                              >
-                                {item.url}
-                              </a>
-                              <CopyUrlButton url={item.url} />
-                            </span>
-                          ) : null}
-                          {item.note ? (
-                            <span className="item-card-note">{item.note}</span>
-                          ) : null}
-                        </div>
-                      ) : null}
-                    </div>
-                    <div className="item-card-top-right">
-                      <StarButton
-                        itemId={item.id}
-                        starred={item.starred}
-                        starLabel={messages.dashboard.starLabel}
-                        unstarLabel={messages.dashboard.unstarLabel}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer: edit toggle + reserve + delete */}
-                <ItemEditSection
-                  editLabel={messages.dashboard.editToggleLabel}
-                  reserveButton={
-                    item.reservation.status === "available" ? (
-                      <ReserveItemButton
-                        itemId={item.id}
-                        reserveLabel={messages.dashboard.reserveLabel}
-                        reserveAction={reserveItemAction}
-                      />
-                    ) : item.reservation.isOwn ? (
-                      <CancelItemReservationButton
-                        reservationId={item.reservation.reservationId}
-                        cancelLabel={messages.dashboard.cancelReservationLabel}
-                        cancelAction={cancelItemReservationAction}
-                      />
-                    ) : undefined
-                  }
-                  deleteButton={
-                    <DeleteItemButton
-                      itemId={item.id}
-                      itemTitle={item.title}
-                      deleteAction={deleteItemAction}
-                      labels={{
-                        deleteLabel: messages.dashboard.deleteLabel,
-                        confirmTitle: messages.dashboard.deleteConfirmTitle,
-                        confirmDescription: messages.dashboard.deleteConfirmDescription,
-                        confirmLabel: messages.dashboard.deleteConfirmLabel,
-                        cancelLabel: messages.dashboard.deleteCancelLabel,
-                      }}
-                    />
-                  }
-                >
-                  <EditItemForm
-                    item={{
-                      id: item.id,
-                      title: item.title,
-                      url: item.url,
-                      note: item.note,
-                      priceFormatted: item.price ?? "",
-                      updatedAt: item.updatedAt.toISOString(),
-                    }}
-                  />
-                </ItemEditSection>
-
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <WishlistManager
+        wishlists={wishlistsData}
+        deleteItemAction={deleteItemAction}
+        reserveItemAction={reserveItemAction}
+        cancelItemReservationAction={cancelItemReservationAction}
+        regenerateShareLinkAction={regenerateShareLinkAction}
+      />
     </div>
   );
 }
@@ -349,7 +157,11 @@ async function deleteItemAction(
   "use server";
 
   const user = await requireCurrentUser();
-  const result = await deleteCurrentWishlistItem(user.id, getFormValue(formData, "itemId"));
+  const result = await deleteCurrentWishlistItem(
+    user.id,
+    getFormValue(formData, "wishlistId"),
+    getFormValue(formData, "itemId"),
+  );
 
   if (result.status === "success") return { status: "success" };
   return { status: "error", error: result.code };
@@ -381,13 +193,16 @@ async function cancelItemReservationAction(
   return { status: "error", error: result.code };
 }
 
-async function regenerateShareLinkAction(prev: RegenerateState): Promise<RegenerateState> {
+async function regenerateShareLinkAction(
+  prev: RegenerateState,
+  formData: FormData,
+): Promise<RegenerateState> {
   "use server";
 
   const user = await requireCurrentUser();
 
   try {
-    await regenerateCurrentShareLink(user.id);
+    await regenerateShareLinkForWishlist(getFormValue(formData, "wishlistId"), user.id);
     return { status: "success" };
   } catch {
     return { status: "error" };
@@ -404,7 +219,6 @@ function getFormValue(formData: FormData, fieldName: string): string {
   return typeof value === "string" ? value : "";
 }
 
-
 async function getAppOrigin(): Promise<string> {
   const headerStore = await headers();
   const forwardedProto = headerStore.get("x-forwarded-proto");
@@ -419,12 +233,4 @@ async function getAppOrigin(): Promise<string> {
 
 function buildShareUrl(origin: string, token: string): string {
   return new URL(`/share/${token}`, origin).toString();
-}
-
-function pluralize(n: number, forms: [string, string, string]): string {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod10 === 1 && mod100 !== 11) return forms[0];
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return forms[1];
-  return forms[2];
 }

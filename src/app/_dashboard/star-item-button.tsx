@@ -24,12 +24,13 @@ function StarIcon({ filled }: { filled: boolean }) {
 
 type StarButtonProps = {
   itemId: string;
+  wishlistId: string;
   starred: boolean;
   starLabel: string;
   unstarLabel: string;
 };
 
-export function StarButton({ itemId, starred, starLabel, unstarLabel }: StarButtonProps) {
+export function StarButton({ itemId, wishlistId, starred, starLabel, unstarLabel }: StarButtonProps) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [state, formAction] = useActionState<ToggleStarredState, FormData>(toggleStarredAction, null);
@@ -53,6 +54,7 @@ export function StarButton({ itemId, starred, starLabel, unstarLabel }: StarButt
   return (
     <form onSubmit={handleSubmit} style={{ display: "contents" }}>
       <input type="hidden" name="itemId" value={itemId} />
+      <input type="hidden" name="wishlistId" value={wishlistId} />
       <button
         type="submit"
         className={`item-star-btn${optimisticStarred ? " item-star-btn--starred" : ""}`}

@@ -7,24 +7,21 @@ The format is based on Keep a Changelog, and this project follows SemVer.
 ## [Unreleased]
 
 ### Added
-- Owners can now reserve their own wishlist items from the dashboard and
-  the share page. Self-reserved items are visually distinct on the dashboard
-  and the reservations page.
-- Item starring: owners can mark any item as a favourite with a star toggle.
-  Starred items sort to the top of the list on both the dashboard and the
-  public share page. Unstarred items keep their creation order below.
-  The share page shows a read-only star badge on starred items so gift-givers
-  can see priorities at a glance.
-- Account profile bio: owners can write a short «О себе» description in the
-  new Settings page (`/settings`). The bio is shown on the public share page
-  in a dedicated «Об авторе» block, visible only to authenticated visitors.
-- Settings page (`/settings`): displays the account email and a bio textarea
-  with inline save feedback.
-- Gear icon menu in the site header: replaces the standalone logout button;
-  shows the account email, a link to Settings, and the logout action.
-- Owner email is shown in the share page title area, visible to all visitors.
-- Brand label "WSHKA" added above the page title on all content pages
-  (dashboard, reservations, settings, share) for visual consistency.
+- Self-reservation: owners can reserve and cancel their own items from the
+  dashboard and the share page; self-reserved items are visually distinct.
+- Item starring: star toggle marks favourite items; starred items sort to the
+  top on the dashboard and share page, with a read-only star badge for
+  gift-givers.
+- Account settings page (`/settings`): email display and «О себе» bio
+  textarea; bio is shown on the share page to authenticated visitors.
+- Header account menu: gear icon with account email, Settings link, and
+  logout; replaces the standalone logout button. Owner email is also shown
+  in the share page title area for all visitors.
+- Multiple wishlists: owners can create, rename, and delete named wishlists;
+  a dropdown selector switches between them instantly with no page reload.
+  Each wishlist has an independent share link; the last wishlist cannot be
+  deleted. A default «Мой список» is created automatically on registration.
+- Brand label "WSHKA" added above the page title on all content pages.
 
 ## [1.0.1] - 2026-04-23
 

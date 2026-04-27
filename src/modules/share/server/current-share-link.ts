@@ -103,6 +103,34 @@ async function createActiveShareLink(wishlistId: string): Promise<CurrentShareLi
   throw new Error("Failed to create active share link.");
 }
 
+export async function getOrCreateShareLinkForWishlist(
+  wishlistId: string,
+): Promise<CurrentShareLink> {
+  const currentShareLink = await findActiveShareLinkByWishlistId(wishlistId);
+
+  if (currentShareLink) {
+    return currentShareLink;
+  }
+
+  return createActiveShareLink(wishlistId);
+}
+
+export async function regenerateShareLinkForWishlist(
+  wishlistId: string,
+  userId: string,
+): Promise<CurrentShareLink> {
+  const { getWishlistForUser } = await import("@/modules/wishlist/server/current-wishlist");
+  const wishlist = await getWishlistForUser(wishlistId, userId);
+
+  if (!wishlist) {
+    throw new Error("Wishlist not found or access denied.");
+  }
+
+  await deactivateActiveShareLinksForWishlist(wishlistId);
+
+  return createActiveShareLink(wishlistId);
+}
+
 async function deactivateActiveShareLinksForWishlist(wishlistId: string): Promise<boolean> {
   const db = await getDb();
 

@@ -3,6 +3,7 @@
 import { eq } from "drizzle-orm";
 import { DatabaseError } from "pg";
 import { users } from "@/modules/auth/db/schema";
+import { wishlists } from "@/modules/wishlist/db/schema";
 import { normalizeEmail } from "@/modules/auth/server/email";
 import { hashPassword } from "@/modules/auth/server/password";
 import {
@@ -39,10 +40,20 @@ export async function registerUser({ email, password }: RegisterUserInput): Prom
   const passwordHash = await hashPassword(password);
 
   try {
-    const [inserted] = await db.insert(users).values({
-      email: normalizedEmail,
-      passwordHash,
-    }).returning({ id: users.id });
+    const inserted = await db.transaction(async (tx) => {
+      const [user] = await tx
+        .insert(users)
+        .values({ email: normalizedEmail, passwordHash })
+        .returning({ id: users.id });
+
+      await tx.insert(wishlists).values({
+        userId: user.id,
+        name: "Мой список",
+        isActive: true,
+      });
+
+      return user;
+    });
 
     return { status: "success", userId: inserted.id };
   } catch (error) {

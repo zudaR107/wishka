@@ -3,9 +3,10 @@ import { DatabaseError } from "pg";
 
 const mocks = vi.hoisted(() => ({
   findFirst: vi.fn(),
-  insert: vi.fn(),
-  insertValues: vi.fn(),
-  insertReturning: vi.fn(),
+  transaction: vi.fn(),
+  txInsert: vi.fn(),
+  txInsertValues: vi.fn(),
+  txInsertReturning: vi.fn(),
   hashPassword: vi.fn(),
 }));
 
@@ -16,7 +17,7 @@ vi.mock("../../src/shared/db", () => ({
         findFirst: mocks.findFirst,
       },
     },
-    insert: mocks.insert,
+    transaction: mocks.transaction,
   },
 }));
 
@@ -29,16 +30,23 @@ import { registerUser } from "../../src/modules/auth/server/register";
 describe("register user flow", () => {
   beforeEach(() => {
     mocks.findFirst.mockReset();
-    mocks.insert.mockReset();
-    mocks.insertValues.mockReset();
+    mocks.transaction.mockReset();
+    mocks.txInsert.mockReset();
+    mocks.txInsertValues.mockReset();
+    mocks.txInsertReturning.mockReset();
     mocks.hashPassword.mockReset();
 
-    mocks.insert.mockReturnValue({
-      values: mocks.insertValues,
-    });
-    mocks.insertValues.mockReturnValue({
-      returning: mocks.insertReturning,
-    });
+    // tx object passed to the transaction callback
+    const tx = {
+      insert: mocks.txInsert,
+    };
+    mocks.txInsert.mockReturnValue({ values: mocks.txInsertValues });
+    mocks.txInsertValues.mockReturnValue({ returning: mocks.txInsertReturning });
+    // default: first insert (users) returns new user; second insert (wishlists) resolves
+    mocks.txInsertReturning.mockResolvedValue([{ id: "new-user-id" }]);
+
+    // transaction executes the callback immediately with the tx object
+    mocks.transaction.mockImplementation((cb: (tx: typeof tx) => Promise<unknown>) => cb(tx));
   });
 
   it("rejects invalid input before querying the database", async () => {
@@ -50,18 +58,33 @@ describe("register user flow", () => {
     expect(mocks.hashPassword).not.toHaveBeenCalled();
   });
 
-  it("creates a user for valid new credentials", async () => {
+  it("creates a user and a default wishlist for valid new credentials", async () => {
     mocks.findFirst.mockResolvedValue(undefined);
     mocks.hashPassword.mockResolvedValue("hashed-password");
-    mocks.insertReturning.mockResolvedValue([{ id: "new-user-id" }]);
+
+    // first call (users insert) → user row; second call (wishlists insert) → undefined
+    mocks.txInsertReturning
+      .mockResolvedValueOnce([{ id: "new-user-id" }]);
+    mocks.txInsertValues
+      .mockReturnValueOnce({ returning: mocks.txInsertReturning })
+      .mockResolvedValueOnce(undefined);
 
     await expect(
       registerUser({ email: " User@Example.com ", password: "password123" }),
     ).resolves.toEqual({ status: "success", userId: "new-user-id" });
+
     expect(mocks.hashPassword).toHaveBeenCalledWith("password123");
-    expect(mocks.insertValues).toHaveBeenCalledWith({
+    expect(mocks.transaction).toHaveBeenCalledTimes(1);
+    // first insert: user row
+    expect(mocks.txInsertValues).toHaveBeenCalledWith({
       email: "user@example.com",
       passwordHash: "hashed-password",
+    });
+    // second insert: default wishlist
+    expect(mocks.txInsertValues).toHaveBeenCalledWith({
+      userId: "new-user-id",
+      name: "Мой список",
+      isActive: true,
     });
   });
 
@@ -75,7 +98,7 @@ describe("register user flow", () => {
       code: "email-taken",
     });
     expect(mocks.hashPassword).not.toHaveBeenCalled();
-    expect(mocks.insert).not.toHaveBeenCalled();
+    expect(mocks.transaction).not.toHaveBeenCalled();
   });
 
   it("maps unique email insert races to duplicate email", async () => {
@@ -84,7 +107,7 @@ describe("register user flow", () => {
 
     mocks.findFirst.mockResolvedValue(undefined);
     mocks.hashPassword.mockResolvedValue("hashed-password");
-    mocks.insertReturning.mockRejectedValue(error);
+    mocks.transaction.mockRejectedValue(error);
 
     await expect(
       registerUser({ email: "user@example.com", password: "password123" }),

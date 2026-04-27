@@ -33,11 +33,11 @@ test("authenticated users are redirected away from auth pages and logout revokes
 
   await page.goto("/login");
   await expect(page).toHaveURL(/\/(?:\?.*)?$/);
-  await expect(page.getByRole("heading", { name: "Мой вишлист" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Мой список" })).toBeVisible();
 
   await page.goto("/register");
   await expect(page).toHaveURL(/\/(?:\?.*)?$/);
-  await expect(page.getByRole("heading", { name: "Мой вишлист" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Мой список" })).toBeVisible();
 
   await page.getByRole("button", { name: "Меню аккаунта" }).click();
   await page.getByRole("button", { name: "Выйти" }).click();

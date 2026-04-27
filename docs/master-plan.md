@@ -21,7 +21,7 @@ create a wishlist → share it by link → let another person reserve a gift.
 |---|---|---|
 | `User` | Account owner or reserver | Unique `email`; password stored only as hash |
 | `Session` | Authenticated access | Required for owner actions and reservations |
-| `Wishlist` | Container for items | Schema supports many per user; v1.0.0 UI exposes one |
+| `Wishlist` | Container for items | Schema and UI support many per user; default created on registration |
 | `WishlistItem` | Single wish | Fields: `title`, `url?`, `note?`, `price?` |
 | `ShareLink` | Public read-only access | Opaque token; one active per wishlist; revocable |
 | `Reservation` | Item reservation | At most one active per item |
@@ -46,6 +46,7 @@ create a wishlist → share it by link → let another person reserve a gift.
 | `/login` | public | Login |
 | `/register` | public | Registration |
 | `/reservations` | auth | Current user's reservations |
+| `/settings` | auth | Account settings (email, bio) |
 | `/share/[token]` | public | Public read-only wishlist |
 | `/roadmap` | public | Product roadmap |
 | `/privacy` | public | Privacy policy |
@@ -90,13 +91,13 @@ Goal:
 - all four features are independent; DB schema is already mostly ready
 
 Status:
-- planned
+- complete (pending release as v1.1.0)
 
 Execution backlog:
-1. Self-reservation — remove owner-check from reservation logic
-2. Item starring — boolean favourite toggle, sort order, and star badge
-3. Account profile «О себе» — bio field, settings page, display on share page
-4. Multiple wishlists — create/rename/switch UI, per-wishlist share links
+1. ✅ Self-reservation — remove owner-check from reservation logic
+2. ✅ Item starring — boolean favourite toggle, sort order, and star badge
+3. ✅ Account profile «О себе» — bio field, settings page, display on share page
+4. ✅ Multiple wishlists — create/rename/switch UI, per-wishlist share links
 
 Recommended issue shape:
 - `M9-I1 Multiple wishlists — create, rename, switch UI and per-wishlist share links`

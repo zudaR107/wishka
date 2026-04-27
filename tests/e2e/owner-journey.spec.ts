@@ -26,7 +26,7 @@ test("owner can complete the core wishlist journey end to end", async ({ page })
     await registerOwner(page, credentials);
 
     await expect(page).toHaveURL(/\/(?:\?.*)?$/);
-    await expect(page.getByRole("heading", { name: "Мой вишлист" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Мой список" })).toBeVisible();
     await expect(page.getByTestId("wishlist-item-count")).toContainText("0");
     await expect(page.getByTestId("wishlist-empty-state")).toBeVisible();
     await expect(page.getByTestId("share-link-url")).toBeVisible();

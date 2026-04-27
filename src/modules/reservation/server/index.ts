@@ -20,5 +20,6 @@ export {
   type OwnerWishlistItem,
   type OwnerWishlistItemReservation,
   type OwnerWishlistWithReservations,
+  getAllOwnerWishlistsWithReservations,
   getCurrentOwnerWishlistWithReservations,
 } from "@/modules/reservation/server/owner-wishlist";

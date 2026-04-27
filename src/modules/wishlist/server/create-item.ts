@@ -1,5 +1,5 @@
 import { wishlistItems } from "@/modules/wishlist/db/schema";
-import { getOrCreateCurrentWishlist } from "@/modules/wishlist/server/current-wishlist";
+import { getWishlistForUser } from "@/modules/wishlist/server/current-wishlist";
 import {
   type WishlistItemInput,
   type WishlistItemValidationErrorCode,
@@ -21,6 +21,7 @@ export function validateCreateWishlistItemInput(
 
 export async function createCurrentWishlistItem(
   userId: string,
+  wishlistId: string,
   input: WishlistItemInput,
 ): Promise<CreateWishlistItemResult> {
   const validationResult = validateCreateWishlistItemInput(input);
@@ -30,7 +31,12 @@ export async function createCurrentWishlistItem(
   }
 
   try {
-    const wishlist = await getOrCreateCurrentWishlist(userId);
+    const wishlist = await getWishlistForUser(wishlistId, userId);
+
+    if (!wishlist) {
+      return { status: "error", code: "unknown" };
+    }
+
     const db = await getDb();
 
     await db.insert(wishlistItems).values({

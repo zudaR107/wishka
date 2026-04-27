@@ -17,6 +17,7 @@ type EditItemFormProps = {
     priceFormatted: string;
     updatedAt: string;
   };
+  wishlistId: string;
 };
 
 function getErrorMessage(code: string): string {
@@ -34,7 +35,7 @@ function getErrorMessage(code: string): string {
   }
 }
 
-export function EditItemForm({ item }: EditItemFormProps) {
+export function EditItemForm({ item, wishlistId }: EditItemFormProps) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
@@ -73,6 +74,7 @@ export function EditItemForm({ item }: EditItemFormProps) {
       ) : null}
       <form ref={formRef} action={action} className="ui-form" style={{ maxWidth: "none" }} noValidate>
         <input type="hidden" name="itemId" value={item.id} />
+        <input type="hidden" name="wishlistId" value={wishlistId} />
         <div className="ui-field">
           <label className="ui-label" htmlFor={`title-${item.id}`}>
             {messages.dashboard.fields.title}
