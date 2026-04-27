@@ -19,6 +19,9 @@ The format is based on Keep a Changelog, and this project follows SemVer.
 - Cancelling a reservation on `/reservations` no longer causes a full-page
   reload; the card disappears inline via `useActionState` + `router.refresh()`,
   consistent with the dashboard and share page mutation pattern.
+- Confirmation dialogs now have side margins on narrow viewports; `max-width`
+  uses `min(24rem, calc(100% - 2 * var(--space-4)))` so the dialog is always
+  inset from the screen edges regardless of device width.
 
 ### Added
 - Self-reservation: owners can reserve and cancel their own items from the
