@@ -18,7 +18,7 @@ function getErrorMessage(code: string): string {
   }
 }
 
-export function LoginForm() {
+export function LoginForm({ next }: { next?: string }) {
   const [state, action] = useActionState<LoginState, FormData>(loginAction, null);
   const err = state?.error ?? null;
 
@@ -28,6 +28,7 @@ export function LoginForm() {
         <p className="ui-message ui-message-error">{getErrorMessage(err)}</p>
       ) : null}
       <form key={state?.key ?? 0} action={action} className="ui-form" style={{ maxWidth: "none" }} noValidate>
+        {next ? <input type="hidden" name="next" value={next} /> : null}
         <div className="ui-field">
           <label className="ui-label" htmlFor="email">
             {messages.login.emailLabel}

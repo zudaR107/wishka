@@ -235,7 +235,10 @@ function SharePageView({
           <p style={{ margin: "0 0 var(--space-3)", fontSize: "var(--font-size-label)" }}>
             {messages.share.guestHint}
           </p>
-          <Link href="/login" className="ui-button">
+          <Link
+            href={`/login?next=/share/${encodeURIComponent(wishlist.shareLink.token)}`}
+            className="ui-button"
+          >
             {messages.share.loginToReserveLabel}
           </Link>
         </div>

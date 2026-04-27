@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { isSafeNextUrl } from "./login-utils";
 
 export type LoginState = {
   error: string;
@@ -14,6 +15,7 @@ export async function loginAction(
 ): Promise<LoginState> {
   const email = getString(formData, "email");
   const password = getString(formData, "password");
+  const next = getString(formData, "next").trim();
 
   const [{ loginUser }, { setSessionCookie }] = await Promise.all([
     import("@/modules/auth/server/login"),
@@ -24,7 +26,7 @@ export async function loginAction(
 
   if (result.status === "success") {
     await setSessionCookie(result.sessionToken, result.expiresAt);
-    redirect("/");
+    redirect(isSafeNextUrl(next) ? next : "/");
   }
 
   return { error: result.code, key: (prev?.key ?? 0) + 1, values: { email } };

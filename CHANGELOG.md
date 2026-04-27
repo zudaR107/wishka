@@ -13,6 +13,9 @@ The format is based on Keep a Changelog, and this project follows SemVer.
 - Reservation on the share page no longer causes a full-page reload; the result
   (success or error) is shown inline using `useActionState` and `router.refresh()`,
   consistent with the dashboard mutation pattern.
+- After logging in from a share page, users are redirected back to the share
+  page they came from instead of the home page. The login link on the share
+  page now passes `?next=/share/<token>` and `loginAction` honours it.
 
 ### Added
 - Self-reservation: owners can reserve and cancel their own items from the

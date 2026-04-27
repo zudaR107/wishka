@@ -52,6 +52,39 @@ test("public wishlist and reserver journey works end to end", async ({ browser }
       await expect(guestPage.getByText(reserver.email)).toHaveCount(0);
     });
 
+    await test.step("login from share page redirects back to the share page", async () => {
+      // Use a fresh context: register a user, clear cookies to simulate guest, then test redirect.
+      const redirectCtx = await browser.newContext();
+      const redirectPage = await redirectCtx.newPage();
+      const redirectUser = createCredentials("redirect");
+
+      try {
+        await registerUser(redirectPage, redirectUser);
+        await redirectCtx.clearCookies();
+
+        await redirectPage.goto(await shareUrl);
+
+        const loginLink = redirectPage.getByTestId("share-guest-guard").getByRole("link", {
+          name: "Войти, чтобы забронировать",
+        });
+
+        await expect(loginLink).toBeVisible();
+        await loginLink.click();
+
+        await expect(redirectPage).toHaveURL(/\/login\?next=\/share\//);
+
+        await redirectPage.getByLabel("Email").fill(redirectUser.email);
+        await redirectPage.getByLabel("Пароль", { exact: true }).fill(redirectUser.password);
+        await redirectPage.getByRole("button", { name: "Войти" }).click();
+
+        await expect(redirectPage).toHaveURL(/\/share\//);
+        await expect(redirectPage.getByRole("heading", { name: "Публичный вишлист" })).toBeVisible();
+        await expect(redirectPage.getByRole("button", { name: "Забронировать" })).toBeVisible();
+      } finally {
+        await redirectCtx.close();
+      }
+    });
+
     await test.step("authenticated non-owner can reserve the shared item", async () => {
       await registerUser(reserverPage, reserver);
       await reserverPage.goto(await shareUrl);

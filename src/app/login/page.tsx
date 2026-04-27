@@ -8,16 +8,25 @@ export const metadata: Metadata = {
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/modules/auth/server/current-user";
 import { getTranslations } from "@/modules/i18n";
+import { isSafeNextUrl } from "./login-utils";
 import { LoginForm } from "./login-form";
 
 const common = getTranslations("common");
 const messages = getTranslations("app");
 
-export default async function LoginPage() {
+type LoginPageProps = {
+  searchParams?: Promise<{ next?: string }>;
+};
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
   const currentUser = await getCurrentUser();
+  const params = searchParams ? await searchParams : undefined;
+  const next = typeof params?.next === "string" && isSafeNextUrl(params.next)
+    ? params.next
+    : undefined;
 
   if (currentUser) {
-    redirect("/");
+    redirect(next ?? "/");
   }
 
   return (
@@ -29,7 +38,7 @@ export default async function LoginPage() {
           <p className="auth-card-description">{messages.login.description}</p>
         </div>
 
-        <LoginForm />
+        <LoginForm next={next} />
 
         <p className="auth-card-footer">
           {messages.login.registerHint}{" "}

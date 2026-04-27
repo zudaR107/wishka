@@ -101,6 +101,7 @@ Execution backlog:
 
 Bugfix batch (M9-I5+):
 5. ✅ M9-I5 Share page redesign — align item card layout with dashboard; replace full-page reload on reservation with inline `useActionState` mutation
+6. ✅ M9-I6 Post-login redirect to share page — login link passes `?next=` param; `loginAction` redirects back after successful authentication
 
 Recommended issue shape:
 - `M9-I1 Multiple wishlists — create, rename, switch UI and per-wishlist share links`

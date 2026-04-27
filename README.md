@@ -18,13 +18,21 @@ another person reserve a gift.
 
 ## Screenshots
 
-| Main Page | Login |
-|:---------:|:-----:|
-| ![Main Page](docs/screenshots/main-page.png) | ![Login](docs/screenshots/login.png) |
+### Main page
 
-| My Wishlist | Reservation |
-|:-----------:|:-----------:|
-| ![My Wishlist](docs/screenshots/wishlist.png) | ![Reservation](docs/screenshots/reservation.png) |
+![Main Page](docs/screenshots/main-page.png)
+
+### Login
+
+![Login](docs/screenshots/login.png)
+
+### My wishlist
+
+![My Wishlist](docs/screenshots/wishlist.png)
+
+### Reservation
+
+![Reservation](docs/screenshots/reservation.png)
 
 ## Stack
 
