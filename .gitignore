@@ -33,5 +33,6 @@ pnpm-debug.log*
 
 # local docs
 docs/COMMANDS.md
+docs/wshka_seo_webmaster_checklist.md
 .claude/
 CLAUDE.md

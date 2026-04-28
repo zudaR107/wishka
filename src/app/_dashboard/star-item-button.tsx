@@ -4,7 +4,7 @@ import { useActionState, useOptimistic, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { type ToggleStarredState, toggleStarredAction } from "@/app/_dashboard/item-actions";
 
-function StarIcon({ filled }: { filled: boolean }) {
+export function StarIcon({ filled }: { filled: boolean }) {
   return (
     <svg
       width="18"

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { PriceInput } from "@/shared/ui/price-input";
 import { getTranslations } from "@/modules/i18n";
 import { updateItemAction, type ItemFormState } from "./item-actions";
+import { useItemEditClose } from "./item-edit-section";
 
 const messages = getTranslations("app");
 
@@ -42,16 +43,21 @@ export function EditItemForm({ item, wishlistId }: EditItemFormProps) {
   // Tracks whether this is the first render so the reset effect skips mount.
   const isMountedRef = useRef(false);
   const [state, action] = useActionState<ItemFormState, FormData>(updateItemAction, null);
+  const closeEditSection = useItemEditClose();
 
   const v = state?.values;
   const err = state?.status === "error" ? state.error : undefined;
 
-  // On success: scroll the item card into view (so the notification is visible)
-  // then refresh RSC data from the server.
+  // On success: capture card ref before collapse, close, then scroll after repaint.
   useEffect(() => {
     if (state?.status !== "success") return;
     const card = formRef.current?.closest(".item-card") as HTMLElement | null;
-    (card ?? formRef.current)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    closeEditSection();
+    // requestAnimationFrame fires after React collapses the form and repaints,
+    // so scrollIntoView runs on the already-collapsed, shorter card.
+    requestAnimationFrame(() => {
+      (card ?? formRef.current)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
     startTransition(() => router.refresh());
   }, [state]);
 
@@ -67,9 +73,7 @@ export function EditItemForm({ item, wishlistId }: EditItemFormProps) {
 
   return (
     <>
-      {state?.status === "success" ? (
-        <p className="ui-message ui-message-success" style={{ marginBottom: "var(--space-4)" }}>{messages.dashboard.updateSuccessMessage}</p>
-      ) : err ? (
+      {err ? (
         <p className="ui-message ui-message-error" style={{ marginBottom: "var(--space-4)" }}>{getErrorMessage(err ?? "")}</p>
       ) : null}
       <form ref={formRef} action={action} className="ui-form" style={{ maxWidth: "none" }} noValidate>

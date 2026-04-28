@@ -72,7 +72,8 @@ function normalizeOptionalField(value: string): string | null {
 }
 
 function normalizePrice(value: string): NormalizedPriceResult {
-  const trimmedValue = value.trim();
+  // Strip formatting characters added by PriceInput (NBSP, spaces, currency symbol).
+  const trimmedValue = value.replace(/[  ₽]/g, "").trim();
 
   if (!trimmedValue) {
     return { status: "success", value: null };

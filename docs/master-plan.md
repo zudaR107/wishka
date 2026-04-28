@@ -91,13 +91,22 @@ Goal:
 - all four features are independent; DB schema is already mostly ready
 
 Status:
-- complete (pending release as v1.1.0)
+- features complete; bugfix batch in progress on branch `fix/m9-bugfixes` (single PR)
 
 Execution backlog:
 1. ✅ Self-reservation — remove owner-check from reservation logic
 2. ✅ Item starring — boolean favourite toggle, sort order, and star badge
 3. ✅ Account profile «О себе» — bio field, settings page, display on share page
 4. ✅ Multiple wishlists — create/rename/switch UI, per-wishlist share links
+
+Bugfix batch (M9-I5+):
+5. ✅ M9-I5 Share page redesign — align item card layout with dashboard; replace full-page reload on reservation with inline `useActionState` mutation
+6. ✅ M9-I6 Post-login redirect to share page — login link passes `?next=` param; `loginAction` redirects back after successful authentication
+7. ✅ M9-I7 Reservations page inline cancel — replace redirect-based cancel with `useActionState` + `router.refresh()`; no full-page reload
+8. ✅ M9-I8 Confirmation dialog side margins — `min(24rem, calc(100% - 2 * var(--space-4)))` ensures inset on all viewport widths
+9. ✅ M9-I9 Currency symbol in price input — live formatting with NBSP thousands separator and `₽` inline in value; `normalizePrice` strips formatting before parse
+10. ✅ M9-I10 Auto-collapse item forms on success — edit/create forms close after successful save; `ItemEditSection` uses context to expose `close` to `EditItemForm`; `CreateItemForm` receives `onSuccess` callback via ref on `<details>`
+11. ✅ M9-I11 Edit-form scroll on mobile — on viewports < 640 px, opening the edit form scrolls to the title field instead of the card header
 
 Recommended issue shape:
 - `M9-I1 Multiple wishlists — create, rename, switch UI and per-wishlist share links`

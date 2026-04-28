@@ -37,7 +37,7 @@ test("public wishlist and reserver journey works end to end", async ({ browser }
     await test.step("guest can view the shared wishlist but cannot reserve", async () => {
       await guestPage.goto(await shareUrl);
 
-      await expect(guestPage.getByRole("heading", { name: "Публичный вишлист" })).toBeVisible();
+      await expect(guestPage.getByRole("heading", { name: "Вишлист" })).toBeVisible();
       await expect(guestPage.getByTestId("share-guest-guard")).toContainText(
         "Войдите, чтобы забронировать доступное желание и потом управлять бронями в своём разделе.",
       );
@@ -52,6 +52,39 @@ test("public wishlist and reserver journey works end to end", async ({ browser }
       await expect(guestPage.getByText(reserver.email)).toHaveCount(0);
     });
 
+    await test.step("login from share page redirects back to the share page", async () => {
+      // Use a fresh context: register a user, clear cookies to simulate guest, then test redirect.
+      const redirectCtx = await browser.newContext();
+      const redirectPage = await redirectCtx.newPage();
+      const redirectUser = createCredentials("redirect");
+
+      try {
+        await registerUser(redirectPage, redirectUser);
+        await redirectCtx.clearCookies();
+
+        await redirectPage.goto(await shareUrl);
+
+        const loginLink = redirectPage.getByTestId("share-guest-guard").getByRole("link", {
+          name: "Войти, чтобы забронировать",
+        });
+
+        await expect(loginLink).toBeVisible();
+        await loginLink.click();
+
+        await expect(redirectPage).toHaveURL(/\/login\?next=\/share\//);
+
+        await redirectPage.getByLabel("Email").fill(redirectUser.email);
+        await redirectPage.getByLabel("Пароль", { exact: true }).fill(redirectUser.password);
+        await redirectPage.getByRole("button", { name: "Войти" }).click();
+
+        await expect(redirectPage).toHaveURL(/\/share\//);
+        await expect(redirectPage.getByRole("heading", { name: "Вишлист" })).toBeVisible();
+        await expect(redirectPage.getByRole("button", { name: "Забронировать" })).toBeVisible();
+      } finally {
+        await redirectCtx.close();
+      }
+    });
+
     await test.step("authenticated non-owner can reserve the shared item", async () => {
       await registerUser(reserverPage, reserver);
       await reserverPage.goto(await shareUrl);
@@ -61,12 +94,9 @@ test("public wishlist and reserver journey works end to end", async ({ browser }
       await expect(availableItemCard.getByRole("button", { name: "Забронировать" })).toBeVisible();
       await availableItemCard.getByRole("button", { name: "Забронировать" }).click();
 
-      await expect(reserverPage).toHaveURL(/\/share\/.*\?status=reservation-created$/);
-      await expect(reserverPage.getByText("Желание забронировано.")).toBeVisible();
-
       const reservedItemCard = getShareItemCard(reserverPage, item.title);
 
-      await expect(reservedItemCard).toContainText("Уже забронировано");
+      await expect(reservedItemCard).toContainText("Статус: забронировано мной");
       await expect(reservedItemCard.getByRole("button", { name: "Забронировать" })).toHaveCount(0);
       await expect(reserverPage.locator("main").getByText(reserver.email)).toHaveCount(0);
     });
@@ -76,7 +106,7 @@ test("public wishlist and reserver journey works end to end", async ({ browser }
 
       const guestReservedItemCard = getShareItemCard(guestPage, item.title);
 
-      await expect(guestReservedItemCard).toContainText("Уже забронировано");
+      await expect(guestReservedItemCard).toContainText("Статус: забронировано");
       await expect(guestReservedItemCard.getByRole("button", { name: "Забронировать" })).toHaveCount(0);
       await expect(guestPage.getByText(reserver.email)).toHaveCount(0);
     });
@@ -93,8 +123,6 @@ test("public wishlist and reserver journey works end to end", async ({ browser }
       await expect(reservationCard).toContainText("3\u00a0490");
       await reservationCard.getByRole("button", { name: "Отменить бронь" }).click();
 
-      await expect(reserverPage).toHaveURL(/\/reservations\?status=reservation-cancelled$/);
-      await expect(reserverPage.getByText("Бронь отменена.")).toBeVisible();
       await expect(reserverPage.getByTestId("reservations-empty-state")).toBeVisible();
       await expect(reserverPage.getByRole("heading", { name: item.title, exact: true })).toHaveCount(0);
     });
@@ -105,7 +133,7 @@ test("public wishlist and reserver journey works end to end", async ({ browser }
       const availableAgainItemCard = getShareItemCard(reserverPage, item.title);
 
       await expect(availableAgainItemCard.getByRole("button", { name: "Забронировать" })).toBeVisible();
-      await expect(availableAgainItemCard.getByText("Уже забронировано")).toHaveCount(0);
+      await expect(availableAgainItemCard.getByText("Статус: забронировано")).toHaveCount(0);
     });
   } finally {
     await Promise.all([
@@ -148,7 +176,7 @@ async function createWishlistItem(
   await createForm.getByLabel("Ссылка").fill(item.url);
   await createForm.getByLabel("Заметка").fill(item.note);
   await createForm.getByLabel("Цена").fill(item.price);
-  await createForm.getByRole("button", { name: "Добавить" }).click();
+  await createForm.getByRole("button", { name: "Добавить", exact: true }).click();
 
   await expect(page.getByTestId("wishlist-item-count")).toContainText("1");
 }

@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "@/modules/i18n";
-import { reservePublicWishlistItemAction } from "@/app/share/[token]/actions";
+import {
+  reserveShareItemAction,
+  cancelShareReservationAction,
+  type ReserveShareItemState,
+  type CancelShareReservationState,
+} from "@/app/share/[token]/actions";
+import { ShareReserveButton } from "@/app/share/[token]/share-reserve-button";
+import { ShareCancelReservationButton } from "@/app/share/[token]/share-cancel-reservation-button";
 import { formatPrice } from "@/app/format-price";
 
 const common = getTranslations("common");
@@ -11,12 +18,11 @@ type SharePageProps = {
   params?: Promise<{
     token?: string;
   }>;
-  searchParams?: Promise<{
-    action?: string;
-    status?: string;
-    error?: string;
-  }>;
 };
+
+type ItemReservation =
+  | { status: "available" }
+  | { status: "reserved"; isViewerReservation: boolean; reservationId: string };
 
 type WishlistView = {
   shareLink: { token: string };
@@ -29,14 +35,17 @@ type WishlistView = {
     note: string | null;
     price: string | null;
     starred: boolean;
-    reservation: { status: "available" | "reserved" };
+    reservation: ItemReservation;
   }>;
 };
 
 const DEV_MOCK_WISHLIST: WishlistView = {
   shareLink: { token: "demo-token" },
   viewer: { isAuthenticated: true, isOwner: false },
-  owner: { email: "demo@example.com", bio: "Люблю книги, путешествия и хорошие наушники. Подарки принимаю в любое время года 🎁" },
+  owner: {
+    email: "demo@example.com",
+    bio: "Люблю книги, путешествия и хорошие наушники. Подарки принимаю в любое время года 🎁",
+  },
   items: [
     {
       id: "mock-1",
@@ -54,7 +63,11 @@ const DEV_MOCK_WISHLIST: WishlistView = {
       note: null,
       price: "850 ₽",
       starred: false,
-      reservation: { status: "reserved" },
+      reservation: {
+        status: "reserved",
+        isViewerReservation: true,
+        reservationId: "mock-reservation-1",
+      },
     },
     {
       id: "mock-3",
@@ -63,7 +76,11 @@ const DEV_MOCK_WISHLIST: WishlistView = {
       note: "На любую сумму",
       price: null,
       starred: false,
-      reservation: { status: "available" },
+      reservation: {
+        status: "reserved",
+        isViewerReservation: false,
+        reservationId: "mock-reservation-2",
+      },
     },
   ],
 };
@@ -73,16 +90,19 @@ export async function generateMetadata(props: SharePageProps): Promise<Metadata>
   const token = params?.token ?? "";
 
   if (token && token !== "demo-token") {
-    const { getPublicWishlistViewByShareToken } = await import("@/modules/share/server/public-wishlist");
+    const { getPublicWishlistViewByShareToken } = await import(
+      "@/modules/share/server/public-wishlist"
+    );
     const wishlist = await getPublicWishlistViewByShareToken(token, undefined);
 
     if (wishlist) {
       const count = wishlist.items.length;
       return {
         title: "Публичный вишлист",
-        description: count > 0
-          ? `${count} ${pluralizeItems(count)} в вишлисте. Забронируй нужный подарок.`
-          : "Вишлист пока пуст.",
+        description:
+          count > 0
+            ? `${count} ${pluralizeItems(count)} в вишлисте. Забронируй нужный подарок.`
+            : "Вишлист пока пуст.",
         robots: { index: false },
       };
     }
@@ -101,16 +121,14 @@ function pluralizeItems(n: number): string {
 
 export default async function SharePage(props: SharePageProps) {
   const params = props?.params ? await props.params : undefined;
-  const search = props?.searchParams ? await props.searchParams : undefined;
   const token = params?.token ?? "";
 
   if (process.env.NODE_ENV === "development" && token === "demo-token") {
     return (
       <SharePageView
         wishlist={DEV_MOCK_WISHLIST}
-        status={undefined}
-        errorCode={undefined}
-        action={undefined}
+        reserveAction={reserveShareItemAction}
+        cancelAction={cancelShareReservationAction}
       />
     );
   }
@@ -121,9 +139,6 @@ export default async function SharePage(props: SharePageProps) {
   ]);
   const currentUser = await getCurrentUser();
   const publicWishlist = await getPublicWishlistViewByShareToken(token, currentUser?.id);
-  const action = search?.action;
-  const status = search?.status;
-  const errorCode = search?.error;
 
   if (!publicWishlist) {
     return (
@@ -152,7 +167,14 @@ export default async function SharePage(props: SharePageProps) {
           >
             {messages.share.unavailableHint}
           </p>
-          <div style={{ display: "flex", justifyContent: "center", gap: "var(--space-3)", flexWrap: "wrap" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "var(--space-3)",
+              flexWrap: "wrap",
+            }}
+          >
             <Link
               href="/"
               className="ui-button ui-button-secondary"
@@ -169,23 +191,26 @@ export default async function SharePage(props: SharePageProps) {
   return (
     <SharePageView
       wishlist={publicWishlist}
-      status={status}
-      errorCode={errorCode}
-      action={action}
+      reserveAction={reserveShareItemAction}
+      cancelAction={cancelShareReservationAction}
     />
   );
 }
 
 function SharePageView({
   wishlist,
-  status,
-  errorCode,
-  action,
+  reserveAction,
+  cancelAction,
 }: {
   wishlist: WishlistView;
-  status: string | undefined;
-  errorCode: string | undefined;
-  action: string | undefined;
+  reserveAction: (
+    prev: ReserveShareItemState,
+    formData: FormData,
+  ) => Promise<ReserveShareItemState>;
+  cancelAction: (
+    prev: CancelShareReservationState,
+    formData: FormData,
+  ) => Promise<CancelShareReservationState>;
 }) {
   return (
     <div className="content-page">
@@ -205,21 +230,15 @@ function SharePageView({
         </div>
       ) : null}
 
-      {status === "reservation-created" ? (
-        <p className="ui-message ui-message-success">{messages.share.successMessage}</p>
-      ) : null}
-      {errorCode ? (
-        <p className="ui-message ui-message-error">
-          {getShareActionErrorMessage(action, errorCode)}
-        </p>
-      ) : null}
-
       {!wishlist.viewer.isAuthenticated ? (
         <div className="ui-message ui-message-info" data-testid="share-guest-guard">
           <p style={{ margin: "0 0 var(--space-3)", fontSize: "var(--font-size-label)" }}>
             {messages.share.guestHint}
           </p>
-          <Link href="/login" className="ui-button">
+          <Link
+            href={`/login?next=/share/${encodeURIComponent(wishlist.shareLink.token)}`}
+            className="ui-button"
+          >
             {messages.share.loginToReserveLabel}
           </Link>
         </div>
@@ -249,81 +268,119 @@ function SharePageView({
               gap: "var(--space-3)",
             }}
           >
-            {wishlist.items.map((item) => (
-              <li key={item.id} className="share-item-card" data-testid="share-item-card">
-                <div className="share-item-header">
-                  <h3 className="share-item-title">{item.title}</h3>
-                  <div className="share-item-header-right">
-                    {item.starred ? (
-                      <span className="share-item-star" aria-label={messages.share.starredLabel}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"
-                          stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-                          strokeLinejoin="round" aria-hidden="true">
-                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                        </svg>
-                      </span>
-                    ) : null}
-                    {item.reservation.status === "reserved" ? (
-                      <span className="ui-badge ui-badge-reserved">
-                        {messages.share.reservedLabel}
-                      </span>
-                    ) : null}
+            {wishlist.items.map((item) => {
+              const isViewerReservation =
+                item.reservation.status === "reserved" && item.reservation.isViewerReservation;
+
+              const statusClass =
+                item.reservation.status === "reserved"
+                  ? isViewerReservation
+                    ? "item-card-status-self-reserved"
+                    : "item-card-status-reserved"
+                  : "item-card-status-available";
+
+              const statusLabel =
+                item.reservation.status === "reserved"
+                  ? isViewerReservation
+                    ? messages.dashboard.itemReservation.selfReservedLabel
+                    : messages.dashboard.itemReservation.reservedLabel
+                  : messages.dashboard.itemReservation.availableLabel;
+
+              return (
+                <li key={item.id} className="item-card" data-testid="share-item-card">
+                  {/* Status strip */}
+                  <div className={`item-card-status ${statusClass}`}>
+                    <span className="item-card-status-dot" />
+                    {statusLabel}
                   </div>
-                </div>
-                {item.price || item.url || item.note ? (
-                  <div className="share-item-meta">
-                    {item.price ? (
-                      <span style={{ fontWeight: 600, color: "var(--color-text-strong)" }}>
-                        {formatPrice(item.price)}
-                      </span>
-                    ) : null}
-                    {item.url ? (
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="item-card-url"
-                      >
-                        {item.url}
-                      </a>
-                    ) : null}
-                    {item.note ? (
-                      <span style={{ color: "var(--color-text-muted)", width: "100%" }}>
-                        {item.note}
-                      </span>
-                    ) : null}
+
+                  {/* Card body */}
+                  <div className="item-card-view">
+                    <div className="item-card-top">
+                      <div className="item-card-top-left">
+                        <h3 className="item-card-title">{item.title}</h3>
+                        {item.price || item.url || item.note ? (
+                          <div className="item-card-meta">
+                            {item.price ? (
+                              <span className="item-card-price">{formatPrice(item.price)}</span>
+                            ) : null}
+                            {item.url ? (
+                              <a
+                                href={item.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="item-card-url"
+                              >
+                                {item.url}
+                              </a>
+                            ) : null}
+                            {item.note ? (
+                              <span className="item-card-note">{item.note}</span>
+                            ) : null}
+                          </div>
+                        ) : null}
+                      </div>
+                      {item.starred ? (
+                        <div className="item-card-top-right">
+                          <span
+                            className="share-item-star"
+                            aria-label={messages.share.starredLabel}
+                          >
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                          </span>
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
-                ) : null}
-                {item.reservation.status !== "reserved" &&
-                wishlist.viewer.isAuthenticated ? (
-                  <form action={reservePublicWishlistItemAction}>
-                    <input type="hidden" name="token" value={wishlist.shareLink.token} />
-                    <input type="hidden" name="itemId" value={item.id} />
-                    <button type="submit" className="ui-button">
-                      {messages.share.reserveLabel}
-                    </button>
-                  </form>
-                ) : null}
-              </li>
-            ))}
+
+                  {/* Footer: reserve or cancel */}
+                  {wishlist.viewer.isAuthenticated ? (
+                    item.reservation.status === "available" ? (
+                      <div className="item-card-footer">
+                        <div className="item-footer-start">
+                          <ShareReserveButton
+                            itemId={item.id}
+                            token={wishlist.shareLink.token}
+                            reserveLabel={messages.share.reserveLabel}
+                            errorMessages={{
+                              alreadyReserved: messages.share.errors.alreadyReserved,
+                              invalidShare: messages.share.errors.invalidShare,
+                              unknown: messages.share.errors.unknown,
+                            }}
+                            reserveAction={reserveAction}
+                          />
+                        </div>
+                      </div>
+                    ) : isViewerReservation ? (
+                      <div className="item-card-footer">
+                        <div className="item-footer-start">
+                          <ShareCancelReservationButton
+                            reservationId={item.reservation.reservationId}
+                            cancelLabel={messages.dashboard.cancelReservationLabel}
+                            cancelAction={cancelAction}
+                          />
+                        </div>
+                      </div>
+                    ) : null
+                  ) : null}
+                </li>
+              );
+            })}
           </ul>
         </section>
       )}
     </div>
   );
-}
-
-function getShareActionErrorMessage(action: string | undefined, errorCode: string): string {
-  if (action !== "reserve") {
-    return messages.share.errors.unknown;
-  }
-
-  switch (errorCode) {
-    case "already-reserved":
-      return messages.share.errors.alreadyReserved;
-    case "invalid-share":
-      return messages.share.errors.invalidShare;
-    default:
-      return messages.share.errors.unknown;
-  }
 }

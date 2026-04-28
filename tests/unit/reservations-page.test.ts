@@ -6,11 +6,6 @@ const mocks = vi.hoisted(() => ({
   requireCurrentUser: vi.fn(),
   listCurrentUserActiveReservations: vi.fn(),
   cancelReservation: vi.fn(),
-  redirect: vi.fn(),
-}));
-
-vi.mock("next/navigation", () => ({
-  redirect: mocks.redirect,
 }));
 
 vi.mock("../../src/modules/auth/server/current-user", () => ({
@@ -22,13 +17,10 @@ vi.mock("../../src/modules/reservation", () => ({
   listCurrentUserActiveReservations: mocks.listCurrentUserActiveReservations,
 }));
 
-function expectRedirectCall(run: () => Promise<unknown>, url: string) {
-  mocks.redirect.mockImplementationOnce((target: string) => {
-    throw new Error(`REDIRECT:${target}`);
-  });
-
-  return expect(run()).rejects.toThrow(`REDIRECT:${url}`);
-}
+vi.mock("../../src/app/reservations/cancel-reservation-button", () => ({
+  CancelReservationButton: ({ cancelLabel }: { cancelLabel: string }) =>
+    React.createElement("button", { type: "submit" }, cancelLabel),
+}));
 
 describe("current user reservations page", () => {
   beforeEach(() => {
@@ -36,7 +28,6 @@ describe("current user reservations page", () => {
     mocks.requireCurrentUser.mockReset();
     mocks.listCurrentUserActiveReservations.mockReset();
     mocks.cancelReservation.mockReset();
-    mocks.redirect.mockReset();
     mocks.requireCurrentUser.mockResolvedValue({
       id: "user-1",
       email: "user@example.com",
@@ -47,7 +38,7 @@ describe("current user reservations page", () => {
     mocks.listCurrentUserActiveReservations.mockResolvedValue([]);
 
     const { default: ReservationsPage } = await import("../../src/app/reservations/page");
-    const page = await ReservationsPage({});
+    const page = await ReservationsPage();
     const html = renderToStaticMarkup(page);
 
     expect(html).toContain("Активных броней пока нет");
@@ -77,7 +68,7 @@ describe("current user reservations page", () => {
     ]);
 
     const { default: ReservationsPage } = await import("../../src/app/reservations/page");
-    const page = await ReservationsPage({});
+    const page = await ReservationsPage();
     const html = renderToStaticMarkup(page);
 
     expect(mocks.listCurrentUserActiveReservations).toHaveBeenCalledWith("user-1");
@@ -85,7 +76,7 @@ describe("current user reservations page", () => {
     expect(html).toContain("Наушники");
     expect(html).toContain("https://example.com/item");
     expect(html).toContain("Нужны беспроводные");
-    expect(html).toContain("9\u00a0990");
+    expect(html).toContain("9 990");
     expect(html).toContain("Отменить бронь");
     expect(html).not.toContain("Моё желание");
   });
@@ -110,67 +101,55 @@ describe("current user reservations page", () => {
     ]);
 
     const { default: ReservationsPage } = await import("../../src/app/reservations/page");
-    const page = await ReservationsPage({});
+    const page = await ReservationsPage();
     const html = renderToStaticMarkup(page);
 
     expect(html).toContain("Книга");
     expect(html).toContain("Моё желание");
   });
+});
 
-  it("renders cancel success and error feedback", async () => {
-    mocks.listCurrentUserActiveReservations.mockResolvedValue([]);
-
-    const { default: ReservationsPage } = await import("../../src/app/reservations/page");
-    const successPage = await ReservationsPage({
-      searchParams: Promise.resolve({ status: "reservation-cancelled" }),
-    });
-    const errorPage = await ReservationsPage({
-      searchParams: Promise.resolve({ action: "cancel", error: "not-reservation-owner" }),
-    });
-
-    expect(renderToStaticMarkup(successPage)).toContain("Бронь отменена.");
-    expect(renderToStaticMarkup(errorPage)).toContain(
-      "Можно отменить только свою активную бронь.",
-    );
+describe("cancelReservationAction", () => {
+  beforeEach(() => {
+    mocks.requireCurrentUser.mockReset();
+    mocks.cancelReservation.mockReset();
+    mocks.requireCurrentUser.mockResolvedValue({ id: "user-1", email: "user@example.com" });
   });
 
-  it("redirects after a successful cancel and blocks not-owner or missing reservations", async () => {
+  it("returns success state after successful cancellation", async () => {
+    mocks.cancelReservation.mockResolvedValueOnce({ status: "success" });
     const { cancelReservationAction } = await import("../../src/app/reservations/actions");
 
-    const successFormData = new FormData();
-    successFormData.set("reservationId", "reservation-1");
-    mocks.cancelReservation.mockResolvedValueOnce({ status: "success" });
+    const formData = new FormData();
+    formData.set("reservationId", "reservation-1");
 
-    await expectRedirectCall(
-      () => cancelReservationAction(successFormData),
-      "/reservations?status=reservation-cancelled",
-    );
+    await expect(cancelReservationAction(null, formData)).resolves.toEqual({ status: "success" });
+    expect(mocks.cancelReservation).toHaveBeenCalledWith("user-1", "reservation-1");
+  });
 
-    const notOwnerFormData = new FormData();
-    notOwnerFormData.set("reservationId", "reservation-2");
-    mocks.cancelReservation.mockResolvedValueOnce({
+  it("returns error state when the user is not the reservation owner", async () => {
+    mocks.cancelReservation.mockResolvedValueOnce({ status: "error", code: "not-reservation-owner" });
+    const { cancelReservationAction } = await import("../../src/app/reservations/actions");
+
+    const formData = new FormData();
+    formData.set("reservationId", "reservation-2");
+
+    await expect(cancelReservationAction(null, formData)).resolves.toEqual({
       status: "error",
-      code: "not-reservation-owner",
+      error: "not-reservation-owner",
     });
+  });
 
-    await expectRedirectCall(
-      () => cancelReservationAction(notOwnerFormData),
-      "/reservations?action=cancel&error=not-reservation-owner",
-    );
+  it("returns error state when the reservation is not found", async () => {
+    mocks.cancelReservation.mockResolvedValueOnce({ status: "error", code: "reservation-not-found" });
+    const { cancelReservationAction } = await import("../../src/app/reservations/actions");
 
-    const missingFormData = new FormData();
-    missingFormData.set("reservationId", "reservation-3");
-    mocks.cancelReservation.mockResolvedValueOnce({
+    const formData = new FormData();
+    formData.set("reservationId", "reservation-3");
+
+    await expect(cancelReservationAction(null, formData)).resolves.toEqual({
       status: "error",
-      code: "reservation-not-found",
+      error: "reservation-not-found",
     });
-
-    await expectRedirectCall(
-      () => cancelReservationAction(missingFormData),
-      "/reservations?action=cancel&error=reservation-not-found",
-    );
-    expect(mocks.cancelReservation).toHaveBeenNthCalledWith(1, "user-1", "reservation-1");
-    expect(mocks.cancelReservation).toHaveBeenNthCalledWith(2, "user-1", "reservation-2");
-    expect(mocks.cancelReservation).toHaveBeenNthCalledWith(3, "user-1", "reservation-3");
   });
 });

@@ -134,9 +134,7 @@ describe("public wishlist loading by share token", () => {
           price: "9990.00",
           createdAt: new Date("2026-04-11T00:00:00.000Z"),
           updatedAt: new Date("2026-04-11T00:00:00.000Z"),
-          reservation: {
-            status: "available",
-          },
+          reservation: { status: "available" },
         },
       ],
       shareLink: {
@@ -208,6 +206,8 @@ describe("public wishlist loading by share token", () => {
           updatedAt: new Date("2026-04-11T00:00:00.000Z"),
           reservation: {
             status: "reserved",
+            isViewerReservation: false,
+            reservationId: "reservation-1",
           },
         },
         {
@@ -219,9 +219,7 @@ describe("public wishlist loading by share token", () => {
           price: null,
           createdAt: new Date("2026-04-11T00:00:00.000Z"),
           updatedAt: new Date("2026-04-11T00:00:00.000Z"),
-          reservation: {
-            status: "available",
-          },
+          reservation: { status: "available" },
         },
       ],
       shareLink: {

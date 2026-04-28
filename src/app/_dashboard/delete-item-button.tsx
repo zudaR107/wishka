@@ -1,7 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useActionState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useRef, useEffect, useActionState } from "react";
 import { getTranslations } from "@/modules/i18n";
 import type { DeleteItemState } from "./item-actions";
 
@@ -33,6 +32,7 @@ type DeleteItemButtonProps = {
   itemTitle: string;
   deleteAction: (prev: DeleteItemState, formData: FormData) => Promise<DeleteItemState>;
   labels: DeleteItemButtonLabels;
+  onSuccess?: () => void;
 };
 
 export function DeleteItemButton({
@@ -41,16 +41,15 @@ export function DeleteItemButton({
   itemTitle,
   deleteAction,
   labels,
+  onSuccess,
 }: DeleteItemButtonProps) {
-  const router = useRouter();
-  const [, startTransition] = useTransition();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [state, formAction] = useActionState(deleteAction, null);
 
   useEffect(() => {
     if (state?.status === "success") {
       dialogRef.current?.close();
-      startTransition(() => router.refresh());
+      onSuccess?.();
     }
   }, [state]);
 

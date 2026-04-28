@@ -176,8 +176,6 @@ export function WishlistSelector({
           <span className="wishlist-btn-label">{messages.dashboard.wishlists.renameLabel}</span>
         </button>
 
-        <DeleteWishlistButton wishlistId={selectedId} disabled={wishlists.length <= 1} />
-
         <button
           type="button"
           className="ui-button ui-button-soft"
@@ -188,6 +186,8 @@ export function WishlistSelector({
           <PlusIcon />
           <span className="wishlist-btn-label">{messages.dashboard.wishlists.createLabel}</span>
         </button>
+
+        <DeleteWishlistButton wishlistId={selectedId} disabled={wishlists.length <= 1} />
       </div>
     );
 

@@ -1,5 +1,5 @@
 import { and, eq } from "drizzle-orm";
-import { listActiveReservationsByItemIds } from "@/modules/reservation";
+import { type ActiveReservation, listActiveReservationsByItemIds } from "@/modules/reservation";
 import { shareLinks } from "@/modules/share/db/schema";
 import { type CurrentShareLink } from "@/modules/share/server/current-share-link";
 import {
@@ -8,9 +8,9 @@ import {
 } from "@/modules/wishlist/server/items";
 import { users } from "@/modules/auth/db/schema";
 
-export type PublicWishlistItemReservation = {
-  status: "available" | "reserved";
-};
+export type PublicWishlistItemReservation =
+  | { status: "available" }
+  | { status: "reserved"; isViewerReservation: boolean; reservationId: string };
 
 export type PublicWishlistItem = WishlistItemRecord & {
   reservation: PublicWishlistItemReservation;
@@ -81,7 +81,7 @@ export async function getPublicWishlistViewByShareToken(
   const ownerProfile = await getOwnerProfile(data.wishlist.userId);
 
   return {
-    ...buildPublicWishlist(data),
+    ...buildPublicWishlist(data, viewerUserId),
     viewer: {
       isAuthenticated: Boolean(viewerUserId),
       isOwner: viewerUserId === data.wishlist.userId,
@@ -102,7 +102,7 @@ export async function getReservationAwarePublicWishlistByShareToken(
     return null;
   }
 
-  return buildPublicWishlist(data);
+  return buildPublicWishlist(data, undefined);
 }
 
 async function loadPublicWishlistByShareToken(token: string) {
@@ -118,29 +118,36 @@ async function loadPublicWishlistByShareToken(token: string) {
     return null;
   }
 
-  const activeReservationItemIds = new Set(
+  const activeReservations = new Map(
     (await listActiveReservationsByItemIds(wishlist.items.map((item) => item.id))).map(
-      (reservation) => reservation.wishlistItemId,
+      (reservation) => [reservation.wishlistItemId, reservation],
     ),
   );
 
   return {
     shareLink,
     wishlist,
-    activeReservationItemIds,
+    activeReservations,
   };
 }
 
-function buildPublicWishlist(data: {
-  shareLink: CurrentShareLink;
-  wishlist: Awaited<ReturnType<typeof getWishlistWithItems>> extends infer T
-    ? NonNullable<T>
-    : never;
-  activeReservationItemIds: Set<string>;
-}): PublicWishlist {
+function buildPublicWishlist(
+  data: {
+    shareLink: CurrentShareLink;
+    wishlist: Awaited<ReturnType<typeof getWishlistWithItems>> extends infer T
+      ? NonNullable<T>
+      : never;
+    activeReservations: Map<string, ActiveReservation>;
+  },
+  viewerUserId: string | undefined,
+): PublicWishlist {
   const items = data.wishlist.items.map((item) => ({
     ...item,
-    reservation: getPublicWishlistItemReservation(item.id, data.activeReservationItemIds),
+    reservation: getPublicWishlistItemReservation(
+      item.id,
+      data.activeReservations,
+      viewerUserId,
+    ),
   }));
 
   return {
@@ -155,16 +162,25 @@ function buildPublicWishlist(data: {
 
 function getPublicWishlistItemReservation(
   itemId: string,
-  activeReservationItemIds: Set<string>,
+  activeReservations: Map<string, ActiveReservation>,
+  viewerUserId: string | undefined,
 ): PublicWishlistItemReservation {
-  if (activeReservationItemIds.has(itemId)) {
-    return { status: "reserved" };
+  const reservation = activeReservations.get(itemId);
+
+  if (reservation) {
+    return {
+      status: "reserved",
+      isViewerReservation: Boolean(viewerUserId && reservation.userId === viewerUserId),
+      reservationId: reservation.id,
+    };
   }
 
   return { status: "available" };
 }
 
-async function getOwnerProfile(userId: string): Promise<{ email: string; bio: string | null } | null> {
+async function getOwnerProfile(
+  userId: string,
+): Promise<{ email: string; bio: string | null } | null> {
   const db = await getDb();
 
   const user = await db.query.users.findFirst({

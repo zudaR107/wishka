@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/login", "/register", "/reservations", "/share/"],
+        disallow: ["/share/"],
       },
     ],
     sitemap: "https://wshka.ru/sitemap.xml",

@@ -9,6 +9,7 @@ const messages = getTranslations("app");
 
 export const metadata: Metadata = {
   title: "Настройки",
+  robots: { index: false },
 };
 
 type SettingsPageProps = {

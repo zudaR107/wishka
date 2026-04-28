@@ -1,30 +1,29 @@
-import { redirect } from "next/navigation";
+"use server";
+
 import { requireCurrentUser } from "@/modules/auth/server/current-user";
 import { cancelReservation } from "@/modules/reservation";
 
-export async function cancelReservationAction(formData: FormData) {
-  "use server";
+export type CancelReservationState = {
+  status: "success" | "error";
+  error?: string;
+} | null;
 
+export async function cancelReservationAction(
+  _prev: CancelReservationState,
+  formData: FormData,
+): Promise<CancelReservationState> {
   const user = await requireCurrentUser();
   const reservationId = getFormValue(formData, "reservationId");
   const result = await cancelReservation(user.id, reservationId);
 
   if (result.status === "success") {
-    redirect("/reservations?status=reservation-cancelled");
+    return { status: "success" };
   }
 
-  switch (result.code) {
-    case "not-reservation-owner":
-      redirect("/reservations?action=cancel&error=not-reservation-owner");
-    case "reservation-not-found":
-      redirect("/reservations?action=cancel&error=reservation-not-found");
-    default:
-      redirect("/reservations?action=cancel&error=unknown");
-  }
+  return { status: "error", error: result.code };
 }
 
 function getFormValue(formData: FormData, fieldName: string): string {
   const value = formData.get(fieldName);
-
   return typeof value === "string" ? value : "";
 }

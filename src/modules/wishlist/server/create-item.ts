@@ -23,6 +23,7 @@ export async function createCurrentWishlistItem(
   userId: string,
   wishlistId: string,
   input: WishlistItemInput,
+  starred = false,
 ): Promise<CreateWishlistItemResult> {
   const validationResult = validateCreateWishlistItemInput(input);
 
@@ -42,6 +43,7 @@ export async function createCurrentWishlistItem(
     await db.insert(wishlistItems).values({
       wishlistId: wishlist.id,
       ...validationResult.values,
+      starred,
     });
 
     return { status: "success" };

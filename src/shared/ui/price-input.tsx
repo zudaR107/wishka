@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { MAX_PRICE } from "@/modules/wishlist/server/item-input";
+import { getTranslations } from "@/modules/i18n";
+
+const common = getTranslations("common");
 
 type PriceInputProps = {
   id: string;
@@ -22,6 +25,21 @@ const ALLOWED_KEYS = new Set([
 
 const MAX_PRICE_DISPLAY = MAX_PRICE.toLocaleString("ru-RU");
 
+/** Non-breaking space + currency symbol appended after digits. */
+const SUFFIX = ` ${common.currencySymbol}`;
+
+/** Strip all formatting chars: NBSP, regular space, currency symbol. */
+function stripFormat(value: string): string {
+  return value.replace(/[  ₽]/g, "");
+}
+
+/** Format raw digit string as "3 490 ₽" with NBSP thousands separator. */
+function applyFormat(raw: string): string {
+  if (!raw) return "";
+  const thousands = raw.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  return `${thousands}${SUFFIX}`;
+}
+
 export function PriceInput({ id, name, defaultValue, className, autoFocus, error }: PriceInputProps) {
   const [hint, setHint] = useState<InputHint>(null);
 
@@ -32,10 +50,11 @@ export function PriceInput({ id, name, defaultValue, className, autoFocus, error
       setHint("non-numeric");
       return;
     }
+    // Check MAX_PRICE: compute what raw value would be after inserting this digit.
     const { value, selectionStart, selectionEnd } = e.currentTarget;
-    const before = value.slice(0, selectionStart ?? value.length);
-    const after = value.slice(selectionEnd ?? value.length);
-    const next = Number(before + e.key + after);
+    const beforeRaw = stripFormat(value.slice(0, selectionStart ?? value.length));
+    const afterRaw = stripFormat(value.slice(selectionEnd ?? value.length));
+    const next = Number(beforeRaw + e.key + afterRaw);
     if (next > MAX_PRICE) {
       e.preventDefault();
       setHint("too-large");
@@ -46,17 +65,49 @@ export function PriceInput({ id, name, defaultValue, className, autoFocus, error
 
   function handleInput(e: React.FormEvent<HTMLInputElement>) {
     const input = e.currentTarget;
-    const filtered = input.value.replace(/[^0-9]/g, "");
-    if (filtered !== input.value) {
-      input.value = filtered;
-      setHint("non-numeric");
+    const cursorPos = input.selectionStart ?? input.value.length;
+
+    // Count digits before cursor so we can restore cursor after reformatting.
+    const digitsBeforeCursor = stripFormat(input.value.slice(0, cursorPos)).length;
+
+    const raw = stripFormat(input.value);
+
+    if (!raw) {
+      input.value = "";
+      setHint(null);
       return;
     }
-    if (Number(filtered) > MAX_PRICE) {
-      input.value = String(MAX_PRICE);
+
+    if (Number(raw) > MAX_PRICE) {
+      const formatted = applyFormat(String(MAX_PRICE));
+      input.value = formatted;
+      const pos = formatted.length - SUFFIX.length;
+      input.setSelectionRange(pos, pos);
       setHint("too-large");
       return;
     }
+
+    const formatted = applyFormat(raw);
+    input.value = formatted;
+
+    // Restore cursor: find position after the same number of digits as before.
+    let newPos = formatted.length - SUFFIX.length; // default: right before suffix
+    if (digitsBeforeCursor === 0) {
+      newPos = 0;
+    } else {
+      let count = 0;
+      for (let i = 0; i < formatted.length; i++) {
+        if (/\d/.test(formatted[i])) {
+          count++;
+          if (count === digitsBeforeCursor) {
+            newPos = i + 1;
+            break;
+          }
+        }
+      }
+    }
+
+    input.setSelectionRange(newPos, newPos);
     setHint(null);
   }
 
@@ -69,10 +120,9 @@ export function PriceInput({ id, name, defaultValue, className, autoFocus, error
       <input
         id={id}
         name={name}
-        defaultValue={defaultValue}
+        defaultValue={applyFormat(stripFormat(defaultValue ?? ""))}
         className={error ? `${className ?? ""} ui-input-error`.trim() : className}
         inputMode="numeric"
-        min="0"
         autoComplete="off"
         autoFocus={autoFocus}
         onKeyDown={handleKeyDown}

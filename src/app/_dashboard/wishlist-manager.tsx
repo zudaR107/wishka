@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getTranslations } from "@/modules/i18n";
 import { WishlistSelector } from "./wishlist-selector";
 import { StarButton } from "./star-item-button";
@@ -64,11 +64,47 @@ export function WishlistManager({
 
   const wishlist = wishlists.find((w) => w.id === selectedId) ?? wishlists[0];
 
+  // Local copy of items — lets us remove items optimistically on delete
+  // without triggering a full router.refresh() that repaints the background.
+  const [localItems, setLocalItems] = useState(wishlist?.items ?? []);
+  // Set to true after create so the post-refresh sync scrolls to the new item.
+  const pendingScrollToNewRef = useRef(false);
+  const listEndRef = useRef<HTMLDivElement>(null);
+  // Tracks known item IDs so we can find the newly created one after RSC refresh.
+  const knownItemIdsRef = useRef<Set<string>>(new Set(wishlist?.items.map((i) => i.id) ?? []));
+
+  // Sync local items whenever RSC delivers new wishlist data (create/edit/star/reserve).
+  // Dependency on `wishlist` (object reference) — changes only when RSC sends new props.
+  // Does NOT run after optimistic delete (no router.refresh() there → same wishlist ref).
+  useEffect(() => {
+    if (!wishlist) return;
+    setLocalItems(wishlist.items);
+    // pendingScrollToNewRef stays set; useEffect([localItems]) will scroll after DOM update.
+  }, [wishlist]);
+
+  // Scroll to new item AFTER React has committed updated localItems to the DOM.
+  // Finds the newly added item by diffing against knownItemIdsRef, so it works
+  // whether the item landed at the top (starred) or at the bottom (unstarred).
+  useEffect(() => {
+    if (!pendingScrollToNewRef.current) {
+      knownItemIdsRef.current = new Set(localItems.map((i) => i.id));
+      return;
+    }
+    pendingScrollToNewRef.current = false;
+    const newItem = localItems.find((i) => !knownItemIdsRef.current.has(i.id));
+    knownItemIdsRef.current = new Set(localItems.map((i) => i.id));
+    const target = newItem
+      ? document.querySelector<HTMLElement>(`[data-item-id="${newItem.id}"]`)
+      : listEndRef.current;
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [localItems]);
+
   if (!wishlist) {
     return null;
   }
 
   const formId = `wishlist-create-form-panel-${wishlist.id}`;
+  const addDetailsRef = useRef<HTMLDetailsElement>(null);
 
   return (
     <>
@@ -78,7 +114,7 @@ export function WishlistManager({
         <WishlistSelector
           wishlists={wishlists}
           selectedId={selectedId}
-          itemCount={wishlist.items.length}
+          itemCount={localItems.length}
           onSelect={setSelectedId}
           onCreated={setSelectedId}
         />
@@ -119,7 +155,7 @@ export function WishlistManager({
 
       {/* Add item collapsible */}
       <AddItemFormFocus formId={formId} inputName="title" />
-      <details className="add-item-details" id={formId}>
+      <details ref={addDetailsRef} className="add-item-details" id={formId}>
         <summary className="add-item-summary" data-testid="add-item-toggle">
           <span>{messages.dashboard.addItemToggleLabel}</span>
         </summary>
@@ -133,12 +169,18 @@ export function WishlistManager({
           >
             {messages.dashboard.formDescription}
           </p>
-          <CreateItemForm wishlistId={wishlist.id} />
+          <CreateItemForm
+            wishlistId={wishlist.id}
+            onSuccess={() => {
+              if (addDetailsRef.current) addDetailsRef.current.open = false;
+              pendingScrollToNewRef.current = true;
+            }}
+          />
         </div>
       </details>
 
       {/* Items list or empty state */}
-      {wishlist.items.length === 0 ? (
+      {localItems.length === 0 ? (
         <div className="dashboard-empty" data-testid="wishlist-empty-state">
           <p className="dashboard-empty-title">{messages.dashboard.emptyTitle}</p>
           <p className="dashboard-empty-description">{messages.dashboard.emptyDescription}</p>
@@ -168,10 +210,11 @@ export function WishlistManager({
               display: "flex",
               flexDirection: "column",
               gap: "var(--space-3)",
+              overflowAnchor: "none",
             }}
           >
-            {wishlist.items.map((item) => (
-              <li key={item.id} className="item-card">
+            {localItems.map((item) => (
+              <li key={item.id} data-item-id={item.id} className="item-card">
                 {/* Status strip */}
                 {item.reservation.status === "reserved" ? (
                   <div
@@ -254,6 +297,9 @@ export function WishlistManager({
                       wishlistId={wishlist.id}
                       itemTitle={item.title}
                       deleteAction={deleteItemAction}
+                      onSuccess={() =>
+                        setLocalItems((prev) => prev.filter((i) => i.id !== item.id))
+                      }
                       labels={{
                         deleteLabel: messages.dashboard.deleteLabel,
                         confirmTitle: messages.dashboard.deleteConfirmTitle,
@@ -279,6 +325,7 @@ export function WishlistManager({
               </li>
             ))}
           </ul>
+          <div ref={listEndRef} aria-hidden="true" />
         </section>
       )}
     </>

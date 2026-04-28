@@ -385,6 +385,7 @@
     display: block;
     overflow-wrap: break-word;
     word-break: break-word;
+    white-space: pre-wrap;
   }
 
   /* ── Item footer: edit + delete ──────────────────────── */
@@ -579,7 +580,7 @@
   .confirm-dialog {
     margin: auto;
     width: 100%;
-    max-width: 24rem;
+    max-width: min(24rem, calc(100% - 2 * var(--space-4)));
     border: 1px solid var(--color-border-soft);
     border-radius: var(--radius-xl);
     background: var(--color-bg-surface);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 function PencilIcon() {
   return (
@@ -10,6 +10,13 @@ function PencilIcon() {
       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
     </svg>
   );
+}
+
+const ItemEditCloseContext = createContext<() => void>(() => {});
+
+/** Call inside EditItemForm to close the enclosing ItemEditSection on success. */
+export function useItemEditClose(): () => void {
+  return useContext(ItemEditCloseContext);
 }
 
 type ItemEditSectionProps = {
@@ -22,42 +29,41 @@ type ItemEditSectionProps = {
 export function ItemEditSection({ editLabel, reserveButton, deleteButton, children }: ItemEditSectionProps) {
   const [open, setOpen] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
-  const formAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
-    const card = sectionRef.current?.closest(".item-card") as HTMLElement | null;
-    (card ?? sectionRef.current)?.scrollIntoView({ behavior: "smooth", block: "start" });
-    formAreaRef.current?.querySelector<HTMLElement>('[name="title"]')?.focus({ preventScroll: true });
+    sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [open]);
 
   return (
-    <div ref={sectionRef} className="item-edit-section">
-      <div className="item-card-footer">
-        <div className="item-footer-start">
-          <button
-            type="button"
-            className="item-edit-btn"
-            data-testid="edit-item-toggle"
-            aria-expanded={open}
-            onClick={() => setOpen((v) => !v)}
-          >
-            <PencilIcon />
-            <span className="item-btn-label">{editLabel}</span>
-          </button>
+    <ItemEditCloseContext.Provider value={() => setOpen(false)}>
+      <div ref={sectionRef} className="item-edit-section">
+        <div className="item-card-footer">
+          <div className="item-footer-start">
+            <button
+              type="button"
+              className="item-edit-btn"
+              data-testid="edit-item-toggle"
+              aria-expanded={open}
+              onClick={() => setOpen((v) => !v)}
+            >
+              <PencilIcon />
+              <span className="item-btn-label">{editLabel}</span>
+            </button>
+          </div>
+          <div className="item-footer-center">
+            {reserveButton}
+          </div>
+          <div className="item-footer-end">
+            {deleteButton}
+          </div>
         </div>
-        <div className="item-footer-center">
-          {reserveButton}
-        </div>
-        <div className="item-footer-end">
-          {deleteButton}
-        </div>
+        {open && (
+          <div className="item-edit-form-inner">
+            {children}
+          </div>
+        )}
       </div>
-      {open && (
-        <div ref={formAreaRef} className="item-edit-form-inner">
-          {children}
-        </div>
-      )}
-    </div>
+    </ItemEditCloseContext.Provider>
   );
 }
