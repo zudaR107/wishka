@@ -1,1 +1,1 @@
-ALTER TABLE "users" ADD COLUMN "bio" varchar(500);
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "bio" varchar(500);

@@ -1,1 +1,1 @@
-ALTER TABLE "wishlist_items" ADD COLUMN "starred" boolean DEFAULT false NOT NULL;
+ALTER TABLE "wishlist_items" ADD COLUMN IF NOT EXISTS "starred" boolean DEFAULT false NOT NULL;
