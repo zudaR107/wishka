@@ -6,48 +6,14 @@ The format is based on Keep a Changelog, and this project follows SemVer.
 
 ## [Unreleased]
 
-### Added
-- Item create and edit forms auto-collapse on success: after saving, the
-  form closes and the page scrolls to the card. On create, the scroll
-  targets the newly added card regardless of its position (starred items
-  land at the top, unstarred at the bottom). Error path is unchanged —
-  the form stays open with the error message displayed.
-- Star toggle in the create-item form: a star button next to «Добавить»
-  lets owners mark an item as favourite at creation time, without a
-  separate tap after saving.
-- Deleting an item removes it from the list immediately without calling
-  `router.refresh()`, so the decorative background stays stable.
-- Price input field shows live formatting while typing: thousands are
-  separated by a non-breaking space and the currency symbol (₽) appears
-  inline right after the digits (e.g. `3 490 ₽`). The server strips
-  formatting before parsing so existing validation is unaffected.
-
-### Fixed
-- On narrow viewports (< 640 px) opening the item edit form now scrolls
-  directly to the title field instead of the card header, so the input
-  is immediately visible without a manual scroll.
-- Share page item cards now match the dashboard layout: colored status strip
-  (green = available, purple = reserved), unified card body, and `item-reserve-btn`
-  button style.
-- Reservation on the share page no longer causes a full-page reload; the result
-  (success or error) is shown inline using `useActionState` and `router.refresh()`,
-  consistent with the dashboard mutation pattern.
-- After logging in from a share page, users are redirected back to the share
-  page they came from instead of the home page. The login link on the share
-  page now passes `?next=/share/<token>` and `loginAction` honours it.
-- Cancelling a reservation on `/reservations` no longer causes a full-page
-  reload; the card disappears inline via `useActionState` + `router.refresh()`,
-  consistent with the dashboard and share page mutation pattern.
-- Confirmation dialogs now have side margins on narrow viewports; `max-width`
-  uses `min(24rem, calc(100% - 2 * var(--space-4)))` so the dialog is always
-  inset from the screen edges regardless of device width.
+## [1.1.0] - 2026-04-28
 
 ### Added
 - Self-reservation: owners can reserve and cancel their own items from the
   dashboard and the share page; self-reserved items are visually distinct.
 - Item starring: star toggle marks favourite items; starred items sort to the
   top on the dashboard and share page, with a read-only star badge for
-  gift-givers.
+  gift-givers. Star can also be set at creation time via the create-item form.
 - Account settings page (`/settings`): email display and «О себе» bio
   textarea; bio is shown on the share page to authenticated visitors.
 - Header account menu: gear icon with account email, Settings link, and
@@ -58,6 +24,38 @@ The format is based on Keep a Changelog, and this project follows SemVer.
   Each wishlist has an independent share link; the last wishlist cannot be
   deleted. A default «Мой список» is created automatically on registration.
 - Brand label "WSHKA" added above the page title on all content pages.
+- Price input field shows live formatting while typing: thousands are
+  separated by a non-breaking space and the currency symbol (₽) appears
+  inline right after the digits (e.g. `3 490 ₽`). The server strips
+  formatting before parsing so existing validation is unaffected.
+- Item create and edit forms auto-collapse on success; the page scrolls to
+  the action buttons row. On create, scroll targets the newly added card
+  regardless of its position (starred items land at the top, unstarred at
+  the bottom).
+- Deleting an item removes it from the list immediately without a background
+  refresh, so the decorative background stays stable.
+
+### Fixed
+- Share page item cards now match the dashboard layout: colored status strip,
+  unified card body, and consistent button style.
+- Reservation on the share page no longer causes a full-page reload; the
+  result is shown inline via `useActionState` + `router.refresh()`.
+- After logging in from a share page, users are redirected back to the share
+  page they came from. The login link passes `?next=/share/<token>` and
+  `loginAction` honours it.
+- Cancelling a reservation on `/reservations` no longer causes a full-page
+  reload; the card disappears inline.
+- Confirmation dialogs have side margins on narrow viewports via
+  `min(24rem, calc(100% - 2 * var(--space-4)))`.
+- Opening the item edit form scrolls to the action buttons row (Edit /
+  Reserve / Delete) without triggering auto-focus, so the browser chrome
+  stays visible on mobile.
+- Share page title changed from "Публичный вишлист" to "Вишлист"; the list
+  is link-shared, not openly public.
+- `/settings` added to `robots.txt` Disallow and gets `noindex` meta tag.
+  Auth pages (`/login`, `/register`, `/reservations`) removed from
+  `robots.txt` Disallow so Googlebot can crawl them and honour their
+  existing `noindex` meta tags.
 
 ## [1.0.1] - 2026-04-23
 

@@ -81,78 +81,7 @@ create a wishlist → share it by link → let another person reserve a gift.
 | v0.1.0–v0.7.0 | M0–M6: Repo scaffold, auth, wishlist CRUD, share links, reservations, Docker/CI/CD/VPS | ✅ shipped |
 | v1.0.0 | M7–M8: UI redesign, auto-login, /app→/ routing merge, legal pages, project restructure | ✅ shipped |
 | v1.0.1 | Patch: inline mutation state (no redirect), UX fixes, technical SEO, dashboard refactor, test coverage | ✅ shipped |
-
----
-
-### Milestone 9 — Core Enhancements (`v1.1.0`)
-
-Goal:
-- deliver high-value product features with minimal external dependencies
-- all four features are independent; DB schema is already mostly ready
-
-Status:
-- features complete; bugfix batch in progress on branch `fix/m9-bugfixes` (single PR)
-
-Execution backlog:
-1. ✅ Self-reservation — remove owner-check from reservation logic
-2. ✅ Item starring — boolean favourite toggle, sort order, and star badge
-3. ✅ Account profile «О себе» — bio field, settings page, display on share page
-4. ✅ Multiple wishlists — create/rename/switch UI, per-wishlist share links
-
-Bugfix batch (M9-I5+):
-5. ✅ M9-I5 Share page redesign — align item card layout with dashboard; replace full-page reload on reservation with inline `useActionState` mutation
-6. ✅ M9-I6 Post-login redirect to share page — login link passes `?next=` param; `loginAction` redirects back after successful authentication
-7. ✅ M9-I7 Reservations page inline cancel — replace redirect-based cancel with `useActionState` + `router.refresh()`; no full-page reload
-8. ✅ M9-I8 Confirmation dialog side margins — `min(24rem, calc(100% - 2 * var(--space-4)))` ensures inset on all viewport widths
-9. ✅ M9-I9 Currency symbol in price input — live formatting with NBSP thousands separator and `₽` inline in value; `normalizePrice` strips formatting before parse
-10. ✅ M9-I10 Auto-collapse item forms on success — edit/create forms close after successful save; `ItemEditSection` uses context to expose `close` to `EditItemForm`; `CreateItemForm` receives `onSuccess` callback via ref on `<details>`
-11. ✅ M9-I11 Edit-form scroll on mobile — on viewports < 640 px, opening the edit form scrolls to the title field instead of the card header
-
-Recommended issue shape:
-- `M9-I1 Multiple wishlists — create, rename, switch UI and per-wishlist share links`
-- `M9-I2 Item starring — boolean favourite toggle, sort order, and star badge`
-- `M9-I3 Self-reservation — remove owner restriction`
-- `M9-I4 Account profile — bio field, settings, share page display`
-
-Recommended PR order:
-1. `M9-I3 Self-reservation — remove owner restriction`
-2. `M9-I2 Item prioritization — schema, sort, and priority badge`
-3. `M9-I4 Account profile — bio field, settings, share page display`
-4. `M9-I1 Multiple wishlists — create, rename, switch UI and per-wishlist share links`
-
-Dependencies:
-- `M9-I3` has no dependencies
-- `M9-I2` has no dependencies
-- `M9-I4` has no dependencies
-- `M9-I1` has no dependencies; done last because it is the most complex
-
-Scope notes:
-- Self-reservation (`M9-I3`) is a one-line logic change; keep the PR minimal.
-- Item starring (`M9-I2`) uses a boolean `starred` field (not an enum); starred items sort to the top on both the dashboard and the share page; sort must be consistent between both views.
-- Profile bio (`M9-I4`) is visible to authenticated users on the share page, not to guests. This is intentional: it helps gift-givers, not strangers.
-- Multiple wishlists (`M9-I1`): the schema already supports N wishlists per user. The effort is entirely in the UI: create/rename/switch, dashboard navigation, and wiring each wishlist to its own share link.
-- Do not add size/measurement fields to the profile in this milestone — start with bio only.
-
-Acceptance targets:
-- owner can reserve their own wishlist items
-- owner can mark items as starred (favourite); starred items sort to the top on the dashboard and share page
-- owner can write a short «О себе» bio in account settings; bio is shown on the share page to authenticated viewers
-- owner can create and name multiple wishlists, switch between them on the dashboard, and generate a separate share link per wishlist
-
-Exit criteria:
-- self-reservation works end-to-end without errors
-- starred boolean migration applied; sort is consistent on dashboard and share page
-- bio field migration applied; bio visible on share page to authenticated non-guest visitors
-- multiple wishlist create/rename/switch UI works; each wishlist has an independent share link
-
-Definition of small PRs for this milestone:
-- self-reservation PR only removes the owner-check guard and updates the related test
-- starring PR only adds the `starred` boolean column migration, updates sort queries, adds the star toggle and read-only badge UI, and does not touch auth or share logic
-- profile PR only adds the `bio` column migration, adds an account settings form, and renders bio on the share page
-- multiple wishlists PR only adds wishlist create/rename/switch UI and wires share links; does not change item or reservation logic
-
-Release note:
-- `v1.1.0` delivers the first batch of quality-of-life enhancements: self-reservation, item priority, owner bio, and multiple wishlists.
+| v1.1.0 | M9: self-reservation, item starring, owner bio, multiple wishlists, UX bugfix batch | ✅ shipped |
 
 ---
 
@@ -163,7 +92,7 @@ Goal:
 - no schema migrations required; all changes are frontend-only
 
 Status:
-- planned
+- in progress
 
 Execution backlog:
 1. Dark theme — CSS variable toggle, `localStorage` persistence, `prefers-color-scheme` default
@@ -183,7 +112,7 @@ Recommended PR order:
 Dependencies:
 - `M10-I1` has no dependencies
 - `M10-I2` has no dependencies; locale switcher touches the header component
-- `M10-I3` depends on `M9-I4` (user profile) for storing the currency preference
+- `M10-I3` depends on the user profile (shipped in v1.1.0) for storing the currency preference
 
 Scope notes:
 - Dark theme must not introduce client components in pages that are currently server-rendered; use a CSS class on `<html>` toggled by a small script tag or a client component at the layout boundary only.

@@ -56,10 +56,10 @@ export const app = {
       {
         version: "v1.1",
         title: "Основные улучшения",
-        status: "inProgress" as const,
+        status: "released" as const,
         items: [
           "Несколько вишлистов",
-          "Приоритет желаний",
+          "Приоритет желаний (избранное)",
           "Самобронирование",
           "Профиль «О себе»",
         ],
@@ -67,7 +67,7 @@ export const app = {
       {
         version: "v1.2",
         title: "Оформление",
-        status: "planned" as const,
+        status: "inProgress" as const,
         items: [
           "Тёмная тема",
           "Английский язык",
