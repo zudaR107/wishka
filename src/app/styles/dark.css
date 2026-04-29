@@ -1,15 +1,13 @@
 /* ── Dark mode — hardcoded color overrides ───────────── */
 
-/* Background: dim wallpaper with a near-opaque dark overlay */
-.dark body {
-  background-image:
-    linear-gradient(rgba(15, 23, 42, 0.80), rgba(15, 23, 42, 0.80)),
-    url('/wallpaper.svg');
+/* Background: dim wallpaper by reducing pseudo-element opacity */
+.dark body::before {
+  opacity: 0.18;
 }
 
-/* Site header glass */
+/* Site header */
 .dark .site-header {
-  background: rgba(15, 23, 42, 0.88);
+  background: rgba(15, 23, 42, 0.92);
 }
 
 /* Secondary button — stronger border so it stands out from the surface */

@@ -96,7 +96,7 @@ Status:
 
 Execution backlog:
 1. ✅ Dark theme — CSS variable toggle, `localStorage` persistence, `prefers-color-scheme` default
-2. Background parallax — subtle depth effect on the wallpaper pattern, CSS or JS-driven
+2. ✅ Background parallax — subtle depth effect on the wallpaper pattern, CSS or JS-driven
 3. English locale — `en/` i18n dictionary, locale switcher in header, browser auto-detect
 4. Multiple currencies — currency preference per user profile, locale-aware display formatting
 

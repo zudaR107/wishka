@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/modules/auth/server/current-user";
 import { Header } from "@/shared/ui/header";
 import { Footer } from "@/shared/ui/footer";
 import { CookieBanner } from "@/shared/ui/cookie-banner";
+import { WallpaperParallax } from "@/shared/ui/wallpaper-parallax";
 import { logoutAction } from "@/app/auth-actions";
 import "./globals.css";
 
@@ -41,6 +42,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         />
       </head>
       <body>
+        <WallpaperParallax />
         <div className="app-layout">
           <Header user={user} onLogout={logoutAction} />
           <main className="app-main">{children}</main>

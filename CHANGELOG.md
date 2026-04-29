@@ -7,6 +7,27 @@ The format is based on Keep a Changelog, and this project follows SemVer.
 ## [Unreleased]
 
 ### Added
+- Background parallax: wallpaper pattern is rendered on a viewport-fixed
+  `body::before` pseudo-element. A `WallpaperParallax` client component
+  drives two combined inputs — `pointermove` shifts the layer ±20 px
+  opposite to the pointer (depth-through-window effect); `wheel` and
+  `scroll` events re-read `window.scrollY` and map it as a fraction of
+  total page height to a fixed ±90 px range, so the effect is evenly
+  distributed across any page length. `wheel` covers Mac trackpad
+  momentum; `scroll` covers mobile touch scroll. Both are RAF-throttled.
+  `prefers-reduced-motion: reduce` disables the component entirely.
+  Dark mode dims the wallpaper layer via `opacity: 0.18` instead of
+  the previous gradient overlay.
+
+### Changed
+- Site header: removed `backdrop-filter: blur(12px)` for performance;
+  background opacity raised from 0.88 to 0.92 to compensate.
+- Site layout: added `overscroll-behavior: none` on `<html>` to prevent
+  rubber-band overscroll from exposing the fixed wallpaper layer behind
+  the header and footer.
+- Mobile header: logo text («Wshka») is now hidden at ≤479 px on all
+  nav states (was hidden for authenticated users only), freeing space
+  for the theme toggle.
 - Dark theme: CSS custom property overrides under `.dark` class on `<html>`;
   all design tokens and hardcoded palette values have dark equivalents.
 - Theme toggle in the account menu (gear icon dropdown): switches immediately

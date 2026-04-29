@@ -81,20 +81,34 @@
   html {
     background: var(--color-bg-canvas);
     overflow-x: clip;
+    overscroll-behavior: none;
   }
 
   body {
     margin: 0;
     min-height: 100vh;
-    background-color: var(--color-bg-canvas);
-    background-image: url('/wallpaper.svg');
-    background-size: 200px 200px;
-    background-repeat: repeat;
     color: var(--color-text-strong);
     font-family: var(--font-sans);
     font-size: var(--font-size-body);
     line-height: var(--line-height-body);
     text-rendering: optimizeLegibility;
+  }
+
+  /* Wallpaper on a fixed pseudo-element for parallax depth.
+     Using ::before + position:fixed is more reliable than
+     background-attachment:fixed when a parent has overflow-x:clip.
+     inset:-50px extends beyond the viewport so edges stay covered
+     when JS shifts the layer via --wp-x / --wp-y (max ±20 px). */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: -120px;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url('/wallpaper.svg');
+    background-size: 200px 200px;
+    background-repeat: repeat;
+    transform: translate(var(--wp-x, 0px), var(--wp-y, 0px));
   }
 
   a {
