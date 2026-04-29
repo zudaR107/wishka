@@ -395,7 +395,8 @@
 
   .item-card-footer {
     display: flex;
-    align-items: center;
+    align-items: stretch;
+    gap: var(--space-6);
     padding: var(--space-3) var(--space-4);
     border-top: 1px solid var(--color-border-soft);
     background: var(--color-bg-subtle);
@@ -405,19 +406,38 @@
   .item-footer-start {
     flex: 1;
     display: flex;
+    justify-content: flex-start;
+    min-width: 0;
   }
 
   .item-footer-center {
+    flex: 1;
     display: flex;
     justify-content: center;
-    flex-shrink: 0;
-    padding: 0 var(--space-2);
+    min-width: 0;
   }
 
   .item-footer-end {
     flex: 1;
     display: flex;
     justify-content: flex-end;
+    min-width: 0;
+  }
+
+  .item-footer-start > .item-edit-btn,
+  .item-footer-end > .item-delete-btn {
+    flex: 1;
+  }
+
+  .item-footer-center > form {
+    flex: 1;
+    display: flex;
+  }
+
+  .item-footer-center > form > button,
+  .item-footer-center > .item-reserve-btn,
+  .item-footer-center > .item-cancel-reservation-btn {
+    flex: 1;
   }
 
   .item-edit-btn {
@@ -512,7 +532,6 @@
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
-    margin-left: auto;
   }
 
   .item-delete-btn:hover {

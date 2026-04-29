@@ -160,6 +160,12 @@
     color: var(--color-text-strong);
   }
 
+  .site-nav-dropdown-item--icon {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
   .site-nav-dropdown form {
     display: contents;
   }

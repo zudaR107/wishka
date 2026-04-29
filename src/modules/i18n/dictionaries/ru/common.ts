@@ -7,6 +7,8 @@ export const common = {
     reservations: "Мои брони",
     settings: "Настройки",
     accountMenu: "Меню аккаунта",
+    themeDark: "Тёмная тема",
+    themeLight: "Светлая тема",
     logout: "Выйти",
     login: "Войти",
     register: "Создать аккаунт",

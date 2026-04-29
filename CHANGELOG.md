@@ -6,6 +6,15 @@ The format is based on Keep a Changelog, and this project follows SemVer.
 
 ## [Unreleased]
 
+### Added
+- Dark theme: CSS custom property overrides under `.dark` class on `<html>`;
+  all design tokens and hardcoded palette values have dark equivalents.
+- Theme toggle in the account menu (gear icon dropdown): switches immediately
+  without page reload; preference persisted in `localStorage`.
+- System preference default: `prefers-color-scheme: dark` is respected on
+  first visit via an inline script in `<head>` that applies the class before
+  hydration, preventing any flash of the wrong theme.
+
 ## [1.1.0] - 2026-04-28
 
 ### Added

@@ -1,0 +1,203 @@
+/* ── Dark mode — hardcoded color overrides ───────────── */
+
+/* Background: dim wallpaper with a near-opaque dark overlay */
+.dark body {
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.80), rgba(15, 23, 42, 0.80)),
+    url('/wallpaper.svg');
+}
+
+/* Site header glass */
+.dark .site-header {
+  background: rgba(15, 23, 42, 0.88);
+}
+
+/* Secondary button — stronger border so it stands out from the surface */
+.dark .ui-button-secondary {
+  border-color: var(--color-border-strong);
+}
+.dark .ui-button-secondary:hover {
+  border-color: #5a7499;
+  background: #243348;
+}
+
+/* Soft button — replace hardcoded light-blue hover with dark equivalent */
+.dark .ui-button.ui-button-soft {
+  border-color: var(--color-border-strong);
+}
+.dark .ui-button.ui-button-soft:hover {
+  background: #1e3a5f;
+  border-color: var(--color-accent);
+}
+
+/* Gradient surface card */
+.dark .ui-surface {
+  background: linear-gradient(180deg, #1e293b 0%, #1a2744 100%);
+}
+
+/* Input error state */
+.dark .ui-input-error {
+  background: #1f0a0c;
+  border-color: #5c2029;
+}
+.dark .ui-input-error:hover,
+.dark .ui-input-error:focus-visible {
+  border-color: #7f2d3a;
+}
+
+/* Button: danger */
+.dark .ui-button-danger {
+  border-color: #5c2029;
+  background: #1f0a0c;
+  color: #fca5a5;
+}
+.dark .ui-button-danger:hover {
+  border-color: #7f2d3a;
+  background: #2d0e12;
+}
+
+/* Messages */
+.dark .ui-message-success {
+  background: #0a1f0f;
+  color: #86efac;
+}
+.dark .ui-message-error {
+  background: #1f0a0c;
+  color: #fca5a5;
+}
+
+/* Badges */
+.dark .ui-badge-available {
+  background: #052e16;
+  color: #4ade80;
+}
+.dark .ui-badge-reserved {
+  background: #2e1065;
+  color: #c4b5fd;
+}
+
+/* Item status strips */
+.dark .item-card-status-available {
+  background: #052e16;
+  color: #4ade80;
+  border-bottom-color: #166534;
+}
+.dark .item-card-status-reserved {
+  background: #2e1065;
+  color: #a78bfa;
+  border-bottom-color: #4c1d95;
+}
+.dark .item-card-status-self-reserved {
+  background: #0c1835;
+  color: #93c5fd;
+  border-bottom-color: #1e3a8a;
+}
+.dark .item-own-badge {
+  background: #1e3a8a;
+  color: #93c5fd;
+}
+
+/* Star button hover */
+.dark .item-star-btn:hover {
+  background: #1c1208;
+}
+.dark .item-star-btn--starred:hover {
+  background: #1c1208;
+}
+
+/* Edit button */
+.dark .item-edit-btn {
+  border-color: #5a7499;
+  background: #243348;
+  color: var(--color-text-base);
+}
+.dark .item-edit-btn:hover {
+  border-color: #6a87af;
+  background: #2d3f55;
+}
+
+/* Cancel reservation button */
+.dark .item-cancel-reservation-btn {
+  border-color: #1e3a8a;
+  background: #0c1835;
+  color: #93c5fd;
+}
+.dark .item-cancel-reservation-btn:hover {
+  border-color: #2563eb;
+  background: #0f2050;
+}
+
+/* Delete button */
+.dark .item-delete-btn {
+  border-color: #5c2029;
+  background: #1f0a0c;
+  color: #fca5a5;
+}
+.dark .item-delete-btn:hover {
+  border-color: #7f2d3a;
+  background: #2d0e12;
+}
+
+/* Copy URL button */
+.dark .share-url-row .copy-url-btn {
+  color: #60a5fa;
+}
+.dark .share-url-row .copy-url-btn:hover {
+  background: #0c1835;
+  color: #60a5fa;
+}
+.dark .copy-url-btn[data-copied="true"] {
+  background: #052e16;
+  border-color: #166534;
+  color: #4ade80;
+}
+.dark .share-url-row .copy-url-btn[data-copied="true"],
+.dark .share-url-row .copy-url-btn[data-copied="true"]:hover,
+.dark .share-url-row .copy-url-btn[data-copied="true"]:active {
+  background: #052e16;
+  border-color: #166534;
+  color: #4ade80;
+}
+
+/* Hero / roadmap description backdrop */
+.dark .home-hero-description,
+.dark .not-found-description {
+  background: rgba(30, 41, 59, 0.82);
+}
+
+/* Roadmap subtitle backdrop */
+.dark .roadmap-subtitle-group {
+  background: rgba(30, 41, 59, 0.82);
+}
+
+/* Roadmap status badges */
+.dark .roadmap-status-released {
+  background: #052e16;
+  color: #4ade80;
+}
+.dark .roadmap-status-in-progress {
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+.dark .roadmap-dot-released {
+  background: #16a34a;
+  border-color: #15803d;
+}
+.dark .roadmap-dot-planned {
+  background: #334155;
+  border-color: #1e293b;
+}
+
+/* Dev block links */
+.dark .home-dev-link {
+  background: rgba(30, 41, 59, 0.7);
+}
+.dark .home-dev-link:hover {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: #f59e0b;
+}
+
+/* Confirm dialog shadow */
+.dark .confirm-dialog {
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+}

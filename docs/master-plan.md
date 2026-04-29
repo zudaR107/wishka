@@ -88,54 +88,62 @@ create a wishlist → share it by link → let another person reserve a gift.
 ### Milestone 10 — Look & Feel (`v1.2.0`)
 
 Goal:
-- deliver dark theme, English locale, and multi-currency display
+- deliver dark theme, background parallax, English locale, and multi-currency display
 - no schema migrations required; all changes are frontend-only
 
 Status:
 - in progress
 
 Execution backlog:
-1. Dark theme — CSS variable toggle, `localStorage` persistence, `prefers-color-scheme` default
-2. English locale — `en/` i18n dictionary, locale switcher in header, browser auto-detect
-3. Multiple currencies — currency preference per user profile, locale-aware display formatting
+1. ✅ Dark theme — CSS variable toggle, `localStorage` persistence, `prefers-color-scheme` default
+2. Background parallax — subtle depth effect on the wallpaper pattern, CSS or JS-driven
+3. English locale — `en/` i18n dictionary, locale switcher in header, browser auto-detect
+4. Multiple currencies — currency preference per user profile, locale-aware display formatting
 
 Recommended issue shape:
 - `M10-I1 Dark theme — CSS variable toggle and system preference default`
-- `M10-I2 English locale — en/ dictionary, locale switcher, browser auto-detect`
-- `M10-I3 Multiple currencies — currency preference in profile, display formatting`
+- `M10-I2 Background parallax — depth effect on wallpaper pattern`
+- `M10-I3 English locale — en/ dictionary, locale switcher, browser auto-detect`
+- `M10-I4 Multiple currencies — currency preference in profile, display formatting`
 
 Recommended PR order:
 1. `M10-I1 Dark theme — CSS variable toggle and system preference default`
-2. `M10-I2 English locale — en/ dictionary, locale switcher, browser auto-detect`
-3. `M10-I3 Multiple currencies — currency preference in profile, display formatting`
+2. `M10-I2 Background parallax — depth effect on wallpaper pattern`
+3. `M10-I3 English locale — en/ dictionary, locale switcher, browser auto-detect`
+4. `M10-I4 Multiple currencies — currency preference in profile, display formatting`
 
 Dependencies:
 - `M10-I1` has no dependencies
-- `M10-I2` has no dependencies; locale switcher touches the header component
-- `M10-I3` depends on the user profile (shipped in v1.1.0) for storing the currency preference
+- `M10-I2` has no dependencies
+- `M10-I3` has no dependencies; locale switcher touches the header component
+- `M10-I4` depends on the user profile (shipped in v1.1.0) for storing the currency preference
 
 Scope notes:
-- Dark theme must not introduce client components in pages that are currently server-rendered; use a CSS class on `<html>` toggled by a small script tag or a client component at the layout boundary only.
+- Dark theme must not introduce client components in pages that are currently server-rendered; use a CSS class on `<html>` toggled by a small script tag or a client component at the layout boundary only. The theme toggle is placed inside the gear-icon dropdown in `NavLinks` (already a client component); no new client boundary is introduced.
+- Background parallax must be lightweight — prefer CSS `background-attachment: fixed` or a minimal scroll listener; must not degrade performance on mobile; must work in both light and dark themes.
 - English locale duplicates the Russian dictionary in `en/`; no machine translation, write natural English.
 - Multiple currencies is display-only — no conversion rates, no external API. The preference is stored on the user profile and applied to all price formatting.
 
 Acceptance targets:
 - dark theme can be toggled manually; preference persists across sessions; `prefers-color-scheme: dark` is respected on first visit
+- background wallpaper has a visible but subtle parallax depth effect on scroll; no jank on mobile
 - all user-visible strings are available in English; switching locale changes the entire UI immediately
 - owner can set a preferred currency (e.g. ₽, $, €); all prices display in that currency with correct locale formatting
 
 Exit criteria:
 - dark/light toggle works in all routes with no flash on load
+- parallax effect is smooth on desktop; gracefully disabled or static on mobile if needed
 - English locale covers 100% of i18n keys with no missing-key fallbacks
 - currency preference is stored and applied consistently on dashboard, share page, and reservations page
 
 Definition of small PRs for this milestone:
 - dark theme PR only touches CSS variables, the theme toggle component, and layout wiring
+- parallax PR only touches background rendering; does not touch theme logic or i18n
 - locale PR only adds the `en/` dictionary, the switcher UI, and locale resolution logic; does not touch styles
 - currency PR only adds the preference field, the settings UI, and the price formatting utility; does not touch locale logic
 
 Release note:
-- `v1.2.0` delivers dark theme, English language support, and multi-currency price display.
+- `v1.2.0` delivers dark theme, background parallax, English language support, and multi-currency price display.
 
 ---
 
