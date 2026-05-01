@@ -22,7 +22,7 @@
     "drizzle-orm": "^0.45.2",
     "next": "^15.0.0",
     "pg": "^8.20.0",
-    "postcss": "^8.5.10",
+    "postcss": "^8.5.13",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "@tailwindcss/postcss": "^4",
