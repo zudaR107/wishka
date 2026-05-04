@@ -7,6 +7,7 @@ import { listCurrentUserActiveReservations } from "@/modules/reservation";
 import { cancelReservationAction } from "@/app/reservations/actions";
 import { CancelReservationButton } from "@/app/reservations/cancel-reservation-button";
 import { formatPrice } from "@/app/format-price";
+import { parseCurrency } from "@/shared/lib/currency";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -74,7 +75,7 @@ export default async function ReservationsPage() {
                     <div className="reservation-card-meta">
                       {reservation.item.price ? (
                         <span style={{ fontWeight: 600, color: "var(--color-text-strong)" }}>
-                          {formatPrice(reservation.item.price, common.currencySymbol)}
+                          {formatPrice(reservation.item.price, parseCurrency(reservation.item.currency))}
                         </span>
                       ) : null}
                       {reservation.item.url ? (

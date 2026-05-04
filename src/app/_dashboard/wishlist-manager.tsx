@@ -14,6 +14,7 @@ import { CopyUrlButton } from "./copy-url-button";
 import { RegenerateLinkButton } from "./regenerate-link-button";
 import { OpenFormButton, AddItemFormFocus } from "./open-form-button";
 import { formatPrice } from "../format-price";
+import { type CurrencyCode } from "@/shared/lib/currency";
 import type {
   DeleteItemState,
   ReserveItemState,
@@ -31,6 +32,7 @@ export type DashboardWishlist = {
 
 type WishlistManagerProps = {
   wishlists: DashboardWishlist[];
+  defaultCurrency: CurrencyCode;
   deleteItemAction: (prev: DeleteItemState, formData: FormData) => Promise<DeleteItemState>;
   reserveItemAction: (prev: ReserveItemState, formData: FormData) => Promise<ReserveItemState>;
   cancelItemReservationAction: (
@@ -45,6 +47,7 @@ type WishlistManagerProps = {
 
 export function WishlistManager({
   wishlists,
+  defaultCurrency,
   deleteItemAction,
   reserveItemAction,
   cancelItemReservationAction,
@@ -165,6 +168,7 @@ export function WishlistManager({
           </p>
           <CreateItemForm
             wishlistId={wishlist.id}
+            defaultCurrency={defaultCurrency}
             onSuccess={() => {
               if (addDetailsRef.current) addDetailsRef.current.open = false;
               pendingScrollToNewRef.current = true;
@@ -235,7 +239,7 @@ export function WishlistManager({
                         <div className="item-card-meta">
                           {item.price ? (
                             <span className="item-card-price">
-                              {formatPrice(item.price, common.currencySymbol)}
+                              {formatPrice(item.price, item.currency as CurrencyCode)}
                             </span>
                           ) : null}
                           {item.url ? (
@@ -313,6 +317,7 @@ export function WishlistManager({
                       url: item.url,
                       note: item.note,
                       priceFormatted: item.price ?? "",
+                      currency: item.currency as CurrencyCode,
                       updatedAt: item.updatedAt.toISOString(),
                     }}
                     wishlistId={wishlist.id}

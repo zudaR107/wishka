@@ -1,6 +1,12 @@
 export const common = {
   brand: "Wshka",
-  currencySymbol: "₽",
+  currencies: {
+    RUB: "Ruble (₽)",
+    USD: "Dollar ($)",
+    EUR: "Euro (€)",
+    GBP: "Pound (£)",
+    CNY: "Yuan (¥)",
+  },
   routeSkeleton: "Route skeleton",
   nav: {
     wishlist: "My wishlist",

@@ -13,6 +13,7 @@ export type WishlistItemRecord = {
   url: string | null;
   note: string | null;
   price: string | null;
+  currency: string;
   starred: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -33,6 +34,7 @@ export async function listWishlistItems(wishlistId: string): Promise<WishlistIte
       url: true,
       note: true,
       price: true,
+      currency: true,
       starred: true,
       createdAt: true,
       updatedAt: true,

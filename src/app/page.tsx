@@ -12,6 +12,8 @@ import type { DeleteItemState, ReserveItemState, CancelItemReservationState, Reg
 import { getAllOwnerWishlistsWithReservations, createReservation, cancelReservation } from "@/modules/reservation";
 import { deleteCurrentWishlistItem } from "@/modules/wishlist/server/manage-item";
 import { WishlistManager, type DashboardWishlist } from "./_dashboard/wishlist-manager";
+import { getUserProfile } from "@/modules/auth/server/update-bio";
+import { parseCurrency } from "@/shared/lib/currency";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -122,9 +124,10 @@ export default async function RootPage() {
 // ---------------------------------------------------------------------------
 
 async function DashboardView({ userId }: { userId: string }) {
-  const [allWishlists, appOrigin] = await Promise.all([
+  const [allWishlists, appOrigin, profile] = await Promise.all([
     getAllOwnerWishlistsWithReservations(userId),
     getAppOrigin(),
+    getUserProfile(userId),
   ]);
 
   const shareLinks = await Promise.all(
@@ -136,10 +139,13 @@ async function DashboardView({ userId }: { userId: string }) {
     shareUrl: shareLinks[i] ? buildShareUrl(appOrigin, shareLinks[i].token) : null,
   }));
 
+  const defaultCurrency = parseCurrency(profile?.preferredCurrency);
+
   return (
     <div className="dashboard-page">
       <WishlistManager
         wishlists={wishlistsData}
+        defaultCurrency={defaultCurrency}
         deleteItemAction={deleteItemAction}
         reserveItemAction={reserveItemAction}
         cancelItemReservationAction={cancelItemReservationAction}

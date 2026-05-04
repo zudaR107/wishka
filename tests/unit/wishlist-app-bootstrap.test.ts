@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   createCurrentWishlistItem: vi.fn(),
   updateCurrentWishlistItem: vi.fn(),
   deleteCurrentWishlistItem: vi.fn(),
+  getUserProfile: vi.fn(),
 }));
 
 vi.mock("next/headers", () => ({
@@ -60,6 +61,10 @@ vi.mock("../../src/modules/wishlist/server/manage-item", () => ({
   deleteCurrentWishlistItem: mocks.deleteCurrentWishlistItem,
 }));
 
+vi.mock("../../src/modules/auth/server/update-bio", () => ({
+  getUserProfile: mocks.getUserProfile,
+}));
+
 /**
  * Render a React element (including async RSC components) to an HTML string.
  * renderToReadableStream supports Suspense and async server components (React 19).
@@ -100,6 +105,7 @@ describe("owner app wishlist bootstrap", () => {
     mocks.createCurrentWishlistItem.mockReset();
     mocks.updateCurrentWishlistItem.mockReset();
     mocks.deleteCurrentWishlistItem.mockReset();
+    mocks.getUserProfile.mockReset();
 
     mocks.requireCurrentUser.mockResolvedValue({
       id: "user-1",
@@ -111,6 +117,7 @@ describe("owner app wishlist bootstrap", () => {
     });
     mocks.getAllOwnerWishlistsWithReservations.mockResolvedValue([baseWishlist]);
     mocks.getOrCreateShareLinkForWishlist.mockResolvedValue(baseShareLink);
+    mocks.getUserProfile.mockResolvedValue({ preferredCurrency: "RUB", bio: null });
   });
 
   it("loads all wishlists for the authenticated owner on /", async () => {
@@ -174,7 +181,7 @@ describe("owner app wishlist bootstrap", () => {
     expect(html).toContain("Наушники");
     expect(html).toContain("https://example.com/item");
     expect(html).toContain("Нужны беспроводные");
-    expect(html).toContain("9\u00a0990");
+    expect(html).toContain("9 990");
     expect(html).toContain("Статус: забронировано");
     expect(html).toContain("Редактировать");
     expect(html).toContain("Удалить");

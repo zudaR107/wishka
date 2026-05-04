@@ -16,9 +16,10 @@ type RegisterUserInput = {
   email: string;
   password: string;
   defaultWishlistName?: string;
+  preferredCurrency?: string;
 };
 
-export async function registerUser({ email, password, defaultWishlistName = "Мой список" }: RegisterUserInput): Promise<RegisterUserResult> {
+export async function registerUser({ email, password, defaultWishlistName = "Мой список", preferredCurrency = "RUB" }: RegisterUserInput): Promise<RegisterUserResult> {
   const normalizedEmail = normalizeEmail(email);
   const validationResult = validateRegisterUserInput({
     email: normalizedEmail,
@@ -44,7 +45,7 @@ export async function registerUser({ email, password, defaultWishlistName = "М�
     const inserted = await db.transaction(async (tx) => {
       const [user] = await tx
         .insert(users)
-        .values({ email: normalizedEmail, passwordHash })
+        .values({ email: normalizedEmail, passwordHash, preferredCurrency })
         .returning({ id: users.id });
 
       await tx.insert(wishlists).values({

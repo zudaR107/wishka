@@ -163,7 +163,7 @@ describe("public share route rendering", () => {
     expect(html).toContain("Наушники");
     expect(html).toContain("https://example.com/item");
     expect(html).toContain("Нужны беспроводные");
-    expect(html).toContain("9 990");
+    expect(html).toContain("9 990");
     expect(html).toContain(
       "Войдите, чтобы забронировать доступное желание и потом управлять бронями в своём разделе.",
     );

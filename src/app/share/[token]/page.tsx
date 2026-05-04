@@ -11,6 +11,7 @@ import {
 import { ShareReserveButton } from "@/app/share/[token]/share-reserve-button";
 import { ShareCancelReservationButton } from "@/app/share/[token]/share-cancel-reservation-button";
 import { formatPrice } from "@/app/format-price";
+import { parseCurrency } from "@/shared/lib/currency";
 
 type SharePageProps = {
   params?: Promise<{
@@ -32,6 +33,7 @@ type WishlistView = {
     url: string | null;
     note: string | null;
     price: string | null;
+    currency: string;
     starred: boolean;
     reservation: ItemReservation;
   }>;
@@ -51,6 +53,7 @@ const DEV_MOCK_WISHLIST: WishlistView = {
       url: "https://example.com/sony-headphones",
       note: "Чёрного цвета, если есть возможность",
       price: "29990",
+      currency: "RUB",
       starred: true,
       reservation: { status: "available" },
     },
@@ -60,6 +63,7 @@ const DEV_MOCK_WISHLIST: WishlistView = {
       url: null,
       note: null,
       price: "850",
+      currency: "RUB",
       starred: false,
       reservation: {
         status: "reserved",
@@ -73,6 +77,7 @@ const DEV_MOCK_WISHLIST: WishlistView = {
       url: "https://example.com/ozon-gift",
       note: "На любую сумму",
       price: null,
+      currency: "RUB",
       starred: false,
       reservation: {
         status: "reserved",
@@ -324,7 +329,7 @@ function SharePageView({
                           <div className="item-card-meta">
                             {item.price ? (
                               <span className="item-card-price">
-                                {formatPrice(item.price, common.currencySymbol)}
+                                {formatPrice(item.price, parseCurrency(item.currency))}
                               </span>
                             ) : null}
                             {item.url ? (
