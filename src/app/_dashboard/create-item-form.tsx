@@ -3,21 +3,25 @@
 import { useActionState, useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { PriceInput } from "@/shared/ui/price-input";
+import { CurrencySelect } from "@/shared/ui/currency-select";
 import { useTranslations } from "@/modules/i18n";
+import { type CurrencyCode } from "@/shared/lib/currency";
 import { createItemAction, type ItemFormState } from "./item-actions";
 import { StarIcon } from "./star-item-button";
 
 type CreateItemFormProps = {
   wishlistId: string;
+  defaultCurrency?: CurrencyCode;
   onSuccess?: () => void;
 };
 
-export function CreateItemForm({ wishlistId, onSuccess }: CreateItemFormProps) {
+export function CreateItemForm({ wishlistId, defaultCurrency = "RUB", onSuccess }: CreateItemFormProps) {
   const messages = useTranslations("app");
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [state, action] = useActionState<ItemFormState, FormData>(createItemAction, null);
   const [starred, setStarred] = useState(false);
+  const [currency, setCurrency] = useState<CurrencyCode>(defaultCurrency);
   const err = state?.status === "error" ? state.error : undefined;
 
   function getErrorMessage(code: string): string {
@@ -36,6 +40,7 @@ export function CreateItemForm({ wishlistId, onSuccess }: CreateItemFormProps) {
   useEffect(() => {
     if (state?.status !== "success") return;
     setStarred(false);
+    setCurrency(defaultCurrency);
     onSuccess?.();
     startTransition(() => router.refresh());
   }, [state]);
@@ -100,14 +105,24 @@ export function CreateItemForm({ wishlistId, onSuccess }: CreateItemFormProps) {
           <label className="ui-label" htmlFor="price">
             {messages.dashboard.fields.price}
           </label>
-          <PriceInput
-            id="price"
-            name="price"
-            className="ui-input"
-            defaultValue={state?.values?.price ?? ""}
-            autoFocus={err === "invalid-price"}
-            error={err === "invalid-price"}
-          />
+          <div style={{ display: "flex", gap: "var(--space-2)", alignItems: "flex-start" }}>
+            <PriceInput
+              id="price"
+              name="price"
+              className="ui-input"
+              defaultValue={state?.values?.price ?? ""}
+              autoFocus={err === "invalid-price"}
+              error={err === "invalid-price"}
+              currency={currency}
+            />
+            <CurrencySelect
+              name="currency"
+              value={currency}
+              onChange={setCurrency}
+              label={messages.dashboard.fields.currency}
+              align="right"
+            />
+          </div>
         </div>
         <input type="hidden" name="starred" value={starred ? "true" : "false"} />
         <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>

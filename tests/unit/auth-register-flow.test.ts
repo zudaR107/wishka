@@ -79,6 +79,7 @@ describe("register user flow", () => {
     expect(mocks.txInsertValues).toHaveBeenCalledWith({
       email: "user@example.com",
       passwordHash: "hashed-password",
+      preferredCurrency: "RUB",
     });
     // second insert: default wishlist
     expect(mocks.txInsertValues).toHaveBeenCalledWith({

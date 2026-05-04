@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { requireCurrentUser } from "@/modules/auth/server/current-user";
-import { getUserProfile, updateUserBio } from "@/modules/auth/server/update-bio";
+import { getUserProfile, updateUserBio, updateUserPreferredCurrency } from "@/modules/auth/server/update-bio";
 import { getTranslations } from "@/modules/i18n";
 import { getLocale } from "@/modules/i18n/server";
+import { parseCurrency } from "@/shared/lib/currency";
+import { SettingsCurrencyField } from "./_currency-field";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -27,6 +29,8 @@ export default async function SettingsPage(props: SettingsPageProps) {
   const common = getTranslations("common", locale);
   const messages = getTranslations("app", locale);
 
+  const preferredCurrency = parseCurrency(profile?.preferredCurrency);
+
   return (
     <div className="content-page">
       <div className="content-page-header">
@@ -44,10 +48,8 @@ export default async function SettingsPage(props: SettingsPageProps) {
         </div>
       </section>
 
-      {/* Bio section */}
-      <section className="settings-section">
-        <p className="content-section-label">{messages.settings.bioSection}</p>
-
+      {/* Bio + currency in one form */}
+      <form action={saveSettingsAction}>
         {status === "saved" ? (
           <p className="ui-message ui-message-success" data-testid="settings-bio-success">
             {messages.settings.bioSuccessMessage}
@@ -64,7 +66,9 @@ export default async function SettingsPage(props: SettingsPageProps) {
           </p>
         ) : null}
 
-        <form action={saveBioAction}>
+        {/* Bio section */}
+        <section className="settings-section">
+          <p className="content-section-label">{messages.settings.bioSection}</p>
           <div className="settings-bio-field">
             <textarea
               id="bio"
@@ -78,28 +82,48 @@ export default async function SettingsPage(props: SettingsPageProps) {
             />
             <p className="ui-note">{messages.settings.bioHint}</p>
           </div>
-          <button type="submit" className="ui-button settings-bio-submit">
-            {messages.settings.bioSaveLabel}
-          </button>
-        </form>
-      </section>
+        </section>
+
+        {/* Currency section */}
+        <section className="settings-section" style={{ marginTop: "var(--space-6)" }}>
+          <p className="content-section-label">{messages.settings.currencySection}</p>
+          <div className="settings-bio-field">
+            <SettingsCurrencyField
+              defaultCurrency={preferredCurrency}
+              label={messages.settings.currencyLabel}
+            />
+            <p className="ui-note">{messages.settings.currencyHint}</p>
+          </div>
+        </section>
+
+        <button type="submit" className="ui-button settings-bio-submit">
+          {messages.settings.bioSaveLabel}
+        </button>
+      </form>
     </div>
   );
 }
 
-async function saveBioAction(formData: FormData): Promise<never> {
+async function saveSettingsAction(formData: FormData): Promise<never> {
   "use server";
 
   const user = await requireCurrentUser();
-  const bio = formData.get("bio");
-  const result = await updateUserBio(user.id, typeof bio === "string" ? bio : "");
 
-  if (result.status === "success") {
-    redirect("/settings?status=saved");
+  // Update bio
+  const bio = formData.get("bio");
+  const bioResult = await updateUserBio(user.id, typeof bio === "string" ? bio : "");
+
+  if (bioResult.status === "error" && bioResult.code === "too-long") {
+    redirect("/settings?status=error-too-long");
   }
 
-  if (result.code === "too-long") {
-    redirect("/settings?status=error-too-long");
+  // Update preferred currency (safe — always valid after parseCurrency)
+  const raw = formData.get("preferredCurrency");
+  const currency = parseCurrency(typeof raw === "string" ? raw : "");
+  await updateUserPreferredCurrency(user.id, currency);
+
+  if (bioResult.status === "success") {
+    redirect("/settings?status=saved");
   }
 
   redirect("/settings?status=error");

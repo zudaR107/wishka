@@ -97,6 +97,46 @@ test("saved bio is not visible on share page for guest viewer", async ({ browser
   }
 });
 
+test("owner saves preferred currency and it persists after reload", async ({ page }) => {
+  const credentials = createCredentials();
+
+  await registerUser(page, credentials);
+  await page.goto("/settings");
+
+  // Open the currency dropdown and select USD
+  await page.getByRole("button", { name: "Валюта для новых желаний" }).click();
+  await page.getByRole("option", { name: /Доллар/ }).getByRole("button").click();
+
+  await page.getByRole("button", { name: "Сохранить" }).click();
+
+  await expect(page).toHaveURL(/\/settings\?status=saved$/);
+  await expect(page.getByTestId("settings-bio-success")).toBeVisible();
+
+  // Reload and verify the selected currency is still shown
+  await page.goto("/settings");
+  const trigger = page.getByRole("button", { name: "Валюта для новых желаний" });
+  await expect(trigger).toContainText("$");
+});
+
+test("preferred currency pre-selects in create-item form", async ({ page }) => {
+  const credentials = createCredentials();
+
+  await registerUser(page, credentials);
+
+  // Set preferred currency to EUR
+  await page.goto("/settings");
+  await page.getByRole("button", { name: "Валюта для новых желаний" }).click();
+  await page.getByRole("option", { name: /Евро/ }).getByRole("button").click();
+  await page.getByRole("button", { name: "Сохранить" }).click();
+  await expect(page).toHaveURL(/\/settings\?status=saved$/);
+
+  // Open create-item form and check the currency trigger shows €
+  await page.goto("/");
+  await page.getByTestId("add-item-toggle").click();
+  const currencyTrigger = page.getByRole("button", { name: "Валюта" });
+  await expect(currencyTrigger).toContainText("€");
+});
+
 function createCredentials(): Credentials {
   const runId = randomUUID().slice(0, 12);
   return {

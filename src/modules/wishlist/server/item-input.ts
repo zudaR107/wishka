@@ -1,3 +1,5 @@
+import { parseCurrency } from "@/shared/lib/currency";
+
 export const MAX_PRICE = 999_999_999_999;
 
 export type WishlistItemInput = {
@@ -5,6 +7,7 @@ export type WishlistItemInput = {
   url: string;
   note: string;
   price: string;
+  currency?: string;
 };
 
 export type WishlistItemValues = {
@@ -12,6 +15,7 @@ export type WishlistItemValues = {
   url: string | null;
   note: string | null;
   price: string | null;
+  currency: string;
 };
 
 export type WishlistItemValidationErrorCode =
@@ -41,6 +45,7 @@ export function validateWishlistItemInput(
   const url = rawUrl ? prependProtocol(rawUrl) : null;
   const note = normalizeOptionalField(input.note);
   const priceResult = normalizePrice(input.price);
+  const currency = parseCurrency(input.currency);
 
   if (!title) {
     return { status: "error", code: "invalid-title" };
@@ -61,31 +66,39 @@ export function validateWishlistItemInput(
       url,
       note,
       price: priceResult.value,
+      currency,
     },
   };
 }
 
 function normalizeOptionalField(value: string): string | null {
   const trimmedValue = value.trim();
-
   return trimmedValue ? trimmedValue : null;
 }
 
 function normalizePrice(value: string): NormalizedPriceResult {
-  // Strip formatting characters added by PriceInput (NBSP, spaces, currency symbol).
-  const trimmedValue = value.replace(/[  ₽]/g, "").trim();
+  const trimmed = value.trim();
 
-  if (!trimmedValue) {
+  // Empty input → no price
+  if (!trimmed) {
     return { status: "success", value: null };
   }
 
-  const parsedValue = Number(trimmedValue);
+  // Strip display formatting only: spaces, NBSP, and known currency symbols.
+  const stripped = trimmed.replace(/[\s ₽$€£¥]/g, "");
 
-  if (!Number.isFinite(parsedValue) || parsedValue < 0 || parsedValue > MAX_PRICE) {
+  // After stripping, must be purely digits — anything else (minus, letters, etc.) is invalid.
+  if (!/^\d+$/.test(stripped)) {
     return { status: "error", code: "invalid-price" };
   }
 
-  return { status: "success", value: String(Math.round(parsedValue)) };
+  const parsedValue = Number(stripped);
+
+  if (!Number.isFinite(parsedValue) || parsedValue > MAX_PRICE) {
+    return { status: "error", code: "invalid-price" };
+  }
+
+  return { status: "success", value: String(parsedValue) };
 }
 
 function prependProtocol(value: string): string {
@@ -95,7 +108,6 @@ function prependProtocol(value: string): string {
 function isValidHttpUrl(value: string): boolean {
   try {
     const url = new URL(value);
-
     return (url.protocol === "http:" || url.protocol === "https:") && url.hostname.includes(".");
   } catch {
     return false;

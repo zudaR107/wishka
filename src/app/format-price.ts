@@ -1,7 +1,9 @@
-export function formatPrice(price: string, currencySymbol = "₽"): string {
+import { type CurrencyCode, CURRENCY_SYMBOLS } from "@/shared/lib/currency";
+
+export function formatPrice(price: string, currency: CurrencyCode = "RUB"): string {
   const num = parseFloat(price);
-  const amount = isNaN(num)
-    ? price
-    : Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0");
-  return `${amount}\u00a0${currencySymbol}`;
+  if (isNaN(num)) return price;
+  const formatted = Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  const symbol = CURRENCY_SYMBOLS[currency] ?? currency;
+  return formatted + " " + symbol;
 }

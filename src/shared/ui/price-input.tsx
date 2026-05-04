@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { MAX_PRICE } from "@/modules/wishlist/server/item-input";
 import { useTranslations } from "@/modules/i18n";
+import { type CurrencyCode, CURRENCY_SYMBOLS } from "@/shared/lib/currency";
 
 type PriceInputProps = {
   id: string;
@@ -11,6 +12,7 @@ type PriceInputProps = {
   className?: string;
   autoFocus?: boolean;
   error?: boolean;
+  currency?: CurrencyCode;
 };
 
 type InputHint = "non-numeric" | "too-large" | null;
@@ -21,25 +23,36 @@ const ALLOWED_KEYS = new Set([
   "Home", "End",
 ]);
 
-/** Strip all formatting chars: NBSP, regular space, currency symbol. */
+/** Strip all non-digit characters (spaces, NBSP, currency symbols, etc.). */
 function stripFormat(value: string): string {
-  return value.replace(/[  ₽]/g, "");
+  return value.replace(/[^\d]/g, "");
 }
 
-/** Format raw digit string as "3 490 ₽" with NBSP thousands separator. */
-function applyFormat(raw: string, currencySymbol: string): string {
+/** Format raw digit string as "3 490 ₽" with space thousands separator. */
+function applyFormat(raw: string, symbol: string): string {
   if (!raw) return "";
-  const thousands = raw.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-  return `${thousands} ${currencySymbol}`;
+  const thousands = raw.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  return `${thousands} ${symbol}`;
 }
 
-export function PriceInput({ id, name, defaultValue, className, autoFocus, error }: PriceInputProps) {
+export function PriceInput({ id, name, defaultValue, className, autoFocus, error, currency = "RUB" }: PriceInputProps) {
   const common = useTranslations("common");
   const [hint, setHint] = useState<InputHint>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const currencySymbol = common.currencySymbol;
-  const suffix = ` ${currencySymbol}`;
+  const currencySymbol = CURRENCY_SYMBOLS[currency];
+  const suffix = ` ${currencySymbol}`;
   const maxPriceDisplay = MAX_PRICE.toLocaleString("ru-RU");
+
+  // When currency changes, reformat the displayed value with the new symbol.
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+    const raw = stripFormat(input.value);
+    if (raw) {
+      input.value = applyFormat(raw, CURRENCY_SYMBOLS[currency]);
+    }
+  }, [currency]);
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (ALLOWED_KEYS.has(e.key) || e.ctrlKey || e.metaKey) return;
@@ -116,6 +129,7 @@ export function PriceInput({ id, name, defaultValue, className, autoFocus, error
   return (
     <>
       <input
+        ref={inputRef}
         id={id}
         name={name}
         defaultValue={applyFormat(stripFormat(defaultValue ?? ""), currencySymbol)}

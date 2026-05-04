@@ -31,13 +31,35 @@ export async function updateUserBio(
   }
 }
 
+export type UpdatePreferredCurrencyResult =
+  | { status: "success" }
+  | { status: "error"; code: "db-error" };
+
+export async function updateUserPreferredCurrency(
+  userId: string,
+  currency: string,
+): Promise<UpdatePreferredCurrencyResult> {
+  try {
+    const { db } = await import("@/shared/db");
+
+    await db
+      .update(users)
+      .set({ preferredCurrency: currency, updatedAt: new Date() })
+      .where(eq(users.id, userId));
+
+    return { status: "success" };
+  } catch {
+    return { status: "error", code: "db-error" };
+  }
+}
+
 export async function getUserProfile(
   userId: string,
-): Promise<{ id: string; email: string; bio: string | null } | null> {
+): Promise<{ id: string; email: string; bio: string | null; preferredCurrency: string } | null> {
   const { db } = await import("@/shared/db");
 
   const user = await db.query.users.findFirst({
-    columns: { id: true, email: true, bio: true },
+    columns: { id: true, email: true, bio: true, preferredCurrency: true },
     where: eq(users.id, userId),
   });
 

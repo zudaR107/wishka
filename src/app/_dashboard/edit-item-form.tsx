@@ -1,9 +1,11 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useTransition } from "react";
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { PriceInput } from "@/shared/ui/price-input";
+import { CurrencySelect } from "@/shared/ui/currency-select";
 import { useTranslations } from "@/modules/i18n";
+import { type CurrencyCode } from "@/shared/lib/currency";
 import { updateItemAction, type ItemFormState } from "./item-actions";
 import { useItemEditClose } from "./item-edit-section";
 
@@ -14,6 +16,7 @@ type EditItemFormProps = {
     url: string | null;
     note: string | null;
     priceFormatted: string;
+    currency: CurrencyCode;
     updatedAt: string;
   };
   wishlistId: string;
@@ -27,6 +30,7 @@ export function EditItemForm({ item, wishlistId }: EditItemFormProps) {
   const isMountedRef = useRef(false);
   const [state, action] = useActionState<ItemFormState, FormData>(updateItemAction, null);
   const closeEditSection = useItemEditClose();
+  const [currency, setCurrency] = useState<CurrencyCode>(item.currency);
 
   const v = state?.values;
   const err = state?.status === "error" ? state.error : undefined;
@@ -64,6 +68,7 @@ export function EditItemForm({ item, wishlistId }: EditItemFormProps) {
       isMountedRef.current = true;
       return;
     }
+    setCurrency(item.currency);
     formRef.current?.reset();
   }, [item.updatedAt]);
 
@@ -122,14 +127,24 @@ export function EditItemForm({ item, wishlistId }: EditItemFormProps) {
           <label className="ui-label" htmlFor={`price-${item.id}`}>
             {messages.dashboard.fields.price}
           </label>
-          <PriceInput
-            id={`price-${item.id}`}
-            name="price"
-            defaultValue={v?.price ?? item.priceFormatted}
-            className="ui-input"
-            autoFocus={err === "invalid-price"}
-            error={err === "invalid-price"}
-          />
+          <div style={{ display: "flex", gap: "var(--space-2)", alignItems: "flex-start" }}>
+            <PriceInput
+              id={`price-${item.id}`}
+              name="price"
+              defaultValue={v?.price ?? item.priceFormatted}
+              className="ui-input"
+              autoFocus={err === "invalid-price"}
+              error={err === "invalid-price"}
+              currency={currency}
+            />
+            <CurrencySelect
+              name="currency"
+              value={currency}
+              onChange={setCurrency}
+              label={messages.dashboard.fields.currency}
+              align="right"
+            />
+          </div>
         </div>
         <button type="submit" className="ui-button">
           {messages.dashboard.updateLabel}

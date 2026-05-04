@@ -77,17 +77,65 @@ describe("wishlist item creation validation", () => {
     ).toEqual({ status: "error", code: "invalid-price" });
   });
 
-  it("accepts a price formatted with NBSP thousands separator and currency symbol", () => {
+  it("accepts a price formatted with thousands separator and currency symbol", () => {
     expect(
       validateCreateWishlistItemInput({
         title: "Наушники",
         url: "",
         note: "",
-        price: "3 490 ₽",
+        price: "3 490 ₽",
       }),
     ).toEqual({
       status: "valid",
-      values: { title: "Наушники", url: null, note: null, price: "3490" },
+      values: {
+        title: "Наушники",
+        url: null,
+        note: null,
+        price: "3490",
+        currency: "RUB",
+      },
+    });
+  });
+
+  it("stores the provided currency code", () => {
+    expect(
+      validateCreateWishlistItemInput({
+        title: "Наушники",
+        url: "",
+        note: "",
+        price: "99",
+        currency: "USD",
+      }),
+    ).toEqual({
+      status: "valid",
+      values: {
+        title: "Наушники",
+        url: null,
+        note: null,
+        price: "99",
+        currency: "USD",
+      },
+    });
+  });
+
+  it("falls back to RUB for an unknown currency code", () => {
+    expect(
+      validateCreateWishlistItemInput({
+        title: "Наушники",
+        url: "",
+        note: "",
+        price: "",
+        currency: "XYZ",
+      }),
+    ).toEqual({
+      status: "valid",
+      values: {
+        title: "Наушники",
+        url: null,
+        note: null,
+        price: null,
+        currency: "RUB",
+      },
     });
   });
 
@@ -101,7 +149,13 @@ describe("wishlist item creation validation", () => {
       }),
     ).toEqual({
       status: "valid",
-      values: { title: "Наушники", url: "https://example.com", note: null, price: null },
+      values: {
+        title: "Наушники",
+        url: "https://example.com",
+        note: null,
+        price: null,
+        currency: "RUB",
+      },
     });
   });
 
@@ -126,7 +180,13 @@ describe("wishlist item creation validation", () => {
       }),
     ).toEqual({
       status: "valid",
-      values: { title: "Наушники", url: null, note: null, price: "999999999999" },
+      values: {
+        title: "Наушники",
+        url: null,
+        note: null,
+        price: "999999999999",
+        currency: "RUB",
+      },
     });
   });
 
@@ -140,7 +200,13 @@ describe("wishlist item creation validation", () => {
       }),
     ).toEqual({
       status: "valid",
-      values: { title: "Наушники", url: null, note: null, price: "0" },
+      values: {
+        title: "Наушники",
+        url: null,
+        note: null,
+        price: "0",
+        currency: "RUB",
+      },
     });
   });
 });
@@ -174,6 +240,7 @@ describe("wishlist item creation flow", () => {
         url: "https://example.com/item",
         note: " Беспроводные ",
         price: "1990",
+        currency: "USD",
       }),
     ).resolves.toEqual({ status: "success" });
 
@@ -184,6 +251,7 @@ describe("wishlist item creation flow", () => {
       url: "https://example.com/item",
       note: "Беспроводные",
       price: "1990",
+      currency: "USD",
       starred: false,
     });
   });

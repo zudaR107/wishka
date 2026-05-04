@@ -17,6 +17,7 @@ export type ItemValues = {
   url: string;
   note: string;
   price: string;
+  currency: string;
 };
 
 export type ItemFormState = {
@@ -75,6 +76,7 @@ export async function createItemAction(
     url: getString(formData, "url"),
     note: getString(formData, "note"),
     price: getString(formData, "price"),
+    currency: getString(formData, "currency"),
   };
 
   const user = await requireCurrentUser();
@@ -98,6 +100,7 @@ export async function updateItemAction(
     url: getString(formData, "url"),
     note: getString(formData, "note"),
     price: getString(formData, "price"),
+    currency: getString(formData, "currency"),
   };
 
   const user = await requireCurrentUser();

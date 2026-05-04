@@ -228,6 +228,7 @@ export const app = {
       url: "Link",
       note: "Note",
       price: "Price",
+      currency: "Currency",
     },
     hints: {
       url: "Optional. Add a product link if you already have one.",
@@ -288,6 +289,9 @@ export const app = {
       "Up to 500 characters. Visible only to logged-in users on your wishlist page.",
     bioSaveLabel: "Save",
     bioSuccessMessage: "Description saved.",
+    currencySection: "Default currency",
+    currencyLabel: "Currency for new wishes",
+    currencyHint: "Applied when creating a new wish. You can change the currency per wish individually.",
     errors: {
       bioTooLong: "Description must not exceed 500 characters.",
       unknown: "Failed to save changes. Please try again.",

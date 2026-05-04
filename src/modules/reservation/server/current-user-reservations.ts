@@ -9,6 +9,7 @@ export type CurrentUserReservationItem = {
   url: string | null;
   note: string | null;
   price: string | null;
+  currency: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -46,6 +47,7 @@ export async function listCurrentUserActiveReservations(
       url: true,
       note: true,
       price: true,
+      currency: true,
       createdAt: true,
       updatedAt: true,
     },

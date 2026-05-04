@@ -33,6 +33,14 @@ The format is based on Keep a Changelog, and this project follows SemVer.
 - Price-input inline hints (`priceInput.nonNumericHint`, `priceInput.tooLargeHint`)
   moved from hardcoded Russian strings into the i18n `common` namespace.
 - Cookie-banner `aria-label` moved into i18n `common.cookieBanner.ariaLabel`.
+- Multi-currency support: items now store a `currency` column (RUB/USD/EUR/GBP/CNY);
+  prices are displayed with the correct symbol everywhere (dashboard, share page,
+  reservations). Existing rows default to RUB via migration.
+- `preferredCurrency` user profile field: saved in Settings and pre-selected in
+  the create-item form so new wishes default to the user's chosen currency.
+- `CurrencySelect` custom dropdown component: replaces the native `<select>` in
+  the item forms and Settings page. Opens upward (above the trigger button) with
+  a rotating chevron indicator; left/right alignment is configurable via `align` prop.
 
 ### Changed
 - Background parallax: wallpaper pattern is rendered on a viewport-fixed
@@ -46,8 +54,6 @@ The format is based on Keep a Changelog, and this project follows SemVer.
   `prefers-reduced-motion: reduce` disables the component entirely.
   Dark mode dims the wallpaper layer via `opacity: 0.18` instead of
   the previous gradient overlay.
-
-### Changed
 - Site header: removed `backdrop-filter: blur(12px)` for performance;
   background opacity raised from 0.88 to 0.92 to compensate.
 - Site layout: added `overscroll-behavior: none` on `<html>` to prevent

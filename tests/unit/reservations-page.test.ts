@@ -76,7 +76,7 @@ describe("current user reservations page", () => {
     expect(html).toContain("Наушники");
     expect(html).toContain("https://example.com/item");
     expect(html).toContain("Нужны беспроводные");
-    expect(html).toContain("9 990");
+    expect(html).toContain("9 990");
     expect(html).toContain("Отменить бронь");
     expect(html).not.toContain("Моё желание");
   });
