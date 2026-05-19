@@ -226,6 +226,10 @@ export const app = {
       errors: {
         unknownRegenerate: "Не удалось создать новую публичную ссылку. Попробуйте ещё раз.",
       },
+      qrLabel: "QR",
+      qrDialogTitle: "QR-код вашего вишлиста",
+      qrDownloadLabel: "Скачать PNG",
+      qrCloseLabel: "Закрыть",
     },
     fields: {
       title: "Название",

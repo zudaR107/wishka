@@ -12,6 +12,7 @@ import { CancelItemReservationButton } from "./cancel-item-reservation-button";
 import { CancelOwnerReservationButton } from "./cancel-owner-reservation-button";
 import { ItemEditSection } from "./item-edit-section";
 import { CopyUrlButton } from "./copy-url-button";
+import { QrCodeButton } from "./qr-code-button";
 import { RegenerateLinkButton } from "./regenerate-link-button";
 import { OpenFormButton, AddItemFormFocus } from "./open-form-button";
 import { scrollAndHighlight } from "./scroll-utils";
@@ -163,6 +164,17 @@ export function WishlistManager({
             aria-label={messages.dashboard.share.urlLabel}
           />
           {wishlist.shareUrl ? <CopyUrlButton url={wishlist.shareUrl} /> : null}
+          {wishlist.shareUrl ? (
+            <QrCodeButton
+              url={wishlist.shareUrl}
+              labels={{
+                qrLabel: messages.dashboard.share.qrLabel,
+                qrDialogTitle: messages.dashboard.share.qrDialogTitle,
+                qrDownloadLabel: messages.dashboard.share.qrDownloadLabel,
+                qrCloseLabel: messages.dashboard.share.qrCloseLabel,
+              }}
+            />
+          ) : null}
         </div>
         <p className="ui-note">{messages.dashboard.share.copyHint}</p>
         <div className="share-panel-actions">
