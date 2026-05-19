@@ -102,17 +102,17 @@ Status:
 
 Execution backlog:
 1. ✅ QR code for share links — browser-side generation, modal or inline display
-2. Export / import wishlist — JSON download, JSON upload with item creation
+2. ✅ Export / import wishlist — download all wishlists as a human-readable formatted text file; import back from the same file to restore items
 3. Item image upload — local VPS storage, Caddy serving, `imageUrl` column
 
 Recommended issue shape:
 - `M11-I1 QR code for share links — browser-side generation and display`
-- `M11-I2 Export / import wishlist — JSON download and upload`
+- `M11-I2 Export / import wishlist — formatted text backup download and restore`
 - `M11-I3 Item image upload — VPS local storage, Caddy config, schema addition`
 
 Recommended PR order:
 1. `M11-I1 QR code for share links — browser-side generation and display`
-2. `M11-I2 Export / import wishlist — JSON download and upload`
+2. `M11-I2 Export / import wishlist — formatted text backup download and restore`
 3. `M11-I3 Item image upload — VPS local storage, Caddy config, schema addition`
 
 Dependencies:
@@ -122,27 +122,27 @@ Dependencies:
 
 Scope notes:
 - QR code must be generated entirely in the browser; no backend endpoint required. Use a small, well-maintained library (e.g. `qrcode`).
-- Export format is a plain JSON array of items (title, url, note, price, priority). Import creates new items in the current wishlist; it does not overwrite or merge.
+- Export format is a human-readable Markdown file containing all the owner's wishlists: each wishlist as a named section, each item as a Markdown table row (title, url, note, price, currency). The file is designed to be stored, shared, or read without the app. Import parses the same Markdown format and recreates the wishlists and their items; it does not overwrite or merge existing data.
 - Image upload is one image per item, stored at `/uploads/<uuid>.<ext>` on the VPS. Caddy serves the directory as static files. The `imageUrl` column stores the relative path. Max file size enforced at the Next.js API layer.
 - Do not add S3 or CDN in this milestone — local VPS storage is the explicit target.
 
 Acceptance targets:
 - owner can open a QR code for an active share link and download or share it
-- owner can download their wishlist as a JSON file and re-import it to restore items
+- owner can download all their wishlists as a single human-readable Markdown file, suitable for storage, sharing, or printing; the file can be re-imported to restore wishlists and items
 - owner can upload one image per item; image is shown on the dashboard and the share page
 
 Exit criteria:
 - QR modal works without a server round-trip
-- exported JSON is valid and round-trips through import without data loss
+- exported Markdown is valid, human-readable, and round-trips through import without data loss
 - uploaded images are served at a stable URL; Caddy config updated; `imageUrl` migration applied
 
 Definition of small PRs for this milestone:
 - QR PR only adds the client-side QR component and wires it to the share link block; does not touch the backend
-- export/import PR only adds the download action and the upload/parse flow; does not touch image or QR logic
+- export/import PR only adds the Markdown download action, the file-upload/parse flow, and the dashboard UI entry points; does not touch image or QR logic
 - image PR only adds the upload API route, the `imageUrl` migration, Caddy static-file config, and item card image rendering
 
 Release note:
-- `v1.3.0` adds QR code sharing, wishlist JSON export/import, and per-item image upload.
+- `v1.3.0` adds QR code sharing, wishlist backup export/import (human-readable Markdown), and per-item image upload.
 
 ---
 

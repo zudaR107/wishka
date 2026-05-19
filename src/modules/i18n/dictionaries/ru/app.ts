@@ -261,6 +261,23 @@ export const app = {
       reservedLabel: "Статус: забронировано",
       selfReservedLabel: "Статус: забронировано мной",
     },
+    backup: {
+      triggerLabel: "Резервная копия",
+      exportAllLabel: "Скачать все списки",
+      exportOneLabel: "Скачать этот список",
+      importLabel: "Импортировать...",
+      importDialogTitle: "Импорт вишлистов",
+      importDialogDescription:
+        "Загрузите файл .md, экспортированный из Wshka. Будут созданы новые списки и желания — существующие данные не изменятся.",
+      importFileLabel: "Выберите файл",
+      importSubmitLabel: "Импортировать",
+      importCancelLabel: "Отмена",
+      importSuccess: "Импортировано вишлистов: {wishlists}, желаний: {items}.",
+      importErrorEmpty: "Файл пуст.",
+      importErrorInvalidFormat: "Формат файла не распознан. Убедитесь, что загружаете файл, экспортированный из Wshka.",
+      importErrorNoWishlists: "В файле не найдено ни одного вишлиста.",
+      importErrorUnknown: "Не удалось выполнить импорт. Попробуйте ещё раз.",
+    },
   },
   reservations: {
     title: "Бронирования",

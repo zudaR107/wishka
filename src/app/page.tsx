@@ -11,6 +11,7 @@ import {
 import type { DeleteItemState, ReserveItemState, CancelItemReservationState, CancelOwnerReservationState, RegenerateState } from "./_dashboard/item-actions";
 import { getAllOwnerWishlistsWithReservations, createReservation, cancelReservation, cancelReservationByOwner } from "@/modules/reservation";
 import { deleteCurrentWishlistItem } from "@/modules/wishlist/server/manage-item";
+import { importWishlistsForUser } from "@/modules/wishlist/server/import-wishlists";
 import { WishlistManager, type DashboardWishlist } from "./_dashboard/wishlist-manager";
 import { ScrollHighlight } from "./_dashboard/scroll-highlight";
 import { AutoRefresh } from "@/shared/ui/auto-refresh";
@@ -163,6 +164,7 @@ async function DashboardView({ userId }: { userId: string }) {
         cancelItemReservationAction={cancelItemReservationAction}
         cancelOwnerReservationAction={cancelOwnerReservationAction}
         regenerateShareLinkAction={regenerateShareLinkAction}
+      importAction={importAction}
       />
     </div>
   );
@@ -242,6 +244,13 @@ async function regenerateShareLinkAction(
   } catch {
     return { status: "error" };
   }
+}
+
+async function importAction(text: string) {
+  "use server";
+
+  const user = await requireCurrentUser();
+  return importWishlistsForUser(user.id, text);
 }
 
 // ---------------------------------------------------------------------------
