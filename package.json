@@ -33,6 +33,7 @@
   "devDependencies": {
     "@playwright/test": "^1.59.1",
     "drizzle-kit": "^0.31.10",
+    "esbuild": "^0.28.0",
     "vitest": "^4"
   }
 }
