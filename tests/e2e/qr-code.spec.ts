@@ -13,7 +13,7 @@ test("owner can open the QR code modal and close it", async ({ page }) => {
   await test.step("clicking QR button opens the modal with the QR code", async () => {
     await page.getByRole("button", { name: "QR" }).click();
 
-    const dialog = page.locator("dialog.qr-dialog");
+    const dialog = page.getByTestId("qr-dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog.getByRole("button", { name: "Скачать PNG" })).toBeVisible();
     await expect(dialog.getByRole("button", { name: "Закрыть" })).toBeVisible();
@@ -21,8 +21,8 @@ test("owner can open the QR code modal and close it", async ({ page }) => {
   });
 
   await test.step("close button dismisses the modal", async () => {
-    await page.getByRole("button", { name: "Закрыть" }).click();
-    await expect(page.locator("dialog.qr-dialog")).not.toBeVisible();
+    await page.getByTestId("qr-dialog").getByRole("button", { name: "Закрыть" }).click();
+    await expect(page.getByTestId("qr-dialog")).not.toBeVisible();
   });
 });
 

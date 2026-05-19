@@ -10,6 +10,10 @@ The format is based on Keep a Changelog, and this project follows SemVer.
 - QR code for share links: QR button in the share URL row opens a modal with
   a scannable code; owner can download it as PNG. Browser-side only via
   `qrcode.react`; no backend changes.
+- Wishlist backup: owner can export all wishlists (or a single one) as a
+  human-readable Markdown file and re-import it to restore data. Export via
+  `GET /api/wishlist/export`; import via file-upload modal on the dashboard.
+  Existing data is never overwritten — import always creates new lists.
 
 ## [1.2.0] - 2026-05-12
 

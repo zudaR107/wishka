@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from "@/modules/i18n";
 import { CreateWishlistForm } from "./create-wishlist-form";
 import { RenameWishlistForm } from "./rename-wishlist-form";
 import { DeleteWishlistButton } from "./delete-wishlist-button";
+import { BackupDropdown } from "./backup-dropdown";
 
 function PlusIcon() {
   return (
@@ -69,12 +70,17 @@ type WishlistSelectorEntry = {
   name: string;
 };
 
+type ImportResult =
+  | { status: "success"; wishlists: number; items: number }
+  | { status: "error"; code: "empty" | "invalid-format" | "no-wishlists" | "unknown" };
+
 type WishlistSelectorProps = {
   wishlists: WishlistSelectorEntry[];
   selectedId: string;
   itemCount: number;
   onSelect: (id: string) => void;
   onCreated: (id: string) => void;
+  importAction: (text: string) => Promise<ImportResult>;
 };
 
 export function WishlistSelector({
@@ -83,6 +89,7 @@ export function WishlistSelector({
   itemCount,
   onSelect,
   onCreated,
+  importAction,
 }: WishlistSelectorProps) {
   const messages = useTranslations("app");
   const locale = useLocale();
@@ -186,6 +193,13 @@ export function WishlistSelector({
           <PlusIcon />
           <span className="wishlist-btn-label">{messages.dashboard.wishlists.createLabel}</span>
         </button>
+
+        <BackupDropdown
+          selectedWishlistId={selectedId}
+          labels={messages.dashboard.backup}
+          importAction={importAction}
+          triggerLabel={messages.dashboard.backup.triggerLabel}
+        />
 
         <DeleteWishlistButton wishlistId={selectedId} />
       </div>

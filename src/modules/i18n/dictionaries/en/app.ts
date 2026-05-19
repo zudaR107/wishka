@@ -267,6 +267,24 @@ export const app = {
       reservedLabel: "Status: reserved",
       selfReservedLabel: "Status: reserved by me",
     },
+    backup: {
+      triggerLabel: "Backup",
+      exportAllLabel: "Download all lists",
+      exportOneLabel: "Download this list",
+      importLabel: "Import...",
+      importDialogTitle: "Import wishlists",
+      importDialogDescription:
+        "Upload a .md file exported from Wshka. New lists and wishes will be created — your existing data will not be changed.",
+      importFileLabel: "Choose file",
+      importSubmitLabel: "Import",
+      importCancelLabel: "Cancel",
+      importSuccess: "Imported wishlists: {wishlists}, wishes: {items}.",
+      importErrorEmpty: "The file is empty.",
+      importErrorInvalidFormat:
+        "File format not recognised. Make sure you are uploading a file exported from Wshka.",
+      importErrorNoWishlists: "No wishlists found in the file.",
+      importErrorUnknown: "Import failed. Please try again.",
+    },
   },
   reservations: {
     title: "Reservations",

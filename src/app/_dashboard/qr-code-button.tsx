@@ -68,7 +68,7 @@ export function QrCodeButton({ url, labels }: QrCodeButtonProps) {
         </svg>
       </button>
 
-      <dialog ref={dialogRef} className="qr-dialog" onClick={handleBackdropClick}>
+      <dialog ref={dialogRef} className="qr-dialog" data-testid="qr-dialog" onClick={handleBackdropClick}>
         <div className="qr-dialog-inner">
           <h2 className="qr-dialog-title">{labels.qrDialogTitle}</h2>
           <div className="qr-dialog-code" ref={canvasRef}>

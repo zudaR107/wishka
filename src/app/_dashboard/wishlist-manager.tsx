@@ -27,6 +27,10 @@ import type {
 } from "./item-actions";
 import type { OwnerWishlistItem } from "@/modules/reservation";
 
+type ImportResult =
+  | { status: "success"; wishlists: number; items: number }
+  | { status: "error"; code: "empty" | "invalid-format" | "no-wishlists" | "unknown" };
+
 export type DashboardWishlist = {
   id: string;
   name: string;
@@ -53,6 +57,7 @@ type WishlistManagerProps = {
     prev: RegenerateState,
     formData: FormData,
   ) => Promise<RegenerateState>;
+  importAction: (text: string) => Promise<ImportResult>;
 };
 
 const SELECTED_WISHLIST_COOKIE = "wshka_selected_wishlist";
@@ -67,6 +72,7 @@ export function WishlistManager({
   cancelItemReservationAction,
   cancelOwnerReservationAction,
   regenerateShareLinkAction,
+  importAction,
 }: WishlistManagerProps) {
   const common = useTranslations("common");
   const messages = useTranslations("app");
@@ -145,6 +151,7 @@ export function WishlistManager({
           itemCount={localItems.length}
           onSelect={handleSelectWishlist}
           onCreated={handleSelectWishlist}
+          importAction={importAction}
         />
       </div>
 
