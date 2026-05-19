@@ -6,6 +6,11 @@ The format is based on Keep a Changelog, and this project follows SemVer.
 
 ## [Unreleased]
 
+### Added
+- QR code for share links: QR button in the share URL row opens a modal with
+  a scannable code; owner can download it as PNG. Browser-side only via
+  `qrcode.react`; no backend changes.
+
 ## [1.2.0] - 2026-05-12
 
 ### Added

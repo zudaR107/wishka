@@ -606,6 +606,71 @@
     margin: 0;
   }
 
+  /* ── QR dialog ────────────────────────────────────────── */
+  .qr-dialog {
+    margin: auto;
+    width: 100%;
+    max-width: min(20rem, calc(100% - 2 * var(--space-4)));
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-xl);
+    background: var(--color-bg-surface);
+    box-shadow: 0 24px 64px rgba(15, 23, 42, 0.18);
+    padding: 0;
+  }
+
+  .qr-dialog::backdrop {
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .qr-dialog-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-5);
+    padding: var(--space-6);
+  }
+
+  .qr-dialog-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-strong);
+    margin: 0;
+    text-align: center;
+  }
+
+  .qr-dialog-code {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-lg);
+    background: #ffffff;
+  }
+
+  .qr-dialog-url {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-align: center;
+    word-break: break-all;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .qr-dialog-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+    width: 100%;
+  }
+
+  .qr-dialog-actions .ui-button {
+    justify-content: center;
+    width: 100%;
+  }
+
   /* ── Confirmation dialog ─────────────────────────────── */
   .confirm-dialog {
     margin: auto;

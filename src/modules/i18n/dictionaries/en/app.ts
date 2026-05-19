@@ -232,6 +232,10 @@ export const app = {
       errors: {
         unknownRegenerate: "Failed to create a new public link. Please try again.",
       },
+      qrLabel: "QR",
+      qrDialogTitle: "QR code for your wishlist",
+      qrDownloadLabel: "Download PNG",
+      qrCloseLabel: "Close",
     },
     fields: {
       title: "Name",

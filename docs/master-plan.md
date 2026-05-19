@@ -101,7 +101,7 @@ Status:
 - 🔄 in progress
 
 Execution backlog:
-1. QR code for share links — browser-side generation, modal or inline display
+1. ✅ QR code for share links — browser-side generation, modal or inline display
 2. Export / import wishlist — JSON download, JSON upload with item creation
 3. Item image upload — local VPS storage, Caddy serving, `imageUrl` column
 
