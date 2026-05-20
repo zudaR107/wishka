@@ -248,6 +248,15 @@ export const app = {
       url: "Optional. Add a product link if you already have one.",
       price: "Optional. Enter a whole number, e.g. 1990.",
     },
+    image: {
+      uploadLabel: "Add photo",
+      changeLabel: "Replace",
+      deleteLabel: "Delete",
+      uploading: "Uploading…",
+      errorTooLarge: "File is too large. Maximum 8 MB.",
+      errorInvalidType: "Unsupported format. Use JPEG, PNG, or WebP.",
+      errorUploadFailed: "Upload failed. Please try again.",
+    },
     errors: {
       invalidTitle: "Please enter a wish name.",
       invalidUrl: "Please enter a valid URL if you fill in this field.",

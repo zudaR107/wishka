@@ -399,6 +399,89 @@
     white-space: pre-wrap;
   }
 
+  /* ── Item image (below meta, above buttons) ──────────── */
+
+  /* Sits inside item-card-view (inherits its padding).
+     Uniform border + border-radius gives a clean framed look.
+     object-fit: contain shows the full image without cropping —
+     letterbox areas use the subtle background colour. */
+  /* Separator + image block below the meta section */
+  .item-card-image-section {
+    border-top: 1px solid var(--color-border-soft);
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    line-height: 0;
+  }
+
+  /* border-radius applied directly on the img so rounding clips the actual
+     photo pixels. max-width: 100% + height: auto keeps natural proportions
+     and never stretches. max-height limits very tall portrait shots. */
+  .item-card-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    max-height: 200px;
+    border-radius: var(--radius-md);
+    margin: 0 auto;
+  }
+
+  /* ── Item image upload widget (edit form) ─────────────── */
+  .item-image-upload {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border-soft);
+  }
+
+  .item-image-preview-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .item-image-preview {
+    display: block;
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    background: var(--color-bg-subtle);
+  }
+
+  .item-image-actions {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  /* Modifier: makes ui-button stretch equally inside the flex actions row */
+  .item-image-btn {
+    flex: 1;
+    width: auto;
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .item-image-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* Two icons grouped together inside a button */
+  .item-image-btn-icons {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  /* On narrow screens keep only the icons, hide the text label */
+  @media (max-width: 400px) {
+    .item-image-btn-label {
+      display: none;
+    }
+  }
+
   /* ── Item footer: edit + delete ──────────────────────── */
   .item-edit-section {
     scroll-margin-top: 80px;

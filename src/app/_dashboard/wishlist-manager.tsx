@@ -323,6 +323,16 @@ export function WishlistManager({
                       />
                     </div>
                   </div>
+                  {item.imageUrl ? (
+                    <div className="item-card-image-section">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={item.imageUrl}
+                        alt=""
+                        className="item-card-image"
+                      />
+                    </div>
+                  ) : null}
                 </div>
 
                 {/* Footer: edit toggle + reserve + delete */}
@@ -382,9 +392,15 @@ export function WishlistManager({
                       note: item.note,
                       priceFormatted: item.price ?? "",
                       currency: item.currency as CurrencyCode,
+                      imageUrl: item.imageUrl,
                       updatedAt: item.updatedAt.toISOString(),
                     }}
                     wishlistId={wishlist.id}
+                    onImageChange={(url) =>
+                      setLocalItems((prev) =>
+                        prev.map((i) => (i.id === item.id ? { ...i, imageUrl: url } : i)),
+                      )
+                    }
                   />
                 </ItemEditSection>
               </li>

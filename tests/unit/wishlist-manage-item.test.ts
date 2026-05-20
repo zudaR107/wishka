@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   getWishlistForUser: vi.fn(),
   fanOutNotifications: vi.fn(),
+  deleteImageFile: vi.fn(),
   // db.query
   findWishlistItem: vi.fn(),
   findShareLink: vi.fn(),
@@ -55,6 +56,10 @@ vi.mock("../../src/modules/wishlist/db/schema", () => ({
 
 vi.mock("../../src/modules/share/db/schema", () => ({
   shareLinks: {},
+}));
+
+vi.mock("../../src/modules/wishlist/server/item-image", () => ({
+  deleteImageFile: mocks.deleteImageFile,
 }));
 
 import {
@@ -169,6 +174,7 @@ describe("wishlist item delete flow", () => {
     mocks.getWishlistForUser.mockResolvedValue(baseWishlist);
     mocks.findWishlistItem.mockResolvedValue(baseItem);
     mocks.fanOutNotifications.mockResolvedValue(undefined);
+    mocks.deleteImageFile.mockResolvedValue(undefined);
 
     mocks.deleteItem.mockReturnValue({ where: mocks.deleteWhere });
     mocks.deleteWhere.mockReturnValue({ returning: mocks.deleteReturning });

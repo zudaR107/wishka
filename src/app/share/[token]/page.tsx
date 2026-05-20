@@ -39,6 +39,7 @@ type WishlistView = {
     price: string | null;
     currency: string;
     starred: boolean;
+    imageUrl: string | null;
     reservation: ItemReservation;
   }>;
 };
@@ -59,6 +60,7 @@ const DEV_MOCK_WISHLIST: WishlistView = {
       price: "29990",
       currency: "RUB",
       starred: true,
+      imageUrl: null,
       reservation: { status: "available" },
     },
     {
@@ -69,6 +71,7 @@ const DEV_MOCK_WISHLIST: WishlistView = {
       price: "850",
       currency: "RUB",
       starred: false,
+      imageUrl: null,
       reservation: {
         status: "reserved",
         isViewerReservation: true,
@@ -83,6 +86,7 @@ const DEV_MOCK_WISHLIST: WishlistView = {
       price: null,
       currency: "RUB",
       starred: false,
+      imageUrl: null,
       reservation: {
         status: "reserved",
         isViewerReservation: false,
@@ -347,6 +351,16 @@ function SharePageView({
                         </div>
                       ) : null}
                     </div>
+                    {item.imageUrl ? (
+                      <div className="item-card-image-section">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={item.imageUrl}
+                          alt=""
+                          className="item-card-image"
+                        />
+                      </div>
+                    ) : null}
                   </div>
 
                   {/* Footer: reserve or cancel */}

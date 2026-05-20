@@ -14,6 +14,12 @@ The format is based on Keep a Changelog, and this project follows SemVer.
   human-readable Markdown file and re-import it to restore data. Export via
   `GET /api/wishlist/export`; import via file-upload modal on the dashboard.
   Existing data is never overwritten — import always creates new lists.
+- Item image upload: owner can attach one photo per wishlist item. Images are
+  stored on VPS local storage (`UPLOAD_DIR`, default `/uploads`) and served by
+  Caddy as static files. Client-side canvas compression targets ≤ 1 MB before
+  upload; server enforces 8 MB raw limit. Replacing an image or deleting an
+  item removes the old file from disk. Image shown on dashboard and share page.
+  `imageUrl` column added to `wishlist_items` via migration.
 
 ## [1.2.0] - 2026-05-12
 
