@@ -1,10 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 
-function PhotoIcon() {
+function PhotoIcon({ size = 14 }: { size?: number }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
       <circle cx="8.5" cy="8.5" r="1.5" />
@@ -35,6 +35,25 @@ function DeleteIcon() {
   );
 }
 
+function CloseIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
 /** Max raw size we accept before client-side compression (8 MB, mirrors server limit). */
 const MAX_RAW_BYTES = 8 * 1024 * 1024;
 /** Target max size after compression (1 MB). */
@@ -44,26 +63,34 @@ const MAX_DIM = 1920;
 /** JPEG quality used for the compressed output. */
 const JPEG_QUALITY = 0.85;
 
+type ImageLabels = {
+  uploadLabel: string;
+  changeLabel: string;
+  deleteLabel: string;
+  errorTooLarge: string;
+  errorInvalidType: string;
+  errorUploadFailed: string;
+  pickerTitle: string;
+  pickerChangeTitle: string;
+  pickerDropHint: string;
+  pickerPasteHint: string;
+  pickerChooseFile: string;
+  pickerHint: string;
+  pickerDragActive: string;
+};
+
 type ItemImageUploadProps = {
   itemId: string;
   initialImageUrl: string | null;
   /** Called with the new URL after upload, or null after deletion. */
   onImageChange: (url: string | null) => void;
-  labels: {
-    uploadLabel: string;
-    changeLabel: string;
-    deleteLabel: string;
-    uploading: string;
-    errorTooLarge: string;
-    errorInvalidType: string;
-    errorUploadFailed: string;
-  };
+  labels: ImageLabels;
 };
 
 /**
  * Standalone image upload widget embedded in the edit section.
- * Does NOT show an image preview — the card above already shows it.
- * Makes its own fetch() calls and reports changes via onImageChange.
+ * Clicking "Add / Replace" opens a picker dialog with drag-and-drop,
+ * clipboard paste support, and an in-dialog upload preview.
  */
 export function ItemImageUpload({
   itemId,
@@ -72,29 +99,17 @@ export function ItemImageUpload({
   labels,
 }: ItemImageUploadProps) {
   const [hasImage, setHasImage] = useState(initialImageUrl !== null);
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
-  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!inputRef.current) return;
-    inputRef.current.value = "";
-
-    if (!file) return;
-
-    if (file.size > MAX_RAW_BYTES) {
-      setError(labels.errorTooLarge);
-      return;
-    }
-
-    if (!file.type.startsWith("image/")) {
-      setError(labels.errorInvalidType);
-      return;
-    }
-
-    setError(null);
-    setUploading(true);
+  /**
+   * Validates, compresses, and uploads a file.
+   * Returns null on success or a user-facing error message on failure.
+   */
+  async function uploadFile(file: File): Promise<string | null> {
+    if (file.size > MAX_RAW_BYTES) return labels.errorTooLarge;
+    if (!file.type.startsWith("image/")) return labels.errorInvalidType;
 
     try {
       const compressed = await compressImage(file);
@@ -108,41 +123,35 @@ export function ItemImageUpload({
 
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
-        if (data.error === "too-large") {
-          setError(labels.errorTooLarge);
-        } else if (data.error === "invalid-type") {
-          setError(labels.errorInvalidType);
-        } else {
-          setError(labels.errorUploadFailed);
-        }
-        return;
+        if (data.error === "too-large") return labels.errorTooLarge;
+        if (data.error === "invalid-type") return labels.errorInvalidType;
+        return labels.errorUploadFailed;
       }
 
       const data = (await res.json()) as { imageUrl: string };
       setHasImage(true);
       onImageChange(data.imageUrl);
+      return null;
     } catch {
-      setError(labels.errorUploadFailed);
-    } finally {
-      setUploading(false);
+      return labels.errorUploadFailed;
     }
   }
 
   async function handleDelete() {
-    setError(null);
-    setUploading(true);
+    setDeleteError(null);
+    setDeleting(true);
     try {
       const res = await fetch(`/api/items/${itemId}/image`, { method: "DELETE" });
       if (!res.ok) {
-        setError(labels.errorUploadFailed);
+        setDeleteError(labels.errorUploadFailed);
         return;
       }
       setHasImage(false);
       onImageChange(null);
     } catch {
-      setError(labels.errorUploadFailed);
+      setDeleteError(labels.errorUploadFailed);
     } finally {
-      setUploading(false);
+      setDeleting(false);
     }
   }
 
@@ -152,16 +161,16 @@ export function ItemImageUpload({
         <button
           type="button"
           className="ui-button ui-button-soft item-image-btn"
-          onClick={() => inputRef.current?.click()}
-          disabled={uploading}
+          onClick={() => setPickerOpen(true)}
+          disabled={deleting}
           data-testid="item-image-upload-btn"
         >
           <span className="item-image-btn-icons">
             <PhotoIcon />
-            {hasImage && !uploading ? <ReplaceIcon /> : null}
+            {hasImage && !deleting ? <ReplaceIcon /> : null}
           </span>
           <span className="item-image-btn-label">
-            {uploading ? labels.uploading : hasImage ? labels.changeLabel : labels.uploadLabel}
+            {hasImage ? labels.changeLabel : labels.uploadLabel}
           </span>
         </button>
         {hasImage ? (
@@ -169,7 +178,7 @@ export function ItemImageUpload({
             type="button"
             className="ui-button ui-button-danger item-image-btn"
             onClick={handleDelete}
-            disabled={uploading}
+            disabled={deleting}
           >
             <span className="item-image-btn-icons">
               <PhotoIcon />
@@ -180,17 +189,208 @@ export function ItemImageUpload({
         ) : null}
       </div>
 
-      {error ? <p className="ui-note ui-note-error">{error}</p> : null}
+      {deleteError ? <p className="ui-note ui-note-error">{deleteError}</p> : null}
+
+      {pickerOpen ? (
+        <ItemImagePickerDialog
+          title={hasImage ? labels.pickerChangeTitle : labels.pickerTitle}
+          labels={labels}
+          onUpload={uploadFile}
+          onClose={() => setPickerOpen(false)}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+/** Dialog with drag-and-drop, clipboard paste, file picker, and upload preview. */
+function ItemImagePickerDialog({
+  title,
+  labels,
+  onUpload,
+  onClose,
+}: {
+  title: string;
+  labels: ImageLabels;
+  onUpload: (file: File) => Promise<string | null>;
+  onClose: () => void;
+}) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const successTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    dialogRef.current?.showModal();
+  }, []);
+
+  // Revoke object URL when it changes or on unmount to avoid memory leaks.
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
+  // Clear success timer on unmount.
+  useEffect(() => {
+    return () => {
+      if (successTimerRef.current) clearTimeout(successTimerRef.current);
+    };
+  }, []);
+
+  const handleFile = useCallback(
+    async (file: File) => {
+      if (uploading || success) return;
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+      setError(null);
+      setUploading(true);
+
+      const errorMsg = await onUpload(file);
+
+      setUploading(false);
+      if (errorMsg) {
+        setPreviewUrl(null); // cleanup effect revokes the old URL
+        setError(errorMsg);
+      } else {
+        // Show success state briefly, then auto-close.
+        setSuccess(true);
+        successTimerRef.current = setTimeout(onClose, 1200);
+      }
+    },
+    [onUpload, onClose, uploading, success],
+  );
+
+  // Clipboard paste — scoped to dialog being mounted
+  useEffect(() => {
+    function handlePaste(e: ClipboardEvent) {
+      const items = Array.from(e.clipboardData?.items ?? []);
+      const imageItem = items.find((item) => item.type.startsWith("image/"));
+      if (!imageItem) return;
+      const file = imageItem.getAsFile();
+      if (file) {
+        e.preventDefault();
+        handleFile(file);
+      }
+    }
+    document.addEventListener("paste", handlePaste);
+    return () => document.removeEventListener("paste", handlePaste);
+  }, [handleFile]);
+
+  const busy = uploading || success;
+
+  function handleBackdropClick(e: React.MouseEvent<HTMLDialogElement>) {
+    if (busy) return;
+    if (e.target === e.currentTarget) onClose();
+  }
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+    if (!busy) setIsDragging(true);
+  }
+
+  function handleDragLeave(e: React.DragEvent) {
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setIsDragging(false);
+    }
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setIsDragging(false);
+    if (busy) return;
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) handleFile(file);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  return (
+    <dialog
+      ref={dialogRef}
+      className="confirm-dialog image-picker-dialog"
+      onClick={handleBackdropClick}
+      onClose={onClose}
+    >
+      <div className="confirm-dialog-inner">
+        <div className="image-picker-header">
+          <h2 className="confirm-dialog-title">{title}</h2>
+          <button
+            type="button"
+            className="image-picker-close"
+            onClick={onClose}
+            disabled={busy}
+            aria-label="Закрыть"
+          >
+            <CloseIcon />
+          </button>
+        </div>
+
+        <div
+          className={`image-picker-drop-zone${isDragging ? " image-picker-drop-zone-active" : ""}${previewUrl ? " image-picker-drop-zone-preview" : ""}`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          {previewUrl ? (
+            <>
+              <img src={previewUrl} alt="" className="image-picker-preview" />
+              {uploading ? (
+                <div className="image-picker-uploading-overlay">
+                  <span className="image-picker-spinner" aria-hidden="true" />
+                </div>
+              ) : null}
+              {success ? (
+                <div className="image-picker-success-overlay">
+                  <span className="image-picker-check">
+                    <CheckIcon />
+                  </span>
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <PhotoIcon size={32} />
+              <p className="image-picker-drop-hint">
+                {isDragging ? labels.pickerDragActive : labels.pickerDropHint}
+              </p>
+              <p className="image-picker-paste-hint">{labels.pickerPasteHint}</p>
+            </>
+          )}
+        </div>
+
+        {error ? (
+          <p className="ui-note ui-note-error" style={{ textAlign: "center" }}>{error}</p>
+        ) : null}
+
+        <button
+          type="button"
+          className="ui-button ui-button-secondary ui-button-full"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={busy}
+        >
+          {labels.pickerChooseFile}
+        </button>
+
+        <p className="ui-note" style={{ textAlign: "center" }}>{labels.pickerHint}</p>
+      </div>
 
       <input
-        ref={inputRef}
+        ref={fileInputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp,image/gif"
         style={{ display: "none" }}
         onChange={handleFileChange}
-        data-testid="item-image-input"
       />
-    </div>
+    </dialog>
   );
 }
 

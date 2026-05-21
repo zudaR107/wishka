@@ -465,6 +465,136 @@
     }
   }
 
+  /* ── Image picker dialog ─────────────────────────────── */
+  .image-picker-dialog {
+    max-width: min(26rem, calc(100% - 2 * var(--space-4)));
+  }
+
+  .image-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .image-picker-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: background var(--duration-fast), color var(--duration-fast);
+  }
+
+  .image-picker-close:hover {
+    background: var(--color-bg-muted);
+    color: var(--color-text-base);
+  }
+
+  .image-picker-drop-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: var(--space-6) var(--space-4);
+    border: 2px dashed var(--color-border-soft);
+    border-radius: var(--radius-lg);
+    color: var(--color-text-muted);
+    text-align: center;
+    transition: border-color var(--duration-fast), background var(--duration-fast), color var(--duration-fast);
+    cursor: default;
+  }
+
+  .image-picker-drop-zone-active {
+    border-color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+    color: var(--color-accent);
+  }
+
+  .image-picker-drop-hint {
+    font-size: var(--font-size-label);
+    font-weight: 600;
+    color: inherit;
+    margin: 0;
+  }
+
+  .image-picker-paste-hint {
+    font-size: var(--font-size-label);
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  /* Drop zone with preview: remove dashes, use plain border */
+  .image-picker-drop-zone-preview {
+    border-style: solid;
+    padding: var(--space-3);
+    position: relative;
+  }
+
+  .image-picker-preview {
+    display: block;
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    border-radius: var(--radius-md);
+  }
+
+  /* Semi-transparent overlay shown while uploading */
+  .image-picker-uploading-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--color-bg-surface) 60%, transparent);
+    border-radius: var(--radius-lg);
+  }
+
+  /* Success overlay — green tint + checkmark badge */
+  .image-picker-success-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, #16a34a 15%, transparent);
+    border-radius: var(--radius-lg);
+  }
+
+  .image-picker-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #16a34a;
+    color: #ffffff;
+  }
+
+  /* CSS spinner */
+  .image-picker-spinner {
+    display: block;
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--color-border-soft);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    animation: image-picker-spin 0.7s linear infinite;
+  }
+
+  @keyframes image-picker-spin {
+    to { transform: rotate(360deg); }
+  }
+
   /* ── Item footer: edit + delete ──────────────────────── */
   .item-edit-section {
     scroll-margin-top: 80px;

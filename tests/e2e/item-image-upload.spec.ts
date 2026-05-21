@@ -57,10 +57,17 @@ test("owner can upload and delete an item image", async ({ page }) => {
   const tmpFile = path.join(os.tmpdir(), `test-${runId}.png`);
   fs.writeFileSync(tmpFile, pngBytes);
 
-  // Use Playwright's file chooser interception to supply the temp file.
+  // Click the upload button — it now opens the custom picker dialog.
+  await uploadWidget.getByTestId("item-image-upload-btn").click();
+
+  // The picker dialog should be visible.
+  const pickerDialog = page.locator("dialog.image-picker-dialog");
+  await expect(pickerDialog).toBeVisible();
+
+  // Use Playwright's file chooser interception via the "Choose file" button.
   const [fileChooser] = await Promise.all([
     page.waitForEvent("filechooser"),
-    uploadWidget.getByTestId("item-image-upload-btn").click(),
+    pickerDialog.getByRole("button", { name: /выбрать файл/i }).click(),
   ]);
   await fileChooser.setFiles(tmpFile);
 

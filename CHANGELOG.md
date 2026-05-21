@@ -20,6 +20,9 @@ The format is based on Keep a Changelog, and this project follows SemVer.
   upload; server enforces 8 MB raw limit. Replacing an image or deleting an
   item removes the old file from disk. Image shown on dashboard and share page.
   `imageUrl` column added to `wishlist_items` via migration.
+  Upload picker dialog supports drag-and-drop, clipboard paste (Ctrl+V), and
+  file chooser; shows a preview thumbnail with a spinner during upload and a
+  success indicator before closing.
 
 ## [1.2.0] - 2026-05-12
 
