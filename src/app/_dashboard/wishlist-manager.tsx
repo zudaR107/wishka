@@ -16,6 +16,13 @@ import { QrCodeButton } from "./qr-code-button";
 import { RegenerateLinkButton } from "./regenerate-link-button";
 import { OpenFormButton, AddItemFormFocus } from "./open-form-button";
 import { scrollAndHighlight } from "./scroll-utils";
+import { ItemImageViewer } from "./item-image-lightbox";
+import {
+  ItemImagePickerDialog,
+  compressImage,
+  MAX_RAW_BYTES,
+  type ImageLabels,
+} from "./item-image-upload";
 import { formatPrice } from "../format-price";
 import { type CurrencyCode } from "@/shared/lib/currency";
 import type {
@@ -114,6 +121,45 @@ export function WishlistManager({
     if (!wishlist) return;
     setLocalItems(wishlist.items);
   }, [wishlist]);
+
+  // Active picker: item ID whose picker dialog is open (null = closed).
+  const [activePickerItemId, setActivePickerItemId] = useState<string | null>(null);
+
+  /** Upload a file for a given item. Returns null on success, error message on failure. */
+  async function uploadImageForItem(itemId: string, file: File): Promise<string | null> {
+    const img = messages.dashboard.image;
+    if (file.size > MAX_RAW_BYTES) return img.errorTooLarge;
+    if (!file.type.startsWith("image/")) return img.errorInvalidType;
+    try {
+      const compressed = await compressImage(file);
+      const formData = new FormData();
+      formData.append("image", compressed, file.name);
+      const res = await fetch(`/api/items/${itemId}/image`, { method: "POST", body: formData });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        if (data.error === "too-large") return img.errorTooLarge;
+        if (data.error === "invalid-type") return img.errorInvalidType;
+        return img.errorUploadFailed;
+      }
+      const data = (await res.json()) as { imageUrl: string };
+      setLocalItems((prev) => prev.map((i) => (i.id === itemId ? { ...i, imageUrl: data.imageUrl } : i)));
+      return null;
+    } catch {
+      return img.errorUploadFailed;
+    }
+  }
+
+  /** Delete the image for a given item. Returns null on success, error message on failure. */
+  async function deleteImageForItem(itemId: string): Promise<string | null> {
+    try {
+      const res = await fetch(`/api/items/${itemId}/image`, { method: "DELETE" });
+      if (!res.ok) return messages.dashboard.image.errorUploadFailed;
+      setLocalItems((prev) => prev.map((i) => (i.id === itemId ? { ...i, imageUrl: null } : i)));
+      return null;
+    } catch {
+      return messages.dashboard.image.errorUploadFailed;
+    }
+  }
 
   // Scroll to new item AFTER React has committed updated localItems to the DOM.
   useEffect(() => {
@@ -323,6 +369,19 @@ export function WishlistManager({
                       />
                     </div>
                   </div>
+                  {item.imageUrl ? (
+                    <ItemImageViewer
+                      src={item.imageUrl}
+                      onReplace={() => setActivePickerItemId(item.id)}
+                      onDelete={() => deleteImageForItem(item.id)}
+                      labels={{
+                        viewTitle: messages.dashboard.image.viewTitle,
+                        changeLabel: messages.dashboard.image.changeLabel,
+                        deleteLabel: messages.dashboard.image.deleteLabel,
+                        errorDeleteFailed: messages.dashboard.image.errorUploadFailed,
+                      }}
+                    />
+                  ) : null}
                 </div>
 
                 {/* Footer: edit toggle + reserve + delete */}
@@ -382,9 +441,16 @@ export function WishlistManager({
                       note: item.note,
                       priceFormatted: item.price ?? "",
                       currency: item.currency as CurrencyCode,
+                      imageUrl: item.imageUrl,
                       updatedAt: item.updatedAt.toISOString(),
                     }}
                     wishlistId={wishlist.id}
+                    onImageChange={(url) =>
+                      setLocalItems((prev) =>
+                        prev.map((i) => (i.id === item.id ? { ...i, imageUrl: url } : i)),
+                      )
+                    }
+                    onOpenPicker={() => setActivePickerItemId(item.id)}
                   />
                 </ItemEditSection>
               </li>
@@ -393,6 +459,20 @@ export function WishlistManager({
           <div ref={listEndRef} aria-hidden="true" />
         </section>
       )}
+
+      {/* Picker dialog — rendered at top level so it works even when edit section is collapsed */}
+      {activePickerItemId ? (
+        <ItemImagePickerDialog
+          title={
+            localItems.find((i) => i.id === activePickerItemId)?.imageUrl
+              ? messages.dashboard.image.pickerChangeTitle
+              : messages.dashboard.image.pickerTitle
+          }
+          labels={messages.dashboard.image as ImageLabels}
+          onUpload={(file) => uploadImageForItem(activePickerItemId, file)}
+          onClose={() => setActivePickerItemId(null)}
+        />
+      ) : null}
     </>
   );
 }

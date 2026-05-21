@@ -12,6 +12,7 @@
 |---|---|---|---|---|---|
 | `DATABASE_URL` | yes | yes | local, CI with DB work, production | PostgreSQL connection string for app runtime and Drizzle CLI | Required by `src/shared/db/env.ts` and `drizzle.config.ts` |
 | `DATABASE_SSL` | no | no | local, CI, production | Enables PostgreSQL SSL mode when set to `true`, `1`, or `yes` | Default behavior is `false` |
+| `UPLOAD_DIR` | no | no | local, production | Absolute path where uploaded item images are stored | Dev default: `<cwd>/public/uploads`; production default: `/uploads` (served by Caddy) |
 
 ### Process Runtime Variables
 | Variable | Required | Secret | Environments | Purpose | Notes |
@@ -204,6 +205,53 @@
 - Compose smoke-check commands:
   - `docker compose --env-file .env.compose.local ps`
   - `curl -H 'Host: wshka.ru' http://localhost/healthz`
+
+## Item Image Upload
+
+### Storage Contract
+- Uploaded images are stored in `UPLOAD_DIR` (default: `/uploads` on the VPS).
+- Files are named `<uuid>.<ext>` (e.g. `a1b2c3d4-…-uuid.jpg`).
+- The `imageUrl` column stores the public relative path: `/uploads/<filename>`.
+- Max raw upload size is 8 MB (enforced at the Next.js API layer before writing to disk).
+- Client-side compression targets ≤ 1 MB before the request is sent.
+- Supported formats: JPEG, PNG, WebP, GIF.
+
+### Caddy Static-File Block
+Caddy must serve the `/uploads` directory as static files. Add this block to `ops/caddy/Caddyfile`:
+
+```caddy
+handle_path /uploads/* {
+    root * /uploads
+    file_server
+}
+```
+
+Place it before the `reverse_proxy` block so Caddy short-circuits static file requests without forwarding them to the Next.js app.
+
+### VPS Directory Setup
+Before the first upload, create the directory and set correct ownership:
+
+```sh
+sudo mkdir -p /uploads
+sudo chown <app-user>:<app-user> /uploads
+sudo chmod 755 /uploads
+```
+
+In the Docker Compose stack, bind-mount `/uploads` into the `caddy` container (read-only) and into the `app` container (read-write):
+
+```yaml
+# app service
+volumes:
+  - /uploads:/uploads
+
+# caddy service
+volumes:
+  - /uploads:/uploads:ro
+```
+
+### Local Development
+In development, `UPLOAD_DIR` is not set, so files land in `<cwd>/public/uploads/`.
+Next.js serves `public/` at the root, making uploaded images available at `/uploads/<filename>` during local runs.
 
 ## Caddy HTTPS Foundation
 - `ops/caddy/Caddyfile` is now a production-oriented reverse proxy foundation for `wshka.ru`.

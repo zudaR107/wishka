@@ -9,6 +9,7 @@ import { type CurrencyCode } from "@/shared/lib/currency";
 import { updateItemAction, type ItemFormState } from "./item-actions";
 import { useItemEditClose } from "./item-edit-section";
 import { scrollAndHighlight } from "./scroll-utils";
+import { ItemImageUpload } from "./item-image-upload";
 
 type EditItemFormProps = {
   item: {
@@ -18,12 +19,15 @@ type EditItemFormProps = {
     note: string | null;
     priceFormatted: string;
     currency: CurrencyCode;
+    imageUrl: string | null;
     updatedAt: string;
   };
   wishlistId: string;
+  onImageChange: (url: string | null) => void;
+  onOpenPicker: () => void;
 };
 
-export function EditItemForm({ item, wishlistId }: EditItemFormProps) {
+export function EditItemForm({ item, wishlistId, onImageChange, onOpenPicker }: EditItemFormProps) {
   const messages = useTranslations("app");
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -165,6 +169,13 @@ export function EditItemForm({ item, wishlistId }: EditItemFormProps) {
       <button type="submit" className="ui-button">
         {messages.dashboard.updateLabel}
       </button>
+      <ItemImageUpload
+        itemId={item.id}
+        initialImageUrl={item.imageUrl}
+        onImageChange={onImageChange}
+        onOpenPicker={onOpenPicker}
+        labels={messages.dashboard.image}
+      />
     </form>
   );
 }

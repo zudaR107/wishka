@@ -36,3 +36,6 @@ docs/COMMANDS.md
 docs/wshka_seo_webmaster_checklist.md
 .claude/
 CLAUDE.md
+
+# dev upload storage (production uses UPLOAD_DIR outside the project)
+public/uploads/

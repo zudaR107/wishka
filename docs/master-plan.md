@@ -103,22 +103,26 @@ Status:
 Execution backlog:
 1. ✅ QR code for share links — browser-side generation, modal or inline display
 2. ✅ Export / import wishlist — download all wishlists as a human-readable formatted text file; import back from the same file to restore items
-3. Item image upload — local VPS storage, Caddy serving, `imageUrl` column
+3. ✅ Item image upload — local VPS storage, Caddy serving, `imageUrl` column
+4. Marketplace image parsing — parse a product URL (Wildberries, Ozon, etc.) to auto-fill title, price, and image for an item
 
 Recommended issue shape:
 - `M11-I1 QR code for share links — browser-side generation and display`
 - `M11-I2 Export / import wishlist — formatted text backup download and restore`
 - `M11-I3 Item image upload — VPS local storage, Caddy config, schema addition`
+- `M11-I4 Marketplace image parsing — auto-fill item fields from product URL`
 
 Recommended PR order:
 1. `M11-I1 QR code for share links — browser-side generation and display`
 2. `M11-I2 Export / import wishlist — formatted text backup download and restore`
 3. `M11-I3 Item image upload — VPS local storage, Caddy config, schema addition`
+4. `M11-I4 Marketplace image parsing — auto-fill item fields from product URL`
 
 Dependencies:
 - `M11-I1` has no dependencies
 - `M11-I2` has no dependencies
 - `M11-I3` has no dependencies on `M11-I1` or `M11-I2`; done last because it requires ops changes (Caddy config, VPS `/uploads` directory)
+- `M11-I4` depends on `M11-I3` (`imageUrl` column must exist)
 
 Scope notes:
 - QR code must be generated entirely in the browser; no backend endpoint required. Use a small, well-maintained library (e.g. `qrcode`).
@@ -140,9 +144,16 @@ Definition of small PRs for this milestone:
 - QR PR only adds the client-side QR component and wires it to the share link block; does not touch the backend
 - export/import PR only adds the Markdown download action, the file-upload/parse flow, and the dashboard UI entry points; does not touch image or QR logic
 - image PR only adds the upload API route, the `imageUrl` migration, Caddy static-file config, and item card image rendering
+- parsing PR only adds the URL-parsing server action, the auto-fill UI trigger, and scraping logic for Wildberries and Ozon; does not change the upload flow
+
+Scope notes (M11-I4):
+- Triggered from the item form: owner pastes a product URL and clicks «Fill from URL».
+- Server-side fetch + HTML parsing (no headless browser); best-effort — gracefully degrades when parsing fails.
+- Populates `title`, `price`, `currency`, and `imageUrl` (downloads and stores the image via the same `/uploads` flow as M11-I3).
+- Start with Wildberries and Ozon; other marketplaces are future work.
 
 Release note:
-- `v1.3.0` adds QR code sharing, wishlist backup export/import (human-readable Markdown), and per-item image upload.
+- `v1.3.0` adds QR code sharing, wishlist backup export/import (human-readable Markdown), per-item image upload, and auto-fill from marketplace product URLs.
 
 ---
 
@@ -257,7 +268,6 @@ Release note:
 
 | Idea | Notes |
 |---|---|
-| **Marketplace image parsing** | Parse a product URL → auto-fill title, price, image from Wildberries / Ozon / etc. Fragile; far future. |
 | **Email notifications (opt-in)** | Notify owner when an item is reserved or reservation is cancelled. Requires M12 email infrastructure. |
 | **OAuth login** | GitHub, Google, Yandex. Needs account-merging logic if the same person registered by email first. |
 | **S3-compatible image storage** | Replace VPS local uploads with Yandex Object Storage or MinIO when scale demands it. |

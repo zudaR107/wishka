@@ -8,6 +8,7 @@ import {
   validateWishlistItemInput,
 } from "@/modules/wishlist/server/item-input";
 import { fanOutNotifications } from "@/modules/notification/server/create-notification";
+import { deleteImageFile } from "@/modules/wishlist/server/item-image";
 
 export type UpdateWishlistItemResult =
   | { status: "success" }
@@ -86,9 +87,9 @@ export async function deleteCurrentWishlistItem(
 
     const db = await getDb();
 
-    // Snapshot item title and reservers BEFORE deletion (cascade will remove them)
+    // Snapshot item title, imageUrl, and reservers BEFORE deletion (cascade will remove them)
     const existing = await db.query.wishlistItems.findFirst({
-      columns: { id: true, title: true, wishlistId: true },
+      columns: { id: true, title: true, wishlistId: true, imageUrl: true },
       where: and(eq(wishlistItems.id, itemId), eq(wishlistItems.wishlistId, wishlist.id)),
     });
 
@@ -108,6 +109,11 @@ export async function deleteCurrentWishlistItem(
 
     if (result.length === 0) {
       return { status: "error", code: "item-not-found" };
+    }
+
+    // Best-effort cleanup of the associated image file.
+    if (existing.imageUrl) {
+      void deleteImageFile(existing.imageUrl);
     }
 
     // Fan-out notifications with itemId=null (item is now deleted)

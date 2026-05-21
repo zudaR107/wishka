@@ -13,6 +13,7 @@ import { ShareCancelReservationButton } from "@/app/share/[token]/share-cancel-r
 import { BioHighlight } from "@/app/share/[token]/bio-highlight";
 import { OwnerEmail } from "@/app/share/[token]/owner-email";
 import { ScrollHighlight } from "@/app/_dashboard/scroll-highlight";
+import { ItemImageViewer } from "@/app/_dashboard/item-image-lightbox";
 import { SharePageSync } from "@/app/share/[token]/share-page-sync";
 import { formatPrice } from "@/app/format-price";
 import { parseCurrency } from "@/shared/lib/currency";
@@ -39,6 +40,7 @@ type WishlistView = {
     price: string | null;
     currency: string;
     starred: boolean;
+    imageUrl: string | null;
     reservation: ItemReservation;
   }>;
 };
@@ -59,6 +61,7 @@ const DEV_MOCK_WISHLIST: WishlistView = {
       price: "29990",
       currency: "RUB",
       starred: true,
+      imageUrl: null,
       reservation: { status: "available" },
     },
     {
@@ -69,6 +72,7 @@ const DEV_MOCK_WISHLIST: WishlistView = {
       price: "850",
       currency: "RUB",
       starred: false,
+      imageUrl: null,
       reservation: {
         status: "reserved",
         isViewerReservation: true,
@@ -83,6 +87,7 @@ const DEV_MOCK_WISHLIST: WishlistView = {
       price: null,
       currency: "RUB",
       starred: false,
+      imageUrl: null,
       reservation: {
         status: "reserved",
         isViewerReservation: false,
@@ -347,6 +352,9 @@ function SharePageView({
                         </div>
                       ) : null}
                     </div>
+                    {item.imageUrl ? (
+                      <ItemImageViewer src={item.imageUrl} />
+                    ) : null}
                   </div>
 
                   {/* Footer: reserve or cancel */}
