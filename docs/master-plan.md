@@ -103,7 +103,7 @@ Status:
 Execution backlog:
 1. ✅ QR code for share links — browser-side generation, modal or inline display
 2. ✅ Export / import wishlist — download all wishlists as a human-readable formatted text file; import back from the same file to restore items
-3. Item image upload — local VPS storage, Caddy serving, `imageUrl` column
+3. ✅ Item image upload — local VPS storage, Caddy serving, `imageUrl` column
 4. Marketplace image parsing — parse a product URL (Wildberries, Ozon, etc.) to auto-fill title, price, and image for an item
 
 Recommended issue shape:

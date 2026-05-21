@@ -64,19 +64,17 @@ test("owner can upload and delete an item image", async ({ page }) => {
   ]);
   await fileChooser.setFiles(tmpFile);
 
-  // Wait for the preview image to appear (upload succeeded).
-  await expect(itemCard.locator(".item-image-preview")).toBeVisible({ timeout: 10_000 });
-
-  // The item card image (read view) should also become visible after
-  // the component updates its local state.
-  // (no router.refresh needed — ItemImageUpload updates imageUrl via useState)
-  await expect(itemCard.locator(".item-image-preview")).toBeVisible();
+  // Wait for the card image to appear (optimistic update via onImageChange).
+  // The image renders in the card view (.item-card-image), not in the edit form.
+  await expect(itemCard.locator(".item-card-image")).toBeVisible({ timeout: 10_000 });
 
   // ── Delete the image ─────────────────────────────────────────────────────
-  await itemCard.getByRole("button", { name: /удалить фото/i }).click();
+  // Scope to uploadWidget to avoid matching the item-delete button.
+  await uploadWidget.getByRole("button", { name: /удалить/i }).click();
 
-  // Preview should disappear and the upload button should re-appear.
-  await expect(itemCard.locator(".item-image-preview")).not.toBeVisible();
+  // Card image should disappear (optimistic null update) and
+  // the upload button should revert to "add photo" state.
+  await expect(itemCard.locator(".item-card-image")).not.toBeVisible();
   await expect(uploadWidget.getByTestId("item-image-upload-btn")).toBeVisible();
 
   // Cleanup temp file.

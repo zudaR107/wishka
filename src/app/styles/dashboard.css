@@ -413,16 +413,14 @@
     line-height: 0;
   }
 
-  /* border-radius applied directly on the img so rounding clips the actual
-     photo pixels. max-width: 100% + height: auto keeps natural proportions
-     and never stretches. max-height limits very tall portrait shots. */
+  /* Left-aligned, natural proportions. Sits like another meta row.
+     max-height caps very tall images; border-radius rounds the photo. */
   .item-card-image {
     display: block;
     max-width: 100%;
     height: auto;
     max-height: 200px;
     border-radius: var(--radius-md);
-    margin: 0 auto;
   }
 
   /* ── Item image upload widget (edit form) ─────────────── */
@@ -433,21 +431,6 @@
     margin-top: var(--space-4);
     padding-top: var(--space-4);
     border-top: 1px solid var(--color-border-soft);
-  }
-
-  .item-image-preview-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-  }
-
-  .item-image-preview {
-    display: block;
-    width: 100%;
-    max-height: 200px;
-    object-fit: cover;
-    border-radius: var(--radius-md);
-    background: var(--color-bg-subtle);
   }
 
   .item-image-actions {
