@@ -13,6 +13,7 @@ import { ShareCancelReservationButton } from "@/app/share/[token]/share-cancel-r
 import { BioHighlight } from "@/app/share/[token]/bio-highlight";
 import { OwnerEmail } from "@/app/share/[token]/owner-email";
 import { ScrollHighlight } from "@/app/_dashboard/scroll-highlight";
+import { ItemImageViewer } from "@/app/_dashboard/item-image-lightbox";
 import { SharePageSync } from "@/app/share/[token]/share-page-sync";
 import { formatPrice } from "@/app/format-price";
 import { parseCurrency } from "@/shared/lib/currency";
@@ -352,14 +353,7 @@ function SharePageView({
                       ) : null}
                     </div>
                     {item.imageUrl ? (
-                      <div className="item-card-image-section">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={item.imageUrl}
-                          alt=""
-                          className="item-card-image"
-                        />
-                      </div>
+                      <ItemImageViewer src={item.imageUrl} />
                     ) : null}
                   </div>
 

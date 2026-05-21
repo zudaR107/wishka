@@ -24,9 +24,10 @@ type EditItemFormProps = {
   };
   wishlistId: string;
   onImageChange: (url: string | null) => void;
+  onOpenPicker: () => void;
 };
 
-export function EditItemForm({ item, wishlistId, onImageChange }: EditItemFormProps) {
+export function EditItemForm({ item, wishlistId, onImageChange, onOpenPicker }: EditItemFormProps) {
   const messages = useTranslations("app");
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -172,6 +173,7 @@ export function EditItemForm({ item, wishlistId, onImageChange }: EditItemFormPr
         itemId={item.id}
         initialImageUrl={item.imageUrl}
         onImageChange={onImageChange}
+        onOpenPicker={onOpenPicker}
         labels={messages.dashboard.image}
       />
     </form>

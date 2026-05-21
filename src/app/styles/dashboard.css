@@ -421,6 +421,7 @@
     height: auto;
     max-height: 200px;
     border-radius: var(--radius-md);
+    cursor: pointer;
   }
 
   /* ── Item image upload widget (edit form) ─────────────── */

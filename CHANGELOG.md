@@ -23,6 +23,9 @@ The format is based on Keep a Changelog, and this project follows SemVer.
   Upload picker dialog supports drag-and-drop, clipboard paste (Ctrl+V), and
   file chooser; shows a preview thumbnail with a spinner during upload and a
   success indicator before closing.
+- Item image lightbox: clicking an item image opens a full-width dialog viewer.
+  On the dashboard the lightbox includes Replace and Delete actions; on the
+  share page it is view-only.
 
 ## [1.2.0] - 2026-05-12
 

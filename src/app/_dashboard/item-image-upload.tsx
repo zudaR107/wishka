@@ -55,7 +55,7 @@ function CheckIcon() {
 }
 
 /** Max raw size we accept before client-side compression (8 MB, mirrors server limit). */
-const MAX_RAW_BYTES = 8 * 1024 * 1024;
+export const MAX_RAW_BYTES = 8 * 1024 * 1024;
 /** Target max size after compression (1 MB). */
 const TARGET_BYTES = 1 * 1024 * 1024;
 /** Max dimension (px) for the longer side after downscaling. */
@@ -63,7 +63,7 @@ const MAX_DIM = 1920;
 /** JPEG quality used for the compressed output. */
 const JPEG_QUALITY = 0.85;
 
-type ImageLabels = {
+export type ImageLabels = {
   uploadLabel: string;
   changeLabel: string;
   deleteLabel: string;
@@ -84,6 +84,8 @@ type ItemImageUploadProps = {
   initialImageUrl: string | null;
   /** Called with the new URL after upload, or null after deletion. */
   onImageChange: (url: string | null) => void;
+  /** Called when the user requests to open the picker (managed by the parent). */
+  onOpenPicker: () => void;
   labels: ImageLabels;
 };
 
@@ -96,46 +98,18 @@ export function ItemImageUpload({
   itemId,
   initialImageUrl,
   onImageChange,
+  onOpenPicker,
   labels,
 }: ItemImageUploadProps) {
   const [hasImage, setHasImage] = useState(initialImageUrl !== null);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
-  const [pickerOpen, setPickerOpen] = useState(false);
 
-  /**
-   * Validates, compresses, and uploads a file.
-   * Returns null on success or a user-facing error message on failure.
-   */
-  async function uploadFile(file: File): Promise<string | null> {
-    if (file.size > MAX_RAW_BYTES) return labels.errorTooLarge;
-    if (!file.type.startsWith("image/")) return labels.errorInvalidType;
-
-    try {
-      const compressed = await compressImage(file);
-      const formData = new FormData();
-      formData.append("image", compressed, file.name);
-
-      const res = await fetch(`/api/items/${itemId}/image`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const data = (await res.json().catch(() => ({}))) as { error?: string };
-        if (data.error === "too-large") return labels.errorTooLarge;
-        if (data.error === "invalid-type") return labels.errorInvalidType;
-        return labels.errorUploadFailed;
-      }
-
-      const data = (await res.json()) as { imageUrl: string };
-      setHasImage(true);
-      onImageChange(data.imageUrl);
-      return null;
-    } catch {
-      return labels.errorUploadFailed;
-    }
-  }
+  // Sync hasImage when the parent updates initialImageUrl after an external upload
+  // (e.g. upload triggered from the lightbox or any other external entry point).
+  useEffect(() => {
+    setHasImage(initialImageUrl !== null);
+  }, [initialImageUrl]);
 
   async function handleDelete() {
     setDeleteError(null);
@@ -161,7 +135,7 @@ export function ItemImageUpload({
         <button
           type="button"
           className="ui-button ui-button-soft item-image-btn"
-          onClick={() => setPickerOpen(true)}
+          onClick={onOpenPicker}
           disabled={deleting}
           data-testid="item-image-upload-btn"
         >
@@ -190,21 +164,12 @@ export function ItemImageUpload({
       </div>
 
       {deleteError ? <p className="ui-note ui-note-error">{deleteError}</p> : null}
-
-      {pickerOpen ? (
-        <ItemImagePickerDialog
-          title={hasImage ? labels.pickerChangeTitle : labels.pickerTitle}
-          labels={labels}
-          onUpload={uploadFile}
-          onClose={() => setPickerOpen(false)}
-        />
-      ) : null}
     </div>
   );
 }
 
 /** Dialog with drag-and-drop, clipboard paste, file picker, and upload preview. */
-function ItemImagePickerDialog({
+export function ItemImagePickerDialog({
   title,
   labels,
   onUpload,
@@ -396,10 +361,11 @@ function ItemImagePickerDialog({
 
 /**
  * Compress an image using the Canvas API.
+ * Exported for use by parent components that manage the picker at a higher level.
  * Downscales to MAX_DIM on the longer side and encodes as JPEG at JPEG_QUALITY.
  * If the result is larger than TARGET_BYTES, retries at lower quality.
  */
-async function compressImage(file: File): Promise<File> {
+export async function compressImage(file: File): Promise<File> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     const objectUrl = URL.createObjectURL(file);

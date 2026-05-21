@@ -246,6 +246,7 @@ export const app = {
       uploadLabel: "Добавить фото",
       changeLabel: "Заменить",
       deleteLabel: "Удалить",
+      viewTitle: "Фото",
       errorTooLarge: "Файл слишком большой. Максимум 8 МБ.",
       errorInvalidType: "Недопустимый формат. Используйте JPEG, PNG или WebP.",
       errorUploadFailed: "Не удалось загрузить изображение. Попробуйте ещё раз.",
