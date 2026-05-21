@@ -25,6 +25,14 @@ export async function POST(request: NextRequest, { params }: RouteContext): Prom
 
   const { id: itemId } = await params;
 
+  // Reject oversized requests before parsing the body.
+  // Content-Length includes multipart overhead, so it's slightly larger than
+  // the raw file — but that's acceptable for a server-side guard.
+  const contentLength = request.headers.get("content-length");
+  if (contentLength && parseInt(contentLength, 10) > MAX_UPLOAD_BYTES) {
+    return NextResponse.json({ error: "too-large" }, { status: 413 });
+  }
+
   let formData: FormData;
   try {
     formData = await request.formData();
