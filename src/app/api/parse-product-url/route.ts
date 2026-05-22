@@ -55,29 +55,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   // Parse metadata.
   const parsed = await parseProductUrl(rawUrl);
 
-  const isDev = process.env.NODE_ENV === "development";
-  if (isDev) {
-    console.log("[parse-product-url] parsed:", {
-      url: rawUrl,
-      title: parsed.title,
-      price: parsed.price,
-      currency: parsed.currency,
-      externalImageUrl: parsed.externalImageUrl,
-      hasItemId: !!itemId,
-    });
-  }
-
   // Download image to disk (best-effort, works even before the item exists).
   // If itemId is present, also update the DB association immediately (edit flow).
   let localImageUrl: string | undefined;
   if (parsed.externalImageUrl) {
     localImageUrl = await downloadImageToDisk(parsed.externalImageUrl, rawUrl);
-    if (isDev) {
-      console.log("[parse-product-url] image download result:", {
-        externalImageUrl: parsed.externalImageUrl,
-        localImageUrl,
-      });
-    }
     if (localImageUrl && itemId) {
       await associateLocalImageWithItem(user.id, itemId, localImageUrl);
     }

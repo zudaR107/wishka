@@ -158,14 +158,14 @@ describe("Wildberries article extraction (via URL pattern)", () => {
       id: 12345,
       name: "FM Transmitter",
       brand: "Roidmi",
-      salePriceU: 199000, // 1990 RUB in kopecks
+      sizes: [{ price: { basic: 250000, product: 199000 } }], // 1990 RUB
     };
 
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ data: { products: [mockProduct] } }),
+        json: async () => ({ products: [mockProduct] }),
       }),
     );
 
@@ -179,6 +179,36 @@ describe("Wildberries article extraction (via URL pattern)", () => {
     expect(result.externalImageUrl).toMatch(/wbbasket\.ru/);
   });
 
+  it("uses product name without the '-' brand placeholder", async () => {
+    const { parseProductUrl } = await import(
+      "../../src/modules/item/parse-product-url"
+    );
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          products: [
+            {
+              id: 777,
+              name: "ESP32 Controller",
+              brand: "-",
+              sizes: [{ price: { basic: 85500, product: 57700 } }],
+            },
+          ],
+        }),
+      }),
+    );
+
+    const result = await parseProductUrl(
+      "https://www.wildberries.ru/catalog/777/detail.aspx",
+    );
+
+    expect(result.title).toBe("ESP32 Controller");
+    expect(result.price).toBe(577);
+  });
+
   it("returns empty object when WB API returns no products", async () => {
     const { parseProductUrl } = await import(
       "../../src/modules/item/parse-product-url"
@@ -188,7 +218,7 @@ describe("Wildberries article extraction (via URL pattern)", () => {
       "fetch",
       vi.fn().mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ data: { products: [] } }),
+        json: async () => ({ products: [] }),
       }),
     );
 

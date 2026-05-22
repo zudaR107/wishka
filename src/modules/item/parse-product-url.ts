@@ -1,4 +1,8 @@
 import * as cheerio from "cheerio";
+import { execFile } from "child_process";
+import { promisify } from "util";
+
+const execFileAsync = promisify(execFile);
 
 export type ParsedProduct = {
   title?: string;
@@ -122,26 +126,50 @@ async function parseWildberries(url: URL): Promise<ParsedProduct> {
   const nm = extractWbArticle(url);
   if (!nm) return {};
 
-  const apiUrl = `https://card.wb.ru/cards/v1/detail?nm=${nm}`;
-  const res = await fetch(apiUrl, {
-    headers: { "User-Agent": FETCH_HEADERS["User-Agent"] },
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-  });
+  // card.wb.ru v4 — current public card endpoint. Requires appType, curr,
+  // and a dest geo code (Moscow region) for the price field to be returned.
+  const apiUrl =
+    `https://card.wb.ru/cards/v4/detail?appType=1&curr=rub&dest=-1257786&nm=${nm}`;
+  // WB card API blocks Node.js fetch (TLS fingerprint mismatch) but allows curl.
+  // We spawn curl to work around this.
+  let jsonText: string;
+  try {
+    const timeoutSec = Math.floor(REQUEST_TIMEOUT_MS / 1000);
+    const { stdout } = await execFileAsync("curl", [
+      "-s",
+      "--max-time", String(timeoutSec),
+      apiUrl,
+    ], { timeout: REQUEST_TIMEOUT_MS });
+    jsonText = stdout;
+  } catch {
+    return {};
+  }
 
-  if (!res.ok) return {};
+  let json: Record<string, unknown>;
+  try {
+    json = JSON.parse(jsonText) as Record<string, unknown>;
+  } catch {
+    return {};
+  }
 
-  const json = (await res.json()) as Record<string, unknown>;
-  const products = (json?.data as Record<string, unknown>)
-    ?.products as Array<Record<string, unknown>> | undefined;
+  const products = json?.products as Array<Record<string, unknown>> | undefined;
   const product = products?.[0];
   if (!product) return {};
 
-  const brand = product.brand as string | undefined;
-  const name = product.name as string | undefined;
-  const title = [brand, name].filter(Boolean).join(" ") || undefined;
+  // Title: product name, prefixed with a real brand when present.
+  // WB stores "-" as the brand placeholder for unbranded products.
+  const brand = typeof product.brand === "string" ? product.brand : "";
+  const name = typeof product.name === "string" ? product.name : "";
+  const brandPrefix = brand && brand !== "-" ? brand : "";
+  const title = [brandPrefix, name].filter(Boolean).join(" ") || undefined;
 
-  const salePriceU = product.salePriceU as number | undefined;
-  const price = salePriceU ? salePriceU / 100 : undefined;
+  // Price: v4 nests price inside sizes[].price (kopecks). `product` is the
+  // selling price; `basic` is the pre-discount price.
+  const sizes = product.sizes as Array<Record<string, unknown>> | undefined;
+  const priceObj = sizes?.[0]?.price as Record<string, unknown> | undefined;
+  const rawPrice = priceObj?.product ?? priceObj?.basic;
+  const price =
+    typeof rawPrice === "number" && rawPrice > 0 ? rawPrice / 100 : undefined;
 
   // Compose the main image URL from article arithmetic.
   const vol = Math.floor(nm / 100000);
