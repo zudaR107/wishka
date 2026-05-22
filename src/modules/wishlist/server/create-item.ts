@@ -24,6 +24,7 @@ export async function createCurrentWishlistItem(
   wishlistId: string,
   input: WishlistItemInput,
   starred = false,
+  imageUrl?: string,
 ): Promise<CreateWishlistItemResult> {
   const validationResult = validateCreateWishlistItemInput(input);
 
@@ -44,6 +45,7 @@ export async function createCurrentWishlistItem(
       wishlistId: wishlist.id,
       ...validationResult.values,
       starred,
+      ...(imageUrl ? { imageUrl } : {}),
     });
 
     return { status: "success" };

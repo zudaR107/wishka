@@ -33,6 +33,10 @@ export type DeleteItemImageResult =
   | { status: "success" }
   | { status: "error"; code: "item-not-found" | "unknown" };
 
+export type SaveImageFileResult =
+  | { status: "success"; imageUrl: string }
+  | { status: "error"; code: "unknown" };
+
 /** Upload an image for an item. Verifies ownership, replaces any existing image. */
 export async function uploadItemImage(
   userId: string,
@@ -125,6 +129,73 @@ export async function deleteItemImage(
     await db
       .update(wishlistItems)
       .set({ imageUrl: null, updatedAt: new Date() })
+      .where(eq(wishlistItems.id, itemId));
+
+    return { status: "success" };
+  } catch {
+    return { status: "error", code: "unknown" };
+  }
+}
+
+/**
+ * Save an image buffer to the uploads directory without touching the DB.
+ * Used by the marketplace URL parser to persist the image before the item
+ * has been created (create-item flow) or when DB update is handled separately.
+ */
+export async function saveImageToUploadDir(
+  buffer: Buffer,
+  contentType: string,
+): Promise<SaveImageFileResult> {
+  try {
+    const uploadDir = getUploadDir();
+    await fs.mkdir(uploadDir, { recursive: true });
+
+    const ext = mimeToExt(contentType);
+    const filename = `${randomUUID()}.${ext}`;
+    const filePath = path.join(uploadDir, filename);
+    await fs.writeFile(filePath, buffer);
+
+    return { status: "success", imageUrl: `${UPLOAD_URL_PREFIX}/${filename}` };
+  } catch {
+    return { status: "error", code: "unknown" };
+  }
+}
+
+/**
+ * Associate a pre-saved local image path with an item in the DB.
+ * Verifies ownership and removes any previously stored image file.
+ */
+export async function associateLocalImageWithItem(
+  userId: string,
+  itemId: string,
+  localImageUrl: string,
+): Promise<{ status: "success" } | { status: "error"; code: string }> {
+  try {
+    const db = await getDb();
+
+    const row = await db
+      .select({
+        id: wishlistItems.id,
+        imageUrl: wishlistItems.imageUrl,
+        ownerId: wishlists.userId,
+      })
+      .from(wishlistItems)
+      .innerJoin(wishlists, eq(wishlistItems.wishlistId, wishlists.id))
+      .where(eq(wishlistItems.id, itemId))
+      .limit(1)
+      .then((r) => r[0] ?? null);
+
+    if (!row || row.ownerId !== userId) {
+      return { status: "error", code: "item-not-found" };
+    }
+
+    if (row.imageUrl && row.imageUrl !== localImageUrl) {
+      void deleteImageFile(row.imageUrl);
+    }
+
+    await db
+      .update(wishlistItems)
+      .set({ imageUrl: localImageUrl, updatedAt: new Date() })
       .where(eq(wishlistItems.id, itemId));
 
     return { status: "success" };

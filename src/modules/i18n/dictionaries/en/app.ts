@@ -248,6 +248,10 @@ export const app = {
       url: "Optional. Add a product link if you already have one.",
       price: "Optional. Enter a whole number, e.g. 1990.",
     },
+    fillFromUrl: {
+      label: "Fill from URL",
+      noResult: "Could not read product info from this URL.",
+    },
     image: {
       uploadLabel: "Add photo",
       changeLabel: "Replace",

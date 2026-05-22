@@ -7,6 +7,12 @@ The format is based on Keep a Changelog, and this project follows SemVer.
 ## [Unreleased]
 
 ### Added
+- Marketplace auto-fill: owner can paste a product URL and click «Заполнить»
+  to auto-populate title, price, currency, and image for a wish item.
+  Wildberries uses the public `card.wb.ru` JSON API (reliable); Ozon, eBay,
+  AliExpress, and other sites use server-side fetch + OG / JSON-LD parsing
+  (best-effort). Short URLs (`ozon.ru/t/xxx`) are resolved via HTTP redirect.
+  Image is downloaded and stored on VPS (same `/uploads` flow as M11-I3).
 - QR code for share links: QR button in the share URL row opens a modal with
   a scannable code; owner can download it as PNG. Browser-side only via
   `qrcode.react`; no backend changes.

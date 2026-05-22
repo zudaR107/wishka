@@ -87,7 +87,8 @@ export async function createItemAction(
   const user = await requireCurrentUser();
   const wishlistId = getString(formData, "wishlistId");
   const starred = formData.get("starred") === "true";
-  const result = await createCurrentWishlistItem(user.id, wishlistId, values, starred);
+  const autofillImageUrl = getString(formData, "autofillImageUrl") || undefined;
+  const result = await createCurrentWishlistItem(user.id, wishlistId, values, starred, autofillImageUrl);
 
   if (result.status === "success") {
     return { status: "success", key: (prev?.key ?? 0) + 1 };

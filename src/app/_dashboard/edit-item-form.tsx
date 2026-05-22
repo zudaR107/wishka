@@ -10,6 +10,7 @@ import { updateItemAction, type ItemFormState } from "./item-actions";
 import { useItemEditClose } from "./item-edit-section";
 import { scrollAndHighlight } from "./scroll-utils";
 import { ItemImageUpload } from "./item-image-upload";
+import { FillFromUrlButton } from "./fill-from-url-button";
 
 type EditItemFormProps = {
   item: {
@@ -39,6 +40,9 @@ export function EditItemForm({ item, wishlistId, onImageChange, onOpenPicker }: 
   const [state, action] = useActionState<ItemFormState, FormData>(updateItemAction, null);
   const closeEditSection = useItemEditClose();
   const [currency, setCurrency] = useState<CurrencyCode>(item.currency);
+  // Auto-fill state: price is re-mounted with new defaultValue via fillKey.
+  const [fillKey, setFillKey] = useState(0);
+  const [fillPrice, setFillPrice] = useState<string>("");
 
   const v = state?.values;
   const err = state?.status === "error" ? state.error : undefined;
@@ -84,8 +88,30 @@ export function EditItemForm({ item, wishlistId, onImageChange, onOpenPicker }: 
       return;
     }
     setCurrency(item.currency);
+    setFillPrice("");
     formRef.current?.reset();
   }, [item.updatedAt]);
+
+  function handleFillResult(data: {
+    title?: string;
+    price?: number;
+    currency?: string;
+    imageUrl?: string;
+  }) {
+    if (data.title && titleRef.current) {
+      titleRef.current.value = data.title;
+    }
+    if (data.price !== undefined) {
+      setFillPrice(String(Math.round(data.price)));
+      setFillKey((k) => k + 1);
+    }
+    if (data.currency) {
+      setCurrency(data.currency as CurrencyCode);
+    }
+    if (data.imageUrl) {
+      onImageChange(data.imageUrl);
+    }
+  }
 
   return (
     <form ref={formRef} action={action} className="ui-form" style={{ maxWidth: "none" }} noValidate>
@@ -125,6 +151,12 @@ export function EditItemForm({ item, wishlistId, onImageChange, onOpenPicker }: 
         ) : (
           <p className="ui-note">{messages.dashboard.hints.url}</p>
         )}
+        <FillFromUrlButton
+          getUrl={() => urlRef.current?.value ?? ""}
+          itemId={item.id}
+          onResult={handleFillResult}
+          labels={messages.dashboard.fillFromUrl}
+        />
       </div>
       <div className="ui-field">
         <label className="ui-label" htmlFor={`note-${item.id}`}>
@@ -147,9 +179,10 @@ export function EditItemForm({ item, wishlistId, onImageChange, onOpenPicker }: 
           style={{ display: "flex", gap: "var(--space-2)", alignItems: "flex-start" }}
         >
           <PriceInput
+            key={fillKey}
             id={`price-${item.id}`}
             name="price"
-            defaultValue={v?.price ?? item.priceFormatted}
+            defaultValue={v?.price ?? (fillKey > 0 ? fillPrice : item.priceFormatted)}
             className="ui-input"
             error={err === "invalid-price"}
             currency={currency}

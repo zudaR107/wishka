@@ -424,6 +424,54 @@
     cursor: pointer;
   }
 
+  /* ── Auto-fill image preview (create form) ────────────── */
+  .autofill-image-preview {
+    margin-top: var(--space-2);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    width: fit-content;
+    border: 1px solid var(--color-border-soft);
+  }
+
+  .autofill-image-preview-img {
+    display: block;
+    max-width: 160px;
+    max-height: 160px;
+    object-fit: cover;
+  }
+
+  /* ── Fill from URL button ─────────────────────────────── */
+  .fill-from-url {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+  }
+
+  .fill-from-url-btn {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.8125rem;
+    padding: var(--space-1) var(--space-3);
+  }
+
+  .fill-from-url-spinner {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: image-picker-spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  .fill-from-url-error {
+    margin: 0;
+  }
+
   /* ── Item image upload widget (edit form) ─────────────── */
   .item-image-upload {
     display: flex;
